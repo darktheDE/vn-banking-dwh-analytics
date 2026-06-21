@@ -1,0 +1,28 @@
+# Environment & Secrets
+.env
+*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files (raw/processed data is not committed to git)
+data/raw/
+data/processed/
+data/external/
+
+# Model artifacts
+reports/models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
