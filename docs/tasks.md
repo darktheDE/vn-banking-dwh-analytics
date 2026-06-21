@@ -25,9 +25,9 @@
 ---
 
 ## Track B — Data Engineering (ETL + DWH)
-*Owner: Member 1 (ETL) and Member 2 (BigQuery). Depends on A-01 through A-06.*
+*Owner: Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng. Depends on A-01 through A-06.*
 
-### B-1: BigQuery Schema Provisioning (Member 2)
+### B-1: BigQuery Schema Provisioning (Nguyễn Đặng Quốc Anh)
 
 - `[ ]` **B-01**: Create the BigQuery Dataset using the `BQ_DATASET_ID` from `.env`.
   - *File*: `sql/bigquery_schema.sql`
@@ -37,7 +37,7 @@
 - `[ ]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
   - *Verification*: All 6 tables exist. `fact_intraday_matching` and `fact_price_history` have DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
 
-### B-2: Dimension Population (Member 1 or 2)
+### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
 
 - `[ ]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
   - *File*: `src/etl/populate_dim_date.py`
@@ -51,7 +51,7 @@
 - `[ ]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
   - *Verification*: 4 rows in table.
 
-### B-3: Fact Table ETL — Stock Data (Member 1)
+### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
 - `[ ]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
   - *File*: `src/etl/load_price_history.py`
@@ -71,7 +71,7 @@
   - *Rules*: `docs/etl-spec.md` Section 3.5. Session classification must be applied.
   - *Verification*: Row count ≈ 10,000. No ticks outside valid HOSE hours. `cumulative_volume` is monotonically non-decreasing.
 
-### B-4: Fact Table ETL — Bank Data (Member 1)
+### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
 - `[ ]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
   - *File*: `src/etl/load_bank_performance.py`
@@ -88,7 +88,7 @@
 
 ---
 
-## Track C — Machine Learning (Member 3)
+## Track C — Machine Learning (Phạm Minh Quân & Nguyễn Đặng Quốc Anh)
 *Depends on B-08 through B-13 being complete.*
 
 ### C-1: Feature Engineering
@@ -135,7 +135,7 @@
 
 ---
 
-## Track D — Business Intelligence (Member 4)
+## Track D — Business Intelligence (Đỗ Kiến Hưng & Phạm Minh Quân)
 *Depends on C-05, C-08, and C-12 being complete.*
 
 - `[ ]` **D-01**: Connect Looker Studio to the BigQuery Dataset using the Native Connector.

@@ -6,8 +6,8 @@ This directory contains all production-quality Python source code for the Financ
 
 | Directory | Owner | Description |
 |-----------|-------|-------------|
-| `etl/` | Member 1 & 2 | ETL scripts: Extract from Excel, Transform and clean, Load to BigQuery |
-| `models/` | Member 3 | Feature engineering, model training, inference, and BigQuery write-back |
+| `etl/` | Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng | ETL scripts: Extract from Excel, Transform and clean, Load to BigQuery |
+| `models/` | Phạm Minh Quân & Nguyễn Đặng Quốc Anh | Feature engineering, model training, inference, and BigQuery write-back |
 | `utils/` | All | Shared utilities: BigQuery client, logger, config loader |
 
 ## Module Usage

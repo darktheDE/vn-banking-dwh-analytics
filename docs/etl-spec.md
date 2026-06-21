@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This document specifies the exact Extract, Transform, and Load logic for each of the 7 source Excel files. It serves as the authoritative implementation contract for the Data Engineering role (Member 1 and Member 2). All Python ETL scripts in `src/etl/` must conform to these rules.
+This document specifies the exact Extract, Transform, and Load logic for each of the 7 source Excel files. It serves as the authoritative implementation contract for the Data Engineering role (Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng). All Python ETL scripts in `src/etl/` must conform to these rules.
 
 **Execution Model**: Scheduled Batch Jobs. Stock data runs End-of-Day (EOD). Bank financial data runs Quarterly, aligned with official bank reporting cycles.
 

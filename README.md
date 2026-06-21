@@ -296,12 +296,12 @@ vn-banking-dwh-analytics/
 
 The project is executed under a **concurrent, role-based strategy** across 4 parallel tracks:
 
-| Member | Role | Responsibilities |
-|--------|------|-----------------|
-| **Member 1** | Data Engineering | EDA, raw data extraction, missing value handling, feature normalization |
-| **Member 2** | Data Warehousing | Star Schema design, BigQuery provisioning, ETL pipeline, data integrity validation |
-| **Member 3** | ML Engineering | LSTM, K-Means, Random Forest training, hyperparameter optimization, BigQuery write-back |
-| **Member 4** | BI and Analytics | Looker Studio dashboards, business insight interpretation, final report |
+| Name | Role | Responsibilities |
+|------|------|------------------|
+| **Trần Minh Khánh** | Data Analysis + Data Warehouse | EDA, raw data extraction, missing value handling, feature normalization |
+| **Nguyễn Đặng Quốc Anh** | Data Processing + Project Owner + Machine Learning | ETL pipeline, data cleaning and transformation, BigQuery load |
+| **Phạm Minh Quân** | Machine Learning + Business Analysis + Data Analysis | LSTM, K-Means, Random Forest training, hyperparameter optimization, BigQuery write-back |
+| **Đỗ Kiến Hưng** | Data Warehouse + Project Manager + Data Processing | Star Schema design, BigQuery provisioning, data integrity validation, Looker Studio dashboards |
 
 ---
 
@@ -394,11 +394,11 @@ python -m src.models.train_random_forest   # Train RF; risk labels → BigQuery
 |----------|---------|----------|
 | [`docs/proposal.md`](docs/proposal.md) | Academic research proposal | Academic committee |
 | [`docs/prd.md`](docs/prd.md) | Full functional and non-functional requirements | All members |
-| [`docs/star-schema.md`](docs/star-schema.md) | DWH schema — field types, relationships, BigQuery optimizations | Member 2 |
-| [`docs/etl-spec.md`](docs/etl-spec.md) | Per-file ETL column mappings and transformation rules | Member 1 & 2 |
+| [`docs/star-schema.md`](docs/star-schema.md) | DWH schema — field types, relationships, BigQuery optimizations | Đỗ Kiến Hưng |
+| [`docs/etl-spec.md`](docs/etl-spec.md) | Per-file ETL column mappings and transformation rules | Trần Minh Khánh & Nguyễn Đặng Quốc Anh |
 | [`docs/data-dictionary.md`](docs/data-dictionary.md) | Variable definitions and data quality rules | All members |
-| [`docs/ml-spec.md`](docs/ml-spec.md) | ML architecture, hyperparameters, and acceptance criteria | Member 3 |
-| [`docs/dashboard-spec.md`](docs/dashboard-spec.md) | Looker Studio chart-level acceptance criteria | Member 4 |
+| [`docs/ml-spec.md`](docs/ml-spec.md) | ML architecture, hyperparameters, and acceptance criteria | Phạm Minh Quân |
+| [`docs/dashboard-spec.md`](docs/dashboard-spec.md) | Looker Studio chart-level acceptance criteria | Đỗ Kiến Hưng |
 | [`docs/system-arch.md`](docs/system-arch.md) | System architecture and data flow diagram | All members |
 | [`docs/tasks.md`](docs/tasks.md) | Atomic SDD task checklist with verification criteria | All members |
 | [`docs/master-plan.md`](docs/master-plan.md) | Concurrent execution tracks and team structure | All members |

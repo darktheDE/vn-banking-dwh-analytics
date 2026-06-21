@@ -226,9 +226,9 @@ if missing:
 ```
 main                ← Production-ready code only
 ├── develop         ← Integration branch — all features merge here first
-│   ├── feature/etl-price-history     ← Member 1/2 feature branches
-│   ├── feature/lstm-training         ← Member 3 feature branches
-│   └── feature/dashboard-risk-page   ← Member 4 feature branches
+│   ├── feature/etl-price-history     ← Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng feature branches
+│   ├── feature/lstm-training         ← Phạm Minh Quân & Nguyễn Đặng Quốc Anh feature branches
+│   └── feature/dashboard-risk-page   ← Đỗ Kiến Hưng & Phạm Minh Quân feature branches
 ```
 
 ### 5.2 Branch Naming Convention

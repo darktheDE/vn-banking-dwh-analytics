@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This document defines the acceptance criteria for the Looker Studio interactive dashboard. It serves as the authoritative implementation contract for the Business Intelligence role (Member 4). Every chart, filter, and metric listed here is a verifiable deliverable.
+This document defines the acceptance criteria for the Looker Studio interactive dashboard. It serves as the authoritative implementation contract for the Business Intelligence role (Đỗ Kiến Hưng & Phạm Minh Quân). Every chart, filter, and metric listed here is a verifiable deliverable.
 
 **Data Connection**: Native BigQuery connector. No CSV exports are permitted.
 
