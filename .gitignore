@@ -26,3 +26,7 @@ reports/models/
 .vscode/
 .idea/
 *.swp
+
+# Data files exceptions
+data/*.zip
+
