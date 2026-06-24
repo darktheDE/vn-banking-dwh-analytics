@@ -13,7 +13,7 @@
   - *Verification*: `python --version` returns ≥ 3.9.
 - `[ ]` **A-02**: Install all dependencies from `requirements.txt` (`pip install -r requirements.txt`).
   - *Verification*: `pip list` shows `pandas`, `openpyxl`, `scikit-learn`, `tensorflow`, `google-cloud-bigquery`, `python-dotenv`.
-- `[ ]` **A-03**: Cloud Administrator creates a GCP Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles. Export the JSON key.
+- `[x]` **A-03**: Cloud Administrator creates a GCP Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles. Export the JSON key.
   - *Verification*: JSON key file is accessible locally.
 - `[ ]` **A-04**: All members configure `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON key.
   - *Verification*: `gcloud auth application-default print-access-token` succeeds.
