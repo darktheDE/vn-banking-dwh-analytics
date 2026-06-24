@@ -1,0 +1,220 @@
+report_type,item_id,item_vi,item_en
+balance_sheet,cash_and_precious_metals,"Tiền mặt, vàng bạc, đá quý",Cash and precious metals
+balance_sheet,fixed_assets,Tài sản cố định,Fixed assets
+balance_sheet,tangible_fixed_assets,Tài sản cố định hữu hình,Tangible fixed assets
+balance_sheet,cost,Nguyên giá TSCĐ hữu hình,Cost
+balance_sheet,accumulated_depreciation,Hao mòn TSCĐ hữu hình,Accumulated depreciation
+balance_sheet,finance_leased_assets,Tài sản cố định thuê tài chính,Finance leased assets
+balance_sheet,cost,Nguyên giá TSCĐ thuê tài chính,Cost
+balance_sheet,accumulated_depreciation,Hao mòn TSCĐ thuê tài chính,Accumulated depreciation
+balance_sheet,intangible_fixed_assets,Tài sản cố định vô hình,Intangible fixed assets
+balance_sheet,cost,Nguyên giá TSCĐ vô hình,Cost
+balance_sheet,accumulated_amortization,Hao mòn TSCĐ vô hình,Accumulated amortization
+balance_sheet,investment_properties,Bất động sản đầu tư,Investment properties
+balance_sheet,historical_cost,Nguyên giá bất động sản đầu tư,Historical cost
+balance_sheet,accumulated_depreciation,Hao mòn bất động sản đầu tư,Accumulated depreciation
+balance_sheet,investment_in_other_entities_and_long_term_investments,"Góp vốn, đầu tư dài hạn",Investment in other entities and long term investments
+balance_sheet,investment_in_subsidiaries,Đầu tư vào công ty con,Investment in subsidiaries
+balance_sheet,investment_in_associate_companies,Đầu tư vào công ty liên doanh,Investment in associate companies
+balance_sheet,other_long_term_investments,Đầu tư dài hạn khác,Other Long-term investments
+balance_sheet,provision_for_long_term_investments,Dự phòng giảm giá đầu tư dài hạn,Provision for long-term investments
+balance_sheet,total_assets,TỔNG TÀI SẢN,TOTAL ASSETS
+balance_sheet,total_liabilities,TỔNG NỢ PHẢI TRẢ,TOTAL LIABILITIES
+balance_sheet,owners_equity,VỐN CHỦ SỞ HỮU,OWNER'S EQUITY
+balance_sheet,charter_capital,Vốn điều lệ,Charter capital
+balance_sheet,capital_surplus,Thặng dư vốn cổ phần,Capital surplus
+balance_sheet,owners_other_capital,Vốn khác,Owner's other capital
+balance_sheet,treasury_shares,Cổ phiếu Quỹ,Treasury shares
+balance_sheet,difference_upon_assets_revaluation,Chênh lệch đánh giá lại tài sản,Difference upon assets revaluation
+balance_sheet,foreign_currency_difference_reserve,Chênh lệch tỷ giá hối đoái,Foreign currency difference reserve
+balance_sheet,retained_earnings,Lợi nhuận chưa phân phối,Retained Earnings
+balance_sheet,minority_interest_before_2015,Lợi ích của cổ đông thiểu số (trước 2015),Minority interest (Before 2015)
+balance_sheet,liabilities_and_shareholders_equity,NỢ PHẢI TRẢ VÀ VỐN CHỦ SỞ HỮU,LIABILITIES AND SHAREHOLDER'S EQUITY
+balance_sheet,balances_with_the_sbv,Tiền gửi tại Ngân hàng nhà nước Việt Nam,Balances with the SBV
+balance_sheet,placements_with_and_loans_to_other_credit_institutions,Tiền gửi tại các TCTD khác và cho vay các TCTD khác,Placements with and loans to other credit institutions
+balance_sheet,trading_securities_net,Chứng khoán kinh doanh,"Trading securities, net"
+balance_sheet,less_provision_for_diminution_in_value_of_trading_securities,Dự phòng giảm giá chứng khoán kinh doanh,Less: Provision for diminution in value of trading securities
+balance_sheet,derivatives_and_other_financial_assets,Các công cụ tài chính phái sinh và các tài sản tài chính khác,Derivatives and other financial assets
+balance_sheet,loans_and_advances_to_customers_net,Cho vay khách hàng,"Loans and advances to customers, net"
+balance_sheet,less_provision_for_losses_on_loans_and_advances_to_customers,Dự phòng rủi ro cho vay khách hàng,Less: Provision for losses on loans and advances to customers
+balance_sheet,investment_securities,Chứng khoán đầu tư,Investment securities
+balance_sheet,available_for_sales_securities,Chứng khoán đầu tư sẵn sàng để bán,Available-for-sales securities
+balance_sheet,held_to_maturity_securities,Chứng khoán đầu tư giữ đến ngày đáo hạn,Held-to-maturity securities
+balance_sheet,provision_for_diminution_in_value_of_investment_securities,Dự phòng giảm giá chứng khoán đầu tư,Provision for diminution in value of investment securities
+balance_sheet,other_assets,Tài sản Có khác,Other assets
+balance_sheet,due_to_gov_and_loans_from_sbv,Các khoản nợ chính phủ và NHNN Việt Nam,Due to Gov and Loans from SBV
+balance_sheet,deposits_and_loans_from_other_credit_institutions,Tiền gửi và vay các Tổ chức tín dụng khác,Deposits and Loans from other credit institutions
+balance_sheet,deposits_from_customers,Tiền gửi của khách hàng,Deposits from customers
+balance_sheet,derivatives_and_other_financial_liabilities,Các công cụ tài chính phái sinh và các khoản nợ tài chính khác,Derivatives and other financial liabilities
+balance_sheet,funds_received_from_gov_international_and_other_institutions,"Vốn tài trợ, uỷ thác đầu tư của Chính phủ và các tổ chức tín dụng khác","Funds received from Gov, international and other institutions"
+balance_sheet,convertible_bonds_cds_and_other_valuable_papers_issued,Phát hành giấy tờ có giá,Convertible bonds/CDs and other valuable papers issued
+balance_sheet,other_liabilities,Các khoản nợ khác,Other liabilities
+balance_sheet,capital,Vốn của tổ chức tín dụng,Capital
+balance_sheet,fund_for_basic_construction,Vốn đầu tư XDCB,Fund for basic construction
+balance_sheet,preferred_shares,Cổ phiếu ưu đãi,Preferred shares
+balance_sheet,reserves,Quỹ của tổ chức tín dụng,Reserves
+balance_sheet,other_guarantee,Bảo lãnh khác,Other guarantee
+balance_sheet,foreign_exchange_transactions_commitments,Cam kết giao dịch hối đoái,Foreign exchange transactions commitments
+balance_sheet,foreign_exchange_buying_commitments,Cam kết mua ngoại tệ,Foreign exchange buying commitments
+balance_sheet,foreign_exchange_selling_commitments,Cam kết bán ngoại tệ,Foreign exchange selling commitments
+balance_sheet,swap_commitments,Cam kết giao dịch hoán đổi,Swap commitments
+balance_sheet,future_commitments,Cam kết giao dịch tương lai,Future commitments
+balance_sheet,irrevocable_loan_commitments,Cam kết cho vay không hủy ngang,Irrevocable loan commitments
+balance_sheet,letters_of_credit_commitments,Cam kết trong nghiệp vụ L/C,Letters of credit commitments
+balance_sheet,other_commitments,Cam kết khác,Other commitments
+balance_sheet,minority_interest,Lợi ích của cổ đông thiểu số,Minority interest
+balance_sheet,balances_with_other_credit_institutions,Tiền gửi tại các TCTD khác,Balances with other credit institutions
+balance_sheet,loans_to_other_credit_institutions,Cho vay các TCTD khác,Loans to other credit institutions
+balance_sheet,allowance_for_balances_with_and_loans_to_other_credit_institutions,Dự phòng rủi ro,Allowance for balances with and loans to other credit institutions
+balance_sheet,debt_buying,Hoạt động mua nợ,Debt Buying
+balance_sheet,debt_buying,Mua nợ,Debt Buying
+balance_sheet,provision_for_losses_on_debt_buying,Dự phòng rủi ro hoạt động mua nợ,Provision for losses on debt buying
+balance_sheet,other_receivables,Các khoản phải thu,Other receivables
+balance_sheet,accrued_interest_and_fee_receivables,Các khoản lãi và phí phải thu,Accrued interest and fee receivables
+balance_sheet,deferred_tax_assets,Tài sản thuế TNDN hoãn lại,Deferred tax assets
+balance_sheet,in_which_goodwill,Trong đó: Lợi thế thương mại,In which: Goodwill
+balance_sheet,provision_for_other_assets,Các khoản dự phòng rủi ro cho các tài sản Có nội bảng khác,Provision for other assets
+balance_sheet,deposits_and_loans_from_other_credit_institutions,Tiền gửi của các tổ chức tín dụng khác,Deposits and Loans from other credit institutions
+balance_sheet,loans_from_other_credit_institutions,Vay các tổ chức tín dụng khác,Loans from other credit institutions
+balance_sheet,accrued_interest_and_fee_payables,"Các khoản lãi, phí phải trả",Accrued interest and fee payables
+balance_sheet,deferred_tax_liabilities,Thuế TNDN hoãn lại phải trả,Deferred tax liabilities
+balance_sheet,other_liabilities,Các khoản phải trả và công nợ khác,Other liabilities
+balance_sheet,allowance_for_other_liabilities,Dự phòng rủi ro khác,Allowance for other liabilities
+balance_sheet,investments_in_joint_venture,Vốn Góp liên doanh,Investments in joint-venture
+balance_sheet,investments_in_associates,Đầu tư vào công ty liên kết,Investments in associates
+income_statement,net_accounting_profit_loss_before_tax,Tổng lợi nhuận/lỗ trước thuế,Net Accounting Profit/(loss) before tax
+income_statement,business_income_tax_current,Chi phí thuế TNDN hiện hành,Business income tax - current
+income_statement,business_income_tax_deferred,Chi phí thuế TNDN hoãn lại,Business income tax - deferred
+income_statement,business_income_tax_expenses,Chi phí thuế thu nhập doanh nghiệp,Business income tax expenses
+income_statement,net_profit_loss_after_tax,Lợi nhuận sau thuế,Net profit/(loss) after tax
+income_statement,minority_interest,Lợi ích của cổ đông thiểu số,Minority interest
+income_statement,attributable_to_parent_company,Cổ đông của Công ty mẹ,Attributable to parent company
+income_statement,eps_basic_vnd,Lãi cơ bản trên cổ phiếu (VND),EPS basic (VND)
+income_statement,eps_diluted_vnd,Lãi trên cổ phiếu pha loãng (VND),EPS diluted (VND)
+income_statement,interest_and_similar_income,Thu nhập lãi và các khoản thu nhập tương tự,Interest and Similar Income
+income_statement,interest_and_similar_expenses,Chi phí lãi và các chi phí tương tự,Interest and Similar Expenses
+income_statement,net_interest_income,Thu nhập lãi thuần,Net Interest Income
+income_statement,fees_and_commission_income,Thu nhập từ dịch vụ,Fees and Commission Income
+income_statement,fees_and_commission_expenses,Chi phí dịch vụ,Fees and Commission Expenses
+income_statement,net_fee_and_commission_income,Lãi/Lỗ thuần từ hoạt động dịch vụ,Net Fee and Commission Income
+income_statement,net_gain_loss_from_foreign_currency_and_gold_dealings,Lãi/(lỗ) thuần từ hoạt động kinh doanh ngoại hối và vàng,Net gain/(loss) from foreign currency and gold dealings
+income_statement,net_gain_loss_from_trading_of_trading_securities,Lãi/(lỗ) thuần từ mua bán chứng khoán kinh doanh,Net gain/(loss) from trading of trading securities
+income_statement,net_gain_loss_from_disposal_of_investment_securities,Lãi/(lỗ) thuần từ mua bán chứng khoán đầu tư,Net gain/(loss) from disposal of investment securities
+income_statement,other_income,Thu nhập khác,Other Income
+income_statement,other_expenses,Chi phí khác,Other Expenses
+income_statement,net_other_income_expenses,Lãi/(lỗ) thuần từ hoạt động khác,Net Other income/expenses
+income_statement,dividends_income,Thu nhập từ cổ tức,Dividends Income
+income_statement,total_operating_income,Tổng thu nhập hoạt động,Total Operating Income
+income_statement,general_and_admin_expenses,Chi phí quản lý doanh nghiệp,General and Admin Expenses
+income_statement,net_operating_profit_before_allowance_for_credit_loss,Lợi nhuận thuần hoạt động trước khi trích lập dự phòng tổn thất tín dụng,Net Operating Profit Before Allowance for Credit Loss
+income_statement,provision_for_credit_losses,Trích lập dự phòng tổn thất tín dụng,Provision for Credit Losses
+cash_flow,operating_profit_loss_before_changes_in_working_capital,Lưu chuyển tiền thuần từ hoạt động kinh doanh trước những thay đổi về tài sản và vốn lưu động,Operating profit/(loss) before changes in Working Capital
+cash_flow,corporate_income_tax_paid,Thuế thu nhập doanh nghiệp đã trả,Corporate income tax paid
+cash_flow,net_cash_from_operating_activities,Lưu chuyển tiền thuần từ các hoạt động sản xuất kinh doanh,Net cash from operating activities
+cash_flow,purchases_of_fixed_assets_and_other_long_term_assets,Mua sắm TSCĐ,Purchases of fixed assets and other long term assets
+cash_flow,proceeds_from_disposal_of_fixed_assets,"Tiền thu được từ thanh lý, nhượng bán tài sản cố định",Proceeds from disposal of fixed assets
+cash_flow,investments_in_other_entities,"Tiền chi đầu tư, góp vốn vào các đơn vị khác",Investments in other entities
+cash_flow,proceeds_from_divestment_in_other_entities,"Tiền thu từ đầu tư, góp vốn vào các đơn vị khác",Proceeds from divestment in other entities
+cash_flow,dividends_and_interest_received,Tiền thu cổ tức và lợi nhuận được chia từ các khoản đầu tư góp vốn dài hạn,Dividends and interest received
+cash_flow,net_cash_from_investing_activities,Lưu chuyển tiền thuần từ hoạt động đầu tư,Net cash from investing activities
+cash_flow,proceeds_from_issue_of_shares,Tăng vốn cổ phần từ góp vốn và/hoặc phát hành cổ phiếu,Proceeds from issue of shares
+cash_flow,dividends_paid,"Cổ tức trả cho cổ đông, lợi nhuận đã chia",Dividends paid
+cash_flow,net_increase_decrease_in_cash_and_cash_equivalents,Lưu chuyển tiền thuần trong kỳ,Net Increase/(Decrease) in cash and cash equivalents
+cash_flow,cash_and_cash_equivalents_at_the_beginning_of_period,Tiền và các khoản tương đương tiền tài thời điểm đầu kỳ,Cash and cash equivalents at the beginning of period
+cash_flow,effect_of_foreign_exchange_differences,Điều chỉnh ảnh hưởng của thay đổi tỷ giá,Effect of foreign exchange differences
+cash_flow,cash_and_cash_equivalents_at_end_of_the_period,Tiền và các khoản tương đương tiền tại thời điểm cuối kỳ,Cash and cash equivalents at end of the period
+cash_flow,payments_for_corporate_income_tax,Tiền thuế thu nhập thực nộp trong kỳ,Payments for corporate income tax
+cash_flow,increase_decrease_in_compulsory_reserves_with_the_sbv,Tiền gửi tại NHNN,(Increase)/decrease in compulsory reserves with the SBV
+cash_flow,increase_decrease_in_placements_with_and_loans_to_other_credit_institutions,Tăng/giảm các khoản tiền gửi và cho vay các tổ chức tín dụng khác,Increase/(decrease) in placements with and loans to other credit institutions
+cash_flow,increase_decrease_in_trading_securities,Tăng/giảm các khoản về kinh doanh chứng khoán,Increase/(decrease) in trading securities
+cash_flow,increase_decrease_in_derivatives_and_other_financial_assets,Tăng/giảm các công cụ tài chính phái sinh và các tài sản tài chính khác,Increase/(decrease) in derivatives and other financial assets
+cash_flow,increase_decrease_in_loans_and_advances_to_customers,Tăng/giảm các khoản cho vay khách hàng,Increase/(decrease) in loans and advances to customers
+cash_flow,increase_decrease_in_interest_receivable,"(Tăng)/Giảm lãi, phí phải thu",(Increase)/decrease in interest receivable
+cash_flow,increase_decrease_in_provision_for_loan_losses,Tăng/giảm nguồn dự phòng để bù đắp tổn thất các khoản,Increase/(decrease) in provision for loan losses
+cash_flow,increase_decrease_in_other_operating_assets,Tăng/giảm khác về tài sản hoạt động,Increase/(decrease) in other operating assets
+cash_flow,increase_decrease_in_loans_from_the_state_and_sbv,Tăng/(Giảm) các khoản nợ chính phủ và NHNN,Increase/(decrease) in Loans from the State and SBV
+cash_flow,increase_decrease_in_placements_and_loans_from_other_credit_institutions,Tăng/(Giảm) các khoản tiền gửi và vay các TCTD khác,Increase/(decrease) in placements and Loans from other credit institutions
+cash_flow,increase_decrease_in_deposits_from_customers,Tăng/(Giảm) tiền gửi của khách hàng,Increase/(decrease) in deposits from customers
+cash_flow,increase_decrease_in_derivatives_and_other_financial_liabilities,Tăng/(Giảm) các công cụ tài chính phái sinh và các khoản nợ tài chính khác,Increase/(decrease) in derivatives and other financial liabilities
+cash_flow,increase_decrease_in_funds_received_from_gov_international_and_other_institutions,"Tăng/(Giảm) vốn tài trợ, uỷ thác đầu tư của chính phủ và các TCTD khác","Increase/(decrease) in funds received from Gov, international and other institutions"
+cash_flow,increase_decrease_in_valuable_papers_issued,Tăng/(Giảm) phát hành giấy tờ có giá,Increase/(decrease) in valuable papers issued
+cash_flow,increase_decrease_in_accrued_interest_expenses,"Tăng/(Giảm) lãi, phí phải trả",Increase/(decrease) in accrued interest expenses
+cash_flow,increase_decrease_in_other_operating_liabilities,Tăng/(Giảm) khác về công nợ hoạt động,Increase/(decrease) in other operating liabilities
+cash_flow,net_cash_flows_from_operating_activities_before_cit,Lưu chuyển tiền thuần từ hoạt động kinh doanh trước thuế thu nhập DN,Net cash flows from operating activities before CIT
+cash_flow,payment_from_reserves,Chi từ các quỹ của TCTD,Payment from reserves
+cash_flow,bad_debt_recoveries,Thu được từ nợ khó đòi,Bad debt recoveries
+cash_flow,payments_on_disposal_of_fixed_assets,"Tiền chi từ thanh lý, nhượng bán TSCĐ",Payments on disposal of fixed assets
+cash_flow,purchases_of_investment_properties,Mua sắm Bất động sản đầu tư,Purchases of investment properties
+cash_flow,proceeds_from_disposal_of_investment_properties,"Tiền thu từ bán, thanh lý bất động sản đầu tư",Proceeds from disposal of investment properties
+cash_flow,payments_on_disposal_of_investment_properties,"Tiền chi ra do bán, thanh lý bất động sản đầu tư",Payments on disposal of investment properties
+cash_flow,proceeds_from_issuance_of_convertible_bonds,Tiền thu từ phát hành giấy tờ có giá dài hạn đủ điều kiện tính vào vốn tự có và các khoản vốn vay dài hạn khác,Proceeds from issuance of convertible bonds
+cash_flow,payments_for_redemption_of_convertible_bonds,Tiền chi thanh toán giấy tờ có giá dài hạn đủ điều kiện tính vào vốn tự có và các khoản vốn vay dài hạn khác,Payments for redemption of convertible bonds
+cash_flow,purchase_of_treasury_shares,Tiền chi ra mua cổ phiếu quỹ,Purchase of treasury shares
+cash_flow,proceeds_from_selling_of_treasury_shares,Tiền thu được do bán cổ phiếu quỹ,Proceeds from selling of treasury shares
+cash_flow,interest_and_similar_receipts,Thu nhập lãi và các khoản thu nhập tương tự nhận được,Interest and similar receipts
+cash_flow,interest_and_similar_payments,Chi phí lãi và các chi phí tương tự đã trả,Interest and similar payments
+cash_flow,fees_and_commission_income_received,Thu nhập từ hoạt động dịch vụ nhận được,Fees and commission income received
+cash_flow,net_receipts_from_dealing_of_foreign_currencies_gold,Thu nhập thuần từ hoạt động kinh doanh ngoại hối và vàng,"Net receipts from dealing of foreign currencies, gold"
+cash_flow,net_receipts_from_dealing_of_securities,Thu nhập từ hoạt động kinh doanh chứng khoán,Net receipts from dealing of securities
+cash_flow,other_operating_income,Thu nhập khác,Other operating income
+cash_flow,payments_to_employees_and_other_operating_expenses,"Tiền chi trả cho nhân viên và hoạt động quản lý, cộng cụ",Payments to employees and other operating expenses
+cash_flow,receipts_from_debts_written_off_or_paid_off_by_risk_fund,"Tiền thu các khoản nợ đã được xử lý, xóa, bù đắp bằng nguồn rủi ro",Receipts from debts written off or paid off by risk fund
+cash_flow,net_receipts_from_foreign_currencies_gold_and_securities_trading,Chênh lệch số tiền thực thu/thực chi từ hoạt động kinh doanh,"Net receipts from foreign currencies, gold and securities trading"
+ratios,report_period,Kỳ báo cáo,report_period
+ratios,year,Năm,
+ratios,quarter,Quý,
+ratios,ratioTTMId,Mã TTM,Ratio TTM Id
+ratios,ratioType,Loại tỷ lệ,Ratio Type
+ratios,numberOfSharesMktCap,Số CP lưu hành (triệu),Outstanding Shares (mil)
+ratios,marketCap,Vốn hóa,Market Cap
+ratios,dividendYield,Tỷ suất cổ tức (%),Dividend Yield (%)
+ratios,pe,P/E,P/E
+ratios,pb,P/B,P/B
+ratios,ps,P/S,P/S
+ratios,priceToCashFlow,Giá/ Dòng tiền,Price/Cash Flow
+ratios,evToEbitda,EV/EBITDA,EV/EBITDA
+ratios,cashRatio,Hệ số thanh toán tiền,Cash Ratio
+ratios,quickRatio,Hệ số thanh toán nhanh,Quick Ratio
+ratios,currentRatio,Hệ số thanh toán hiện hành,Current Ratio
+ratios,ownersEquity,Vốn chủ sở hữu,Owners Equity
+ratios,debtPerEquity,Nợ/Vốn chủ,Debt/Equity
+ratios,debtToEquity,Nợ trên vốn chủ,Debt to Equity
+ratios,roe,ROE (%),ROE (%)
+ratios,roa,ROA (%),ROA (%)
+ratios,daySaleOutstanding,Số ngày phải thu,Days Sales Outstanding
+ratios,daysInventoryOutstanding,Số ngày tồn kho,Days Inventory Outstanding
+ratios,daysPayableOutstanding,Số ngày phải trả,Days Payable Outstanding
+ratios,grossMargin,Biên LN gộp (%),Gross Margin (%)
+ratios,ebitMargin,Biên EBIT (%),EBIT Margin (%)
+ratios,preTaxProfitMargin,Biên LN trước thuế (%),Pre-tax Profit Margin (%)
+ratios,afterTaxProfitMargin,Biên LN sau thuế (%),After-tax Profit Margin (%)
+ratios,assetTurnover,Vòng quay tài sản,Asset Turnover
+ratios,netInterestMargin,Biên lãi thuần,Net Interest Margin
+ratios,averageYieldOnEarningAssets,Lãi suất bình quân tài sản sinh lãi,Avg Yield on Earning Assets
+ratios,averageCostOfFinancing,Chi phí vốn bình quân,Avg Cost of Financing
+ratios,nonAndInterestIncome,Thu nhập ngoài lãi,Non-interest Income
+ratios,costToIncome,Tỷ lệ CIR,Cost/Income Ratio
+ratios,loansGrowth,Tăng trưởng cho vay (%),Loans Growth (%)
+ratios,depositGrowth,Tăng trưởng tiền gửi (%),Deposit Growth (%)
+ratios,equityToLiabilities,Vốn chủ/Tổng nợ,Equity/Total Liabilities
+ratios,equityToLoans,Vốn chủ/Cho vay,Equity/Loans
+ratios,totalEquityTotalAsset,Vốn chủ/Tổng tài sản,Equity/Total Assets
+ratios,ldrLoanDepositRatio,LDR (%),LDR (%)
+ratios,npl,Nợ xấu (%),NPL (%)
+ratios,loansLossReservesToNPLs,DP rủi ro/Nợ xấu,Loan Loss Reserves/NPLs
+ratios,loansLossReserveToLoans,DP rủi ro/Cho vay,Loan Loss Reserve/Loans
+ratios,provisionToOutstandingLoans,Trích lập DP/Cho vay,Provision/Outstanding Loans
+ratios,ebit,EBIT,EBIT
+ratios,ebitda,EBITDA,EBITDA
+ratios,roic,ROIC,ROIC
+ratios,cashCycle,Chu kỳ tiền,Cash Cycle
+ratios,fixedAssetTurnover,Vòng quay TS cố định,Fixed Asset Turnover
+ratios,financialLeverage,Đòn bẩy tài chính,Financial Leverage
+ratios,cir,CIR,CIR
+ratios,car,CAR,CAR
+ratios,casaRatio,Tỷ lệ CASA,CASA Ratio
+ratios,tien_gui_khong_ky_han,Tiền gửi không kỳ hạn,
+ratios,tien_gui_ky_quy,Tiền gửi ký quỹ,
+ratios,tien_gui_cho_nhung_muc_dich_rieng_biet,Tiền gửi mục đích riêng biệt,
+ratios,tien_gui_cua_khach_hang,Tiền gửi khách hàng,
+ratios,ratioYearId,Mã năm tỷ lệ,Ratio Year Id
