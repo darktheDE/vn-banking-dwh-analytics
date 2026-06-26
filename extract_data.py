@@ -14,7 +14,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), 'data', 'processed')
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # Danh sách các mã cổ phiếu cần tải dữ liệu
-SYMBOLS = ['BID', 'TCB']
+SYMBOLS = ['BID', 'TCB', 'VCB']
 
 print("==================================================================")
 print("   BẮT ĐẦU QUÁ TRÌNH TRÍCH XUẤT DỮ LIỆU NGÂN HÀNG (BID - TCB)")
