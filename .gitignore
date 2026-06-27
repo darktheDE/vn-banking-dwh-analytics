@@ -16,8 +16,8 @@ env/
 
 # Data files (raw/processed data is not committed to git)
 data/raw/
-data/processed/
 data/external/
+
 
 # Model artifacts
 reports/models/
