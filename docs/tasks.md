@@ -96,41 +96,41 @@
 - `[ ]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
   - *File*: `src/models/feature_engineering_stock.py`
   - *Verification*: DataFrame has 22 rows, all columns from `docs/data-dictionary.md` Section 4 (derived features included).
-- `[ ]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
+- `[x]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
   - *File*: `src/models/feature_engineering_bank.py`
   - *Verification*: Scaled DataFrame has mean ≈ 0 and std ≈ 1 for all numeric columns.
 
 ### C-2: LSTM Time Series Forecasting
 
-- `[ ]` **C-03**: Establish ARIMA and Moving Average baselines for BID `close_price`. Log RMSE.
+- `[x]` **C-03**: Establish ARIMA and Moving Average baselines for BID `close_price`. Log RMSE.
   - *File*: `notebooks/03_ML_TimeSeries.ipynb` or `src/models/baseline_arima.py`
-- `[ ]` **C-04**: Build and train the LSTM model on valid trading days only (no weekend data).
+- `[x]` **C-04**: Build and train the LSTM model on valid trading days only (no weekend data).
   - *File*: `src/models/train_lstm.py`
   - *Architecture*: Per `docs/ml-spec.md` Section 1. Use `MinMaxScaler` for sequence normalization.
   - *Verification*: RMSE and MAE logged. LSTM RMSE < ARIMA RMSE.
-- `[ ]` **C-05**: Generate T+1 to T+5 predictions. Write results to BigQuery table `fact_model_predictions` (or equivalent).
+- `[x]` **C-05**: Generate T+1 to T+5 predictions. Write results to BigQuery table `fact_model_predictions` (or equivalent).
   - *Verification*: Predictions table exists in BigQuery. Looker Studio can connect to it.
 
 ### C-3: K-Means Clustering with PCA
 
-- `[ ]` **C-06**: Apply PCA to the scaled bank feature matrix. Determine optimal number of components for ≥80% explained variance.
+- `[x]` **C-06**: Apply PCA to the scaled bank feature matrix. Determine optimal number of components for ≥80% explained variance.
   - *File*: `src/models/train_kmeans.py`
   - *Verification*: Cumulative explained variance plot logged. Component count documented.
-- `[ ]` **C-07**: Apply K-Means. Determine optimal `k` using the Elbow Method and Silhouette Analysis.
+- `[x]` **C-07**: Apply K-Means. Determine optimal `k` using the Elbow Method and Silhouette Analysis.
   - *Verification*: Elbow and Silhouette plots saved to `reports/figures/`.
-- `[ ]` **C-08**: Train final K-Means model. Compute Silhouette Score and Davies-Bouldin Index. Log both metrics.
+- `[x]` **C-08**: Train final K-Means model. Compute Silhouette Score and Davies-Bouldin Index. Log both metrics.
   - *Verification*: Both metrics logged. Cluster assignments written to BigQuery.
 
 ### C-4: Random Forest Classification
 
-- `[ ]` **C-09**: Establish Logistic Regression baseline for NPL ≥ 3% classification. Log AUC-ROC.
+- `[x]` **C-09**: Establish Logistic Regression baseline for NPL ≥ 3% classification. Log AUC-ROC.
   - *File*: `src/models/baseline_logistic.py`
-- `[ ]` **C-10**: Train Random Forest classifier. Apply time-based train/test split.
+- `[x]` **C-10**: Train Random Forest classifier. Apply time-based train/test split.
   - *File*: `src/models/train_random_forest.py`
   - *Verification*: AUC-ROC > 0.80. Recall for High Risk class ≥ 85%. Both metrics logged.
-- `[ ]` **C-11**: Extract and log Feature Importance. Save bar chart to `reports/figures/`.
+- `[x]` **C-11**: Extract and log Feature Importance. Save bar chart to `reports/figures/`.
   - *Verification*: Feature importance values written to log. Chart saved.
-- `[ ]` **C-12**: Write classification predictions and risk labels to BigQuery.
+- `[x]` **C-12**: Write classification predictions and risk labels to BigQuery.
   - *Verification*: Prediction table exists and is queryable.
 
 ---
