@@ -27,7 +27,7 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-ML_DATA_DIR = os.path.join(BASE_DIR, "data", "ML_data")
+ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
 FIGURES_DIR = os.path.join(ML_DATA_DIR, "figures")
 
 # Acceptance thresholds (theo AGENTS.md Section 4.3)
