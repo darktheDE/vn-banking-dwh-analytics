@@ -7,21 +7,42 @@ Dưới đây là tài liệu giải thích chi tiết ý nghĩa của từng fi
 ---
 
 ## 1. Dữ Liệu Đầu Vào (Input Data)
-Đây là các file được sinh ra từ script `data_loader.py`, dùng để nạp vào huấn luyện thuật toán.
+Thư mục `input/` chứa các file CSV được trích xuất và tiền xử lý bởi script `data_loader.py`. 
 
-*   **`banks_camels_46.csv`**: Bộ dữ liệu tài chính chuẩn xác của 45-46 ngân hàng thương mại Việt Nam (~667 dòng). Chứa các chỉ số CAMELS (như `npl_ratio`, `roa`, `roe`, `cir`...). Đây là **nguồn dữ liệu sống còn** để chạy mô hình K-Means (phân cụm ngân hàng) và Random Forest (dự đoán nợ xấu).
-*   **`bid_lstm_data.csv`**: Dữ liệu lịch sử giao dịch của mã cổ phiếu BID (hơn 3000 dòng). Đã được tích hợp các tính toán phái sinh (phần trăm thay đổi giá, khối lượng) để nạp vào mạng Neural Network LSTM dự báo chuỗi thời gian.
-*   **`banks_4_financial_ratios.csv`**: Dữ liệu bổ sung các chỉ số định giá tài chính (PE, PB, PS...) của 4 ngân hàng lớn nhất (BID, CTG, TCB, VCB) dùng để đối chiếu hoặc mở rộng cho việc phân tích chuyên sâu.
+**Tại sao phải tạo ra các file input này?**
+Thay vì kết nối trực tiếp vào Data Warehouse (BigQuery) vốn đòi hỏi cấu hình mạng phức tạp và tốn thời gian truy vấn, việc tạo ra các file CSV tĩnh ở Local giúp quá trình phát triển, kiểm thử, và tinh chỉnh mô hình Machine Learning diễn ra cực kỳ nhanh chóng, an toàn và hoàn toàn ngoại tuyến (offline). Môi trường `local` này mô phỏng lại chính xác luồng dữ liệu thật trên Cloud.
+
+**Chi tiết quá trình tạo và nội dung từng file:**
+
+*   **`banks_camels_46.csv`**:
+    *   *Được tạo như thế nào?* File được tổng hợp bằng cách gộp (merge) bảng hiệu suất `fact_bank_performance_clean` và thông tin `dim_bank_clean` của 46 ngân hàng. Script tự động xử lý các giá trị bị khuyết (ví dụ: `npl_ratio` bị thiếu) bằng phương pháp điền trung vị (median imputation) theo chuẩn kiến trúc hệ thống để đảm bảo không bị lỗi dữ liệu đầu vào.
+    *   *Nội dung:* Chứa các chỉ số sức khỏe tài chính cốt lõi (CAMELS) như `npl_ratio` (nợ xấu), `roa`, `roe`, `cir`. Đây là nguyên liệu chính yếu để thuật toán K-Means gom nhóm và Random Forest phân tích cảnh báo.
+
+*   **`bid_lstm_data.csv`**:
+    *   *Được tạo như thế nào?* Trích xuất từ lịch sử giao dịch gốc của mã chứng khoán BID. Script `data_loader.py` đã chủ động tính toán thêm các biến phái sinh vô cùng quan trọng như `% thay đổi giá` (price_change_pct) và `% thay đổi khối lượng` (volume_change_pct).
+    *   *Nội dung:* Gồm các cột OHLCV cùng các biến phái sinh. Việc tính biến phái sinh là vì mạng LSTM nhạy cảm với sự thay đổi (xu hướng) hơn là giá trị tuyệt đối. File này đã được chuẩn bị sẵn sàng để đưa vào hàm cắt "cửa sổ trượt" (sliding windows) 5 ngày ở bước train mô hình.
+
+*   **`banks_4_financial_ratios.csv`**:
+    *   *Được tạo như thế nào?* Đọc và nối (concat) dữ liệu các chỉ số tài chính riêng lẻ từ 4 ông lớn ngân hàng (BID, CTG, TCB, VCB).
+    *   *Nội dung:* Chứa các chỉ số định giá (PE, PB, PS...). Dùng làm dữ liệu tham chiếu bổ sung để làm giàu cho các báo cáo phân tích sâu (nếu cần thiết).
 
 ---
 
 ## 2. Kết Quả Dự Đoán (Output Data)
-Đây là các file CSV được các mô hình tự động sinh ra sau khi huấn luyện xong. Chúng là **kết quả** để đem lên làm Dashboard báo cáo.
+Thư mục `output/` chứa các file CSV được sinh tự động sau khi các thuật toán AI chạy xong. Đây chính là giá trị cốt lõi của dự án, nhằm **trực tiếp trả lời các câu hỏi nghiệp vụ (Business Questions)** của Ban lãnh đạo.
 
-*   **`kmeans_clusters_local.csv`**: Chứa danh sách các ngân hàng kèm theo **nhãn Cụm (Cluster)** mà mô hình K-Means vừa chia ra. Giúp ta biết ngân hàng nào đang nằm chung nhóm với ngân hàng nào dựa trên sức khỏe tài chính.
-*   **`rf_predictions_local.csv`**: Chứa kết quả dự đoán của Random Forest cho tập Test. Gồm nhãn thực tế (`Actual`) và nhãn mô hình dự đoán (`Predicted`) về việc ngân hàng có nguy cơ nợ xấu cao (High Risk) hay không.
-*   **`rf_feature_importance_local.csv`**: Bảng xếp hạng mức độ quan trọng của các chỉ số tài chính (Ví dụ: `llp_ratio`, `roe`...) ảnh hưởng đến nợ xấu ngân hàng.
-*   **`lstm_predictions_local.csv`**: Bảng dự báo giá đóng cửa của cổ phiếu BID trong 5 ngày tương lai tiếp theo (T+1 đến T+5).
+*   **`kmeans_clusters_local.csv`**: 
+    *   *Câu hỏi giải quyết:* "Trong 46 ngân hàng hiện nay, những ngân hàng nào đang có chung một mô hình kinh doanh hoặc cấu trúc rủi ro?"
+    *   *Nội dung:* Kết quả chia các ngân hàng thành các Cụm (Cluster). Nhờ đó, người quản lý có thể phân tích tương quan và so sánh một ngân hàng với các đối thủ cùng phân khúc.
+*   **`rf_predictions_local.csv`**: 
+    *   *Câu hỏi giải quyết:* "Ngân hàng nào đang đối mặt với nguy cơ nợ xấu (NPL) vượt ngưỡng báo động 3%?"
+    *   *Nội dung:* Bảng phân loại rủi ro (High Risk vs Healthy). Nó đóng vai trò như một hệ thống radar cảnh báo sớm rủi ro tín dụng của toàn ngành.
+*   **`rf_feature_importance_local.csv`**: 
+    *   *Câu hỏi giải quyết:* "Tại sao AI lại đánh giá ngân hàng này là rủi ro? Đâu là nguyên nhân gốc rễ?"
+    *   *Nội dung:* Bảng xếp hạng mức độ đóng góp của từng chỉ số vào kết quả dự đoán (Explainable AI). Qua đó ta sẽ biết liệu nợ xấu cao là do "tỷ lệ bao phủ nợ xấu (llp_ratio) thấp" hay do "chi phí hoạt động (cir) kém hiệu quả".
+*   **`lstm_predictions_local.csv`**: 
+    *   *Câu hỏi giải quyết:* "Xu hướng giá cổ phiếu đóng cửa của BID trong 5 ngày giao dịch tiếp theo sẽ như thế nào?"
+    *   *Nội dung:* Bảng kết quả giá dự phóng (T+1 đến T+5). Hỗ trợ nhà đầu tư hoặc phòng ban tự doanh ra quyết định mua/bán (trading) trong ngắn hạn.
 
 ---
 

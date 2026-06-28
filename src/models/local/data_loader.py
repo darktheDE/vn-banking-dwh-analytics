@@ -25,6 +25,7 @@ import numpy as np
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 PROCESSED_DIR = os.path.join(BASE_DIR, "data", "processed")
 ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
+INPUT_DIR = os.path.join(ML_DATA_DIR, "input")
 
 BANKS = ["bid", "ctg", "tcb", "vcb"]
 
@@ -38,6 +39,7 @@ CAMELS_FEATURES = [
 def ensure_ml_data_dir():
     """Tạo thư mục ML_data nếu chưa tồn tại."""
     os.makedirs(ML_DATA_DIR, exist_ok=True)
+    os.makedirs(INPUT_DIR, exist_ok=True)
 
 
 def process_and_export_bank_camels_data() -> str:
@@ -87,7 +89,7 @@ def process_and_export_bank_camels_data() -> str:
         print(f"[INFO] Imputed {npl_null_count} null npl_ratio values with median={median_val:.6f}")
 
     # --- Xuất file ---
-    out_path = os.path.join(ML_DATA_DIR, "banks_camels_46.csv")
+    out_path = os.path.join(INPUT_DIR, "banks_camels_46.csv")
     df_merged.to_csv(out_path, index=False)
     print(f"[INFO] Exported 46-bank CAMELS data to {out_path}")
     print(f"       Shape: {df_merged.shape}, NPL >= 3%: {(df_merged['npl_ratio'] >= 0.03).sum()} rows")
@@ -160,7 +162,7 @@ def process_and_export_stock_data() -> str:
         print(f"[INFO] Loaded proprietary trading data: {len(df_prop)} rows (reference only).")
 
     # --- Xuất file ---
-    out_path = os.path.join(ML_DATA_DIR, "bid_lstm_data.csv")
+    out_path = os.path.join(INPUT_DIR, "bid_lstm_data.csv")
     df.to_csv(out_path, index=False)
     print(f"[INFO] Exported BID LSTM data to {out_path}")
     print(f"       Shape: {df.shape}, Date range: {df['date'].min()} to {df['date'].max()}")
@@ -194,7 +196,7 @@ def process_and_export_4bank_financial_data() -> str:
 
     if all_banks:
         df_combined = pd.concat(all_banks, ignore_index=True)
-        out_path = os.path.join(ML_DATA_DIR, "banks_4_financial_ratios.csv")
+        out_path = os.path.join(INPUT_DIR, "banks_4_financial_ratios.csv")
         df_combined.to_csv(out_path, index=False)
         print(f"[INFO] Exported 4-bank financial ratios to {out_path}")
         print(f"       Shape: {df_combined.shape}")
