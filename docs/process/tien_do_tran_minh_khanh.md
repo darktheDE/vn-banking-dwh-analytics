@@ -12,19 +12,19 @@ Trần Minh Khánh chịu trách nhiệm chính về mảng **Data Engineering /
 
 | Mã Nhiệm Vụ | Mô Tả Nhiệm Vụ | File Code Liên Quan | Trạng Thái Hiện Tại | Ghi Chú |
 | :--- | :--- | :--- | :--- | :--- |
-| **Track A** | Thiết lập môi trường và cấu hình dự án | `.env` | **Chưa Hoàn Thành** | Phối hợp cùng toàn bộ thành viên nhóm để thiết lập `venv`, cấu hình `.env` và biến môi trường GCP. |
-| **B-04** | Điền dữ liệu cho bảng chiều `dim_date` | [populate_dim_date.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_date.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-05** | Điền dữ liệu cho bảng chiều `dim_stock` | [populate_dim_stock.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_stock.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-06** | Điền dữ liệu cho bảng chiều `dim_bank` | [populate_dim_bank.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_bank.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-07** | Điền dữ liệu cho bảng chiều `dim_trading_session` | [populate_dim_trading_session.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_trading_session.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-08** | ETL dữ liệu lịch sử giá cổ phiếu BID | [load_price_history.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_price_history.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-09** | ETL dữ liệu giao dịch khối ngoại cổ phiếu BID | [load_foreign_trading.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_foreign_trading.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-10** | ETL dữ liệu giao dịch tự doanh cổ phiếu BID | [load_proprietary_trading.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_proprietary_trading.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-11** | ETL dữ liệu thống kê đặt lệnh cổ phiếu BID | [load_order_stats.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_order_stats.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-12** | ETL dữ liệu khớp lệnh khớp tích tắc HPG | [load_intraday_matching.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_intraday_matching.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-13** | ETL dữ liệu báo cáo tài chính của 46 ngân hàng | [load_bank_performance.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_bank_performance.py) | **Hoàn thành 80% (Phần Transform)** | Đã triển khai hoàn chỉnh logic làm sạch và impute dữ liệu dưới dạng CSV, cần tích hợp phần tải lên BigQuery. |
-| **B-14** | Chạy kiểm tra tính toàn vẹn tham chiếu | [validate_integrity.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/validate_integrity.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
-| **B-15** | Kiểm tra chất lượng dữ liệu DQ-01 đến DQ-06 | [validate_integrity.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/validate_integrity.py) | **Chưa Bắt Đầu** | Mới có file mẫu (placeholder). |
+| **Track A** | Thiết lập môi trường và cấu hình dự án | `.env` | **Hoàn Thành** | Đã kích hoạt `venv`, cài đặt `requirements.txt` và cấu hình tệp tin `.env` chạy local. |
+| **B-04** | Điền dữ liệu cho bảng chiều `dim_date` | [populate_dim_date.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_date.py) | **Hoàn Thành** | Đã sinh tự động chuỗi ngày từ 2002-2026 và xuất ra local CSV. |
+| **B-05** | Điền dữ liệu cho bảng chiều `dim_stock` | [populate_dim_stock.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_stock.py) | **Hoàn Thành** | Đã ghi nhận thông tin 2 mã BID và HPG ra local CSV. |
+| **B-06** | Điền dữ liệu cho bảng chiều `dim_bank` | [populate_dim_bank.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_bank.py) | **Hoàn Thành** | Đã trích xuất danh sách 46 ngân hàng thương mại ra local CSV. |
+| **B-07** | Điền dữ liệu cho bảng chiều `dim_trading_session` | [populate_dim_trading_session.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/populate_dim_trading_session.py) | **Hoàn Thành** | Đã sinh dữ liệu 4 phiên giao dịch ra local CSV. |
+| **B-08** | ETL dữ liệu lịch sử giá cổ phiếu BID | [load_price_history.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_price_history.py) | **Hoàn Thành** | Đã làm sạch và chuẩn hóa dữ liệu giá đóng cửa ra local CSV. |
+| **B-09** | ETL dữ liệu giao dịch khối ngoại cổ phiếu BID | [load_foreign_trading.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_foreign_trading.py) | **Hoàn Thành** | Đã làm sạch và xử lý dòng tiền khối ngoại ra local CSV. |
+| **B-10** | ETL dữ liệu giao dịch tự doanh cổ phiếu BID | [load_proprietary_trading.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_proprietary_trading.py) | **Hoàn Thành** | Đã làm sạch và xử lý giao dịch tự doanh ra local CSV. |
+| **B-11** | ETL dữ liệu thống kê đặt lệnh cổ phiếu BID | [load_order_stats.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_order_stats.py) | **Hoàn Thành** | Đã làm sạch và xử lý thống kê đặt lệnh ra local CSV. |
+| **B-12** | ETL dữ liệu khớp lệnh khớp tích tắc HPG | [load_intraday_matching.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_intraday_matching.py) | **Hoàn Thành** | Đã phân loại phiên và làm sạch dữ liệu khớp tích tắc ra local CSV. |
+| **B-13** | ETL dữ liệu báo cáo tài chính của 46 ngân hàng | [load_bank_performance.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/load_bank_performance.py) | **Hoàn Thành** | Đã làm sạch và impute dữ liệu CAMELS ngân hàng ra local CSV. |
+| **B-14** | Chạy kiểm tra tính toàn vẹn tham chiếu | [validate_integrity.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/validate_integrity.py) | **Hoàn Thành** | Đã đối chiếu thành công khóa ngoại của 10 bảng dữ liệu dạng local CSV. |
+| **B-15** | Kiểm tra chất lượng dữ liệu DQ-01 đến DQ-06 | [validate_integrity.py](file:///d:/DWH/vn-banking-dwh-analytics/src/etl/validate_integrity.py) | **Hoàn Thành** | Đã chạy kiểm tra và đạt 0 lỗi chất lượng dữ liệu. |
 
 ---
 
