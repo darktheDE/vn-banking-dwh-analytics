@@ -1,2 +1,71 @@
-# Task B-05: Populate dim_stock
-# See docs/etl-spec.md Section 4.2 for specification.
+"""Task B-05: Populate dim_stock.
+
+Generates stock dimension records for BID and HPG and saves them locally
+as a CSV file in the processed data directory.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+from pathlib import Path
+import pandas as pd
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+def generate_dim_stock() -> pd.DataFrame:
+    """Generate stock dimension records.
+
+    Returns:
+        DataFrame with columns: stock_key, ticker, company_name, exchange, industry.
+    """
+    records = [
+        {
+            "stock_key": 1,
+            "ticker": "BID",
+            "company_name": "Joint Stock Commercial Bank for Investment and Development of Vietnam",
+            "exchange": "HOSE",
+            "industry": "Banking",
+        },
+        {
+            "stock_key": 2,
+            "ticker": "HPG",
+            "company_name": "Hoa Phat Group",
+            "exchange": "HOSE",
+            "industry": "Steel / Manufacturing",
+        },
+    ]
+    df = pd.DataFrame(records)
+    logger.info("Generated %d stock records (BID and HPG).", len(df))
+    return df
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Populate dim_stock table locally.")
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Directory for the output CSV. Defaults to PROCESSED_DATA_PATH.",
+    )
+    args = parser.parse_args()
+
+    processed_data_path = os.getenv("PROCESSED_DATA_PATH", "./data/processed/")
+    output_dir = Path(args.output_dir) if args.output_dir else Path(processed_data_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    df_stock = generate_dim_stock()
+    output_path = output_dir / "dim_stock_clean.csv"
+    df_stock.to_csv(output_path, index=False)
+
+    logger.info("Saved dim_stock to %s.", output_path)
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+    from dotenv import load_dotenv
+    load_dotenv()
+    sys.exit(main())
