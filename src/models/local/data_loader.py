@@ -24,7 +24,7 @@ import numpy as np
 # ==============================================================================
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 PROCESSED_DIR = os.path.join(BASE_DIR, "data", "processed")
-ML_DATA_DIR = os.path.join(BASE_DIR, "data", "ML_data")
+ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
 
 BANKS = ["bid", "ctg", "tcb", "vcb"]
 
