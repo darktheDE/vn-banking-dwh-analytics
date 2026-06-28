@@ -39,51 +39,51 @@
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
 
-- `[ ]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
+- `[x]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
   - *File*: `src/etl/populate_dim_date.py`
   - *Verification*: Table row count ≈ 9,131 rows. `is_trading_day` column exists.
-- `[ ]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
+- `[x]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
   - *File*: `src/etl/populate_dim_stock.py`
   - *Verification*: 2 rows in table.
-- `[ ]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
+- `[x]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
   - *File*: `src/etl/populate_dim_bank.py`
   - *Verification*: 46 rows in table. No null `bank_code` values.
-- `[ ]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
+- `[x]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
   - *Verification*: 4 rows in table.
 
 ### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
-- `[ ]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
+- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
   - *File*: `src/etl/load_price_history.py`
   - *Rules*: `docs/etl-spec.md` Section 3.1.
   - *Verification*: 22 rows in table. No null `close_price`. Log confirms row count.
-- `[ ]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
+- `[x]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
   - *File*: `src/etl/load_foreign_trading.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-10**: Implement ETL for File F2 → `fact_proprietary_trading` (22 rows for BID).
+- `[x]` **B-10**: Implement ETL for File F2 → `fact_proprietary_trading` (22 rows for BID).
   - *File*: `src/etl/load_proprietary_trading.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
+- `[x]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
   - *File*: `src/etl/load_order_stats.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (~10,000 rows for HPG).
+- `[x]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (~10,000 rows for HPG).
   - *File*: `src/etl/load_intraday_matching.py`
   - *Rules*: `docs/etl-spec.md` Section 3.5. Session classification must be applied.
   - *Verification*: Row count ≈ 10,000. No ticks outside valid HOSE hours. `cumulative_volume` is monotonically non-decreasing.
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
-- `[ ]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
+- `[x]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
   - *File*: `src/etl/load_bank_performance.py`
   - *Rules*: `docs/etl-spec.md` Section 3.6. Median imputation required for 2002–2005.
   - *Verification*: ~667 rows. No null values in CAMELS ratio columns after imputation. `is_imputed` flag column present. Log confirms row count.
 
 ### B-5: Integration Validation (Both members)
 
-- `[ ]` **B-14**: Run end-to-end referential integrity check — all `date_key` values in fact tables must exist in `dim_date`.
+- `[x]` **B-14**: Run end-to-end referential integrity check — all `date_key` values in fact tables must exist in `dim_date`.
   - *File*: `src/etl/validate_integrity.py`
   - *Verification*: Script exits with 0 errors logged.
-- `[ ]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-06.
+- `[x]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-06.
   - *Verification*: All DQ rules pass.
 
 ---
