@@ -20,6 +20,8 @@ logger = get_logger(__name__)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
+INPUT_DIR = os.path.join(ML_DATA_DIR, "input")
+OUTPUT_DIR = os.path.join(ML_DATA_DIR, "output")
 
 # Hyperparameters
 WINDOW_SIZE = 5
@@ -66,7 +68,7 @@ def train_lstm():
     # Lazy import TensorFlow (tránh crash nếu chưa cài)
     from tensorflow import keras
 
-    data_path = os.path.join(ML_DATA_DIR, "bid_lstm_data.csv")
+    data_path = os.path.join(INPUT_DIR, "bid_lstm_data.csv")
     if not os.path.exists(data_path):
         logger.error("Data not found at %s. Run data_loader.py first.", data_path)
         return None
@@ -154,7 +156,8 @@ def train_lstm():
         "model": ["LSTM"] * FORECAST_HORIZON,
     })
 
-    out_path = os.path.join(ML_DATA_DIR, "lstm_predictions_local.csv")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUTPUT_DIR, "lstm_predictions_local.csv")
     predictions_df.to_csv(out_path, index=False)
     logger.info("Saved LSTM predictions to %s", out_path)
     logger.info("Predictions:\n%s", predictions_df.to_string(index=False))

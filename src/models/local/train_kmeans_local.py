@@ -27,7 +27,9 @@ logger = get_logger(__name__)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
-FIGURES_DIR = os.path.join(ML_DATA_DIR, "figures")
+INPUT_DIR = os.path.join(ML_DATA_DIR, "input")
+OUTPUT_DIR = os.path.join(ML_DATA_DIR, "output")
+FIGURES_DIR = os.path.join(OUTPUT_DIR, "figures")
 
 # Config
 PCA_VARIANCE_THRESHOLD = 0.80
@@ -42,7 +44,7 @@ CAMELS_FEATURES = [
 
 def train_kmeans():
     """Pipeline chính: Load data -> PCA -> Tìm k tối ưu -> K-Means -> Export."""
-    data_path = os.path.join(ML_DATA_DIR, "banks_camels_46.csv")
+    data_path = os.path.join(INPUT_DIR, "banks_camels_46.csv")
     if not os.path.exists(data_path):
         logger.error("Data not found at %s. Run data_loader.py first.", data_path)
         return None
@@ -166,7 +168,8 @@ def train_kmeans():
     output_cols = ["bank_key", "date_key", "year", "cluster_id"]
     if "bank_code" in df_latest.columns:
         output_cols.insert(1, "bank_code")
-    out_path = os.path.join(ML_DATA_DIR, "kmeans_clusters_local.csv")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUTPUT_DIR, "kmeans_clusters_local.csv")
     df_latest[output_cols].to_csv(out_path, index=False)
     logger.info("Saved cluster assignments to %s", out_path)
 

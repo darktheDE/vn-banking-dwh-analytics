@@ -28,7 +28,9 @@ logger = get_logger(__name__)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 ML_DATA_DIR = os.path.join(BASE_DIR, "data", "data_ml")
-FIGURES_DIR = os.path.join(ML_DATA_DIR, "figures")
+INPUT_DIR = os.path.join(ML_DATA_DIR, "input")
+OUTPUT_DIR = os.path.join(ML_DATA_DIR, "output")
+FIGURES_DIR = os.path.join(OUTPUT_DIR, "figures")
 
 # Acceptance thresholds (theo AGENTS.md Section 4.3)
 AUC_ROC_THRESHOLD = 0.80
@@ -46,7 +48,7 @@ FEATURE_COLUMNS = [
 
 def train_random_forest():
     """Pipeline chính: Load data -> Label -> Split -> Train RF -> Evaluate -> Export."""
-    data_path = os.path.join(ML_DATA_DIR, "banks_camels_46.csv")
+    data_path = os.path.join(INPUT_DIR, "banks_camels_46.csv")
     if not os.path.exists(data_path):
         logger.error("Data not found at %s. Run data_loader.py first.", data_path)
         return None
@@ -176,11 +178,12 @@ def train_random_forest():
     if "bank_code" in df_test_output.columns:
         out_cols.insert(1, "bank_code")
 
-    out_path = os.path.join(ML_DATA_DIR, "rf_predictions_local.csv")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUTPUT_DIR, "rf_predictions_local.csv")
     df_test_output[out_cols].to_csv(out_path, index=False)
     logger.info("Saved RF predictions to %s", out_path)
 
-    imp_path = os.path.join(ML_DATA_DIR, "rf_feature_importance_local.csv")
+    imp_path = os.path.join(OUTPUT_DIR, "rf_feature_importance_local.csv")
     importance_df.to_csv(imp_path, index=False)
     logger.info("Saved feature importance to %s", imp_path)
 
