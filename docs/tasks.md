@@ -9,18 +9,19 @@
 ## Track A — Environment and Foundation Setup
 *Owner: All members. No dependencies.*
 
-- `[ ]` **A-01**: All members create and activate a Python 3.9+ virtual environment (`venv`).
+- `[x]` **A-01**: All members create and activate a Python 3.9+ virtual environment (`venv`).
   - *Verification*: `python --version` returns ≥ 3.9.
-- `[ ]` **A-02**: Install all dependencies from `requirements.txt` (`pip install -r requirements.txt`).
+- `[x]` **A-02**: Install all dependencies from `requirements.txt` (`pip install -r requirements.txt`).
   - *Verification*: `pip list` shows `pandas`, `openpyxl`, `scikit-learn`, `tensorflow`, `google-cloud-bigquery`, `python-dotenv`.
 - `[x]` **A-03**: Cloud Administrator creates a GCP Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles. Export the JSON key.
   - *Verification*: JSON key file is accessible locally.
-- `[ ]` **A-04**: All members configure `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON key.
+- `[x]` **A-04**: All members configure `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON key.
   - *Verification*: `gcloud auth application-default print-access-token` succeeds.
-- `[ ]` **A-05**: Create `.env` file from `.env.example`. Fill in `GCP_PROJECT_ID`, `BQ_DATASET_ID`, `RAW_DATA_PATH`, `PROCESSED_DATA_PATH`.
+- `[x]` **A-05**: Create `.env` file from `.env.example`. Fill in `GCP_PROJECT_ID`, `BQ_DATASET_ID`, `RAW_DATA_PATH`, `PROCESSED_DATA_PATH`.
   - *File*: `.env` (gitignored), `.env.example` (committed).
-- `[ ]` **A-06**: Commit the initialized project directory structure (`data/`, `notebooks/`, `src/`, `reports/`, `sql/`) to the repository.
+- `[x]` **A-06**: Commit the initialized project directory structure (`data/`, `notebooks/`, `src/`, `reports/`, `sql/`) to the repository.
   - *Verification*: Structure matches `README.md` Section 3.
+
 
 ---
 
@@ -29,9 +30,10 @@
 
 ### B-1: BigQuery Schema Provisioning (Nguyễn Đặng Quốc Anh)
 
-- `[ ]` **B-01**: Create the BigQuery Dataset using the `BQ_DATASET_ID` from `.env`.
+- `[x]` **B-01**: Create the BigQuery Dataset using the `BQ_DATASET_ID` from `.env`.
   - *File*: `sql/bigquery_schema.sql`
   - *Verification*: Dataset visible in GCP Console.
+
 - `[ ]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
   - *Verification*: All 4 tables exist with correct schemas matching `docs/star-schema.md`.
 - `[ ]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
