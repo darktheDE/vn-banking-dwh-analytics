@@ -13,7 +13,7 @@
   - *Verification*: `python --version` returns ≥ 3.9.
 - `[ ]` **A-02**: Install all dependencies from `requirements.txt` (`pip install -r requirements.txt`).
   - *Verification*: `pip list` shows `pandas`, `openpyxl`, `scikit-learn`, `tensorflow`, `google-cloud-bigquery`, `python-dotenv`.
-- `[ ]` **A-03**: Cloud Administrator creates a GCP Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles. Export the JSON key.
+- `[x]` **A-03**: Cloud Administrator creates a GCP Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles. Export the JSON key.
   - *Verification*: JSON key file is accessible locally.
 - `[ ]` **A-04**: All members configure `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON key.
   - *Verification*: `gcloud auth application-default print-access-token` succeeds.
@@ -39,51 +39,51 @@
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
 
-- `[ ]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
+- `[x]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
   - *File*: `src/etl/populate_dim_date.py`
   - *Verification*: Table row count ≈ 9,131 rows. `is_trading_day` column exists.
-- `[ ]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
+- `[x]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
   - *File*: `src/etl/populate_dim_stock.py`
   - *Verification*: 2 rows in table.
-- `[ ]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
+- `[x]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
   - *File*: `src/etl/populate_dim_bank.py`
   - *Verification*: 46 rows in table. No null `bank_code` values.
-- `[ ]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
+- `[x]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
   - *Verification*: 4 rows in table.
 
 ### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
-- `[ ]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
+- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
   - *File*: `src/etl/load_price_history.py`
   - *Rules*: `docs/etl-spec.md` Section 3.1.
   - *Verification*: 22 rows in table. No null `close_price`. Log confirms row count.
-- `[ ]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
+- `[x]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
   - *File*: `src/etl/load_foreign_trading.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-10**: Implement ETL for File F2 → `fact_proprietary_trading` (22 rows for BID).
+- `[x]` **B-10**: Implement ETL for File F2 → `fact_proprietary_trading` (22 rows for BID).
   - *File*: `src/etl/load_proprietary_trading.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
+- `[x]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
   - *File*: `src/etl/load_order_stats.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[ ]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (~10,000 rows for HPG).
+- `[x]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (~10,000 rows for HPG).
   - *File*: `src/etl/load_intraday_matching.py`
   - *Rules*: `docs/etl-spec.md` Section 3.5. Session classification must be applied.
   - *Verification*: Row count ≈ 10,000. No ticks outside valid HOSE hours. `cumulative_volume` is monotonically non-decreasing.
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
-- `[ ]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
+- `[x]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
   - *File*: `src/etl/load_bank_performance.py`
   - *Rules*: `docs/etl-spec.md` Section 3.6. Median imputation required for 2002–2005.
   - *Verification*: ~667 rows. No null values in CAMELS ratio columns after imputation. `is_imputed` flag column present. Log confirms row count.
 
 ### B-5: Integration Validation (Both members)
 
-- `[ ]` **B-14**: Run end-to-end referential integrity check — all `date_key` values in fact tables must exist in `dim_date`.
+- `[x]` **B-14**: Run end-to-end referential integrity check — all `date_key` values in fact tables must exist in `dim_date`.
   - *File*: `src/etl/validate_integrity.py`
   - *Verification*: Script exits with 0 errors logged.
-- `[ ]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-06.
+- `[x]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-06.
   - *Verification*: All DQ rules pass.
 
 ---
@@ -96,41 +96,41 @@
 - `[ ]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
   - *File*: `src/models/feature_engineering_stock.py`
   - *Verification*: DataFrame has 22 rows, all columns from `docs/data-dictionary.md` Section 4 (derived features included).
-- `[ ]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
+- `[x]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
   - *File*: `src/models/feature_engineering_bank.py`
   - *Verification*: Scaled DataFrame has mean ≈ 0 and std ≈ 1 for all numeric columns.
 
 ### C-2: LSTM Time Series Forecasting
 
-- `[ ]` **C-03**: Establish ARIMA and Moving Average baselines for BID `close_price`. Log RMSE.
+- `[x]` **C-03**: Establish ARIMA and Moving Average baselines for BID `close_price`. Log RMSE.
   - *File*: `notebooks/03_ML_TimeSeries.ipynb` or `src/models/baseline_arima.py`
-- `[ ]` **C-04**: Build and train the LSTM model on valid trading days only (no weekend data).
+- `[x]` **C-04**: Build and train the LSTM model on valid trading days only (no weekend data).
   - *File*: `src/models/train_lstm.py`
   - *Architecture*: Per `docs/ml-spec.md` Section 1. Use `MinMaxScaler` for sequence normalization.
   - *Verification*: RMSE and MAE logged. LSTM RMSE < ARIMA RMSE.
-- `[ ]` **C-05**: Generate T+1 to T+5 predictions. Write results to BigQuery table `fact_model_predictions` (or equivalent).
+- `[x]` **C-05**: Generate T+1 to T+5 predictions. Write results to BigQuery table `fact_model_predictions` (or equivalent).
   - *Verification*: Predictions table exists in BigQuery. Looker Studio can connect to it.
 
 ### C-3: K-Means Clustering with PCA
 
-- `[ ]` **C-06**: Apply PCA to the scaled bank feature matrix. Determine optimal number of components for ≥80% explained variance.
+- `[x]` **C-06**: Apply PCA to the scaled bank feature matrix. Determine optimal number of components for ≥80% explained variance.
   - *File*: `src/models/train_kmeans.py`
   - *Verification*: Cumulative explained variance plot logged. Component count documented.
-- `[ ]` **C-07**: Apply K-Means. Determine optimal `k` using the Elbow Method and Silhouette Analysis.
+- `[x]` **C-07**: Apply K-Means. Determine optimal `k` using the Elbow Method and Silhouette Analysis.
   - *Verification*: Elbow and Silhouette plots saved to `reports/figures/`.
-- `[ ]` **C-08**: Train final K-Means model. Compute Silhouette Score and Davies-Bouldin Index. Log both metrics.
+- `[x]` **C-08**: Train final K-Means model. Compute Silhouette Score and Davies-Bouldin Index. Log both metrics.
   - *Verification*: Both metrics logged. Cluster assignments written to BigQuery.
 
 ### C-4: Random Forest Classification
 
-- `[ ]` **C-09**: Establish Logistic Regression baseline for NPL ≥ 3% classification. Log AUC-ROC.
+- `[x]` **C-09**: Establish Logistic Regression baseline for NPL ≥ 3% classification. Log AUC-ROC.
   - *File*: `src/models/baseline_logistic.py`
-- `[ ]` **C-10**: Train Random Forest classifier. Apply time-based train/test split.
+- `[x]` **C-10**: Train Random Forest classifier. Apply time-based train/test split.
   - *File*: `src/models/train_random_forest.py`
   - *Verification*: AUC-ROC > 0.80. Recall for High Risk class ≥ 85%. Both metrics logged.
-- `[ ]` **C-11**: Extract and log Feature Importance. Save bar chart to `reports/figures/`.
+- `[x]` **C-11**: Extract and log Feature Importance. Save bar chart to `reports/figures/`.
   - *Verification*: Feature importance values written to log. Chart saved.
-- `[ ]` **C-12**: Write classification predictions and risk labels to BigQuery.
+- `[x]` **C-12**: Write classification predictions and risk labels to BigQuery.
   - *Verification*: Prediction table exists and is queryable.
 
 ---
