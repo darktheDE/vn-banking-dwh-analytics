@@ -182,7 +182,7 @@ def train_kmeans_clustering() -> dict:
 
     # ── Step 1: Load scaled bank features ──
     # Use the latest year per bank for clustering (cross-sectional snapshot)
-    df, _ = build_bank_features(scale=True)
+    df, scaler = build_bank_features(scale=True)
 
     # Get the latest year per bank for clustering
     df_latest = (
@@ -268,7 +268,19 @@ def train_kmeans_clustering() -> dict:
         plt.close(fig)
         logger.info("Cluster scatter plot saved to %s.", scatter_path)
 
-    # ── Step 6: Write to BigQuery ──
+    # ── Step 6: Save model artifacts ──
+    os.makedirs(config.model_artifact_path, exist_ok=True)
+    import pickle
+    with open(os.path.join(config.model_artifact_path, "kmeans_model.pkl"), "wb") as f:
+        pickle.dump(final_kmeans, f)
+    with open(os.path.join(config.model_artifact_path, "pca_model.pkl"), "wb") as f:
+        pickle.dump(pca, f)
+    if scaler is not None:
+        with open(os.path.join(config.model_artifact_path, "scaler_bank.pkl"), "wb") as f:
+            pickle.dump(scaler, f)
+    logger.info("Saved K-Means, PCA, and Scaler model artifacts.")
+
+    # ── Step 7: Write to BigQuery ──
     _write_clusters_to_bigquery(df_latest, config)
 
     return {

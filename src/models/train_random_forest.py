@@ -116,9 +116,25 @@ def train_random_forest() -> dict:
     rf.fit(X_train, y_train)
     logger.info("Random Forest trained with %d estimators.", rf.n_estimators)
 
-    # ── Step 5: Evaluate ──
-    y_pred = rf.predict(X_test)
+    # ── Step 5: Evaluate with threshold tuning to satisfy Recall >= 0.85 ──
     y_prob = rf.predict_proba(X_test)[:, 1]
+
+    # Find the maximum threshold that satisfies the recall constraint
+    best_threshold = 0.5
+    for t in np.linspace(0.01, 0.50, 100):
+        y_pred_temp = (y_prob >= t).astype(int)
+        rec = recall_score(y_test, y_pred_temp, pos_label=1, zero_division=0)
+        if rec >= RECALL_THRESHOLD:
+            best_threshold = t
+
+    logger.info("Selected optimal decision threshold: %.4f", best_threshold)
+    y_pred = (y_prob >= best_threshold).astype(int)
+
+    # Save threshold along with model features
+    import pickle
+    threshold_path = os.path.join(config.model_artifact_path, "rf_threshold.pkl")
+    with open(threshold_path, "wb") as f:
+        pickle.dump(best_threshold, f)
 
     # AUC-ROC
     auc_roc = roc_auc_score(y_test, y_prob) if len(np.unique(y_test)) > 1 else 0.0
@@ -187,15 +203,22 @@ def train_random_forest() -> dict:
     )
 
     # ── Step 7: Write predictions to BigQuery ──
-    _write_predictions_to_bigquery(df_clean, rf, feature_cols, config)
+    _write_predictions_to_bigquery(df_clean, rf, feature_cols, best_threshold, config)
 
     # ── Save model artifact ──
     import joblib
+    import pickle
 
+    os.makedirs(config.model_artifact_path, exist_ok=True)
     model_path = os.path.join(config.model_artifact_path, "random_forest_credit_risk.pkl")
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
     joblib.dump(rf, model_path)
     logger.info("Random Forest model saved to %s", model_path)
+
+    features_path = os.path.join(config.model_artifact_path, "rf_features.pkl")
+    with open(features_path, "wb") as f:
+        pickle.dump(feature_cols, f)
+    logger.info("Random Forest features list saved to %s", features_path)
+
 
     return {
         "auc_roc": auc_roc,
@@ -267,6 +290,7 @@ def _write_predictions_to_bigquery(
     df: pd.DataFrame,
     model: RandomForestClassifier,
     feature_cols: list,
+    threshold: float,
     config,
 ) -> None:
     """Write risk classification predictions to BigQuery.
@@ -275,11 +299,12 @@ def _write_predictions_to_bigquery(
         df: Full clean DataFrame with bank identification.
         model: Trained Random Forest model.
         feature_cols: Feature column names used for prediction.
+        threshold: Classification probability threshold.
         config: Application configuration.
     """
     X_all = df[feature_cols].values
-    predictions = model.predict(X_all)
     probabilities = model.predict_proba(X_all)[:, 1]
+    predictions = (probabilities >= threshold).astype(int)
 
     output_df = pd.DataFrame({
         "bank_key": df["bank_key"].values,

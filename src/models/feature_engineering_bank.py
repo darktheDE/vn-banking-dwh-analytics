@@ -81,7 +81,7 @@ def query_bank_performance(client) -> pd.DataFrame:
             ON f.bank_key = d.bank_key
         ORDER BY d.bank_code, f.date_key
     """
-    df = client.query(query).to_dataframe()
+    df = client.query(query).to_dataframe(create_bqstorage_client=False)
     logger.info("Queried %d rows from fact_bank_performance.", len(df))
     return df
 
