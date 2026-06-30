@@ -199,12 +199,13 @@ def show_intro_section():
         *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: **667 dòng** và **47+ cột** chỉ số tài chính, bao phủ **46 ngân hàng thương mại Việt Nam** trong suốt **20 năm** (2002–2022).
         
         ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
-        Dữ liệu được tổ chức dưới dạng Star Schema gồm **9 bảng** tối ưu cho OLAP:
-        *   **Bảng Chiều (4 Dimension tables)**:
+        Dữ liệu được tổ chức dưới dạng Star Schema gồm **10 bảng** tối ưu cho OLAP:
+        *   **Bảng Chiều (5 Dimension tables)**:
             *   `dim_date`: Quản lý thời gian, kiểm soát ngày giao dịch.
             *   `dim_stock`: Thông tin mã cổ phiếu, sàn giao dịch (HOSE).
             *   `dim_bank`: SCD Type 2 quản lý lịch sử thông tin 46 ngân hàng.
             *   `dim_trading_session`: Phiên giao dịch trong ngày (ATO, ATC, Liên tục).
+            *   `dim_audit`: Quản lý nhật ký thực thi ETL, kiểm toán hệ thống và lineage.
         *   **Bảng Thực Thể (5 Fact tables)**:
             *   `fact_price_history`: Lịch sử giá đóng/mở cửa, khối lượng giao dịch ngày.
             *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại & tự doanh.
@@ -243,12 +244,12 @@ def show_intro_section():
     dot_code = """
     digraph G {
         graph [bgcolor="transparent", rankdir=TB, pad=0.3]
-        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=2.6, height=0.5]
+        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=3.0, height=0.5]
         edge [color="#60a5fa", arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#4b5563"]
 
         raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
         etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
-        bq [label="Kho Dữ Liệu DWH\\n(Google BigQuery)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+        bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 5 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
         ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
         app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
 
