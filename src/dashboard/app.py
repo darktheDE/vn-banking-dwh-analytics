@@ -326,7 +326,7 @@ def show_eda_section():
             "roa": "Tình hình: Trung vị ROA của hệ thống đạt quanh mức 0.8% - 1.2%. Các điểm ngoại lệ phía bên phải phản ánh nhóm ngân hàng thương mại năng động tối ưu hóa lợi nhuận tài sản xuất sắc (> 1.8%).",
             "roe": "Tình hình: Hiệu suất sinh lời trên vốn chủ sở hữu (ROE) tập trung phổ biến ở mức 12% - 18%. Nhóm ngân hàng top đầu đạt ROE vượt trội (> 22%) nhờ sử dụng đòn bẩy tài chính hiệu quả.",
             "nim": "Tình hình: Biên lãi ròng (NIM) tập trung phổ biến quanh mức 3% - 4%. Nhóm ngân hàng bán lẻ quy mô vừa và lớn có lợi thế về chi phí vốn thường nằm ở nhóm cận trên.",
-            "cir": "Tình hình: Tỷ lệ CIR phổ biến ở mức 35% - 45%. Một số ít ngân hàng số hóa mạnh hoặc quy mô lớn đạt hiệu quả chi phí vượt trội ở mức < 35%.",
+            "cir": "Tình hình: Tỷ lệ CIR trong bộ dữ liệu này phổ biến ở mức rất cao, từ 90% - 95% (do cấu trúc tính toán bao gồm cả chi phí lãi vay). Điểm ngoại lệ cực âm ở phía bên trái phản ánh các ngân hàng gặp khủng hoảng có tổng thu nhập hoạt động bị âm.",
             "eta": "Tình hình: Tỷ lệ vốn chủ sở hữu trên tổng tài sản (ETA) đạt trung vị khoảng 8% - 10%. Nhóm ngân hàng nhỏ thường duy trì ETA dày hơn để phòng ngừa rủi ro quy mô.",
             "etd": "Tình hình: Vốn chủ sở hữu trên tiền gửi (ETD) dao động quanh mức 10% - 15%, cho thấy tính tự chủ vốn tương đối tốt so với lượng huy động gửi tiền.",
             "lta": "Tình hình: Dư nợ cho vay chiếm khoảng 60% - 70% tổng tài sản. Đây là tỷ lệ phân bổ tài sản sinh lời đặc trưng của hệ thống ngân hàng thương mại Việt Nam.",
