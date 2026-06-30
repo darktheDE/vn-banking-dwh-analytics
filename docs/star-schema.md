@@ -126,6 +126,37 @@ Records the annual and quarterly financial health indicators of the commercial b
 - `nim` of type FLOAT64: Net Interest Margin
 - `cir` of type FLOAT64: Cost to Income Ratio
 
+### 3.6 Machine Learning Output Tables
+
+To serve predictions downstream, three dedicated output tables are defined in BigQuery:
+
+#### 3.6.1 `bank_cluster_assignments` (K-Means Outputs)
+Stores strategic cluster labels assigned to each commercial bank.
+- `bank_key` of type INT64
+- `bank_code` of type STRING
+- `bank_name` of type STRING
+- `bank_type` of type STRING
+- `cluster_id` of type INT64: Assigned cluster identifier
+- `model_name` of type STRING: Model identification string
+
+#### 3.6.2 `bank_risk_predictions` (Random Forest Outputs)
+Stores credit risk classifications and probabilities for each bank.
+- `bank_key` of type INT64
+- `bank_code` of type STRING
+- `date_key` of type INT64
+- `risk_label` of type INT64: Binary classification (`1` for NPL ≥ 3%, `0` otherwise)
+- `risk_probability` of type FLOAT64: Probability score of the risk class
+- `actual_npl_ratio` of type FLOAT64: Historical ground truth NPL ratio
+- `model_name` of type STRING
+
+#### 3.6.3 `fact_model_predictions` (LSTM Outputs)
+Stores daily multi-horizon predictions for BID stock close prices.
+- `base_date_key` of type INT64: The date on which the prediction was generated
+- `stock_key` of type INT64
+- `horizon` of type STRING: Prediction window label (e.g. `'T+1'`, `'T+2'`, ..., `'T+5'`)
+- `predicted_close_price` of type FLOAT64: Predicted closing price
+- `model_name` of type STRING
+
 ---
 
 ## 4. Entity-Relationship Overview

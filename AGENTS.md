@@ -46,9 +46,9 @@ and 3 Looker Studio dashboards.
 
 Memorize these facts. They appear in nearly every task.
 
-### 3.1 BigQuery Star Schema (9 tables total)
+### 3.1 BigQuery Star Schema (10 core tables + 3 ML tables)
 
-**Dimension Tables** (4):
+**Dimension Tables** (5):
 
 | Table | Primary Key | Key Fields |
 |-------|------------|-----------|
@@ -56,8 +56,9 @@ Memorize these facts. They appear in nearly every task.
 | `dim_stock` | `stock_key` INT64 | `ticker` (BID, TCB, VCB, CTG), `exchange` (HOSE) |
 | `dim_bank` | `bank_key` INT64 | `bank_code`, `bank_name`, `bank_type` (SOCB/JSCB/FOCB), `valid_from`, `valid_to`, `is_current` (SCD Type 2) |
 | `dim_trading_session` | `session_key` INT64 | `session_name`, `start_time`, `end_time` |
+| `dim_audit` | `audit_key` INT64 | `run_id`, `run_timestamp`, `script_name`, `source_file`, `rows_processed`, `status` |
 
-*Note: All Dimension and Fact tables dynamically append system auditing columns: _created_at (TIMESTAMP), _updated_at (TIMESTAMP), and _source_file (STRING).*
+*Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: _created_at (TIMESTAMP), _updated_at (TIMESTAMP), and _source_file (STRING).*
 
 **Fact Tables** (5):
 
@@ -68,6 +69,14 @@ Memorize these facts. They appear in nearly every task.
 | `fact_proprietary_trading` | `date_key`, `stock_key` | `date_key` | `stock_key` |
 | `fact_order_stats` | `date_key`, `stock_key` | `date_key` | `stock_key` |
 | `fact_bank_performance` | `date_key`, `bank_key` | `date_key` | `bank_key` |
+
+**Machine Learning Output Tables** (3):
+
+| Table | Model Area | Primary/Key Fields | Description |
+|-------|------------|--------------------|-------------|
+| `bank_cluster_assignments` | K-Means | `bank_key`, `cluster_id` | Strategic segmentation of 46 commercial banks |
+| `bank_risk_predictions` | Random Forest | `bank_key`, `date_key`, `risk_label` | Credit risk classifications and probability scores |
+| `fact_model_predictions` | LSTM | `base_date_key`, `stock_key`, `horizon` | Rolling price predictions for BID stock close prices |
 
 ### 3.2 Trading Session Boundaries (HOSE)
 
@@ -91,6 +100,10 @@ Memorize these facts. They appear in nearly every task.
 | `dim_bank` | 46 rows |
 | `dim_stock` | 4 rows |
 | `dim_trading_session` | 4 rows |
+| `dim_audit` | Dynamic execution runs |
+| `bank_cluster_assignments` | 46 rows |
+| `bank_risk_predictions` | 667 rows |
+| `fact_model_predictions` | ~110 rows |
 
 ---
 

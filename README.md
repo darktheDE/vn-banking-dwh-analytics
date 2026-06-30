@@ -77,7 +77,7 @@ The platform is designed as a **5-layer, modular, batch-processing pipeline** fo
 │                       │     │                  │     │                  │
 │  Excel & CSV Files    │────▶│ Extract          │────▶│ Google BigQuery  │
 │  - Stocks (4 symbols) │     │ Transform/Clean  │     │ Star Schema      │
-│    (BID, TCB, VCB, CTG)     │ Load via API     │     │ 4 Dims · 5 Facts │
+│    (BID, TCB, VCB, CTG)     │ Load via API     │     │5 Dims·5 Facts·3ML│
 │  - Banks (2 files)    │     │ Python + Pandas  │     │                  │
 └───────────────────────┘     └──────────────────┘     └────────┬─────────┘
                                                            │
@@ -119,7 +119,7 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 
 ### Schema Summary
 
-**4 Dimension Tables** (descriptive context):
+**5 Dimension Tables** (descriptive context):
 
 | Table | Description |
 |-------|-------------|
@@ -127,8 +127,9 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 | `dim_stock` | BID, TCB, VCB, CTG stock descriptors (HPG removed to focus strictly on banking) |
 | `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification and SCD Type 2 tracking (`valid_from`, `valid_to`, `is_current`) |
 | `dim_trading_session` | ATO, Morning, Afternoon, ATC session definitions |
+| `dim_audit` | ETL execution run log registry table |
 
-*Note: All tables dynamically append system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
+*Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
 
 **5 Fact Tables** (quantitative measurements):
 
@@ -139,6 +140,14 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 | `fact_proprietary_trading` | Daily per stock | Proprietary desk net volume |
 | `fact_order_stats` | Daily per stock | Buy/sell order counts and matched volume |
 | `fact_bank_performance` | Annual per bank | Full CAMELS indicators — ROA, ROE, NIM, CIR, NPL, ETA |
+
+**3 Machine Learning Output Tables** (model predictions and clusterings):
+
+| Table | Granularity | Key Metrics |
+|-------|-------------|-------------|
+| `bank_cluster_assignments` | Per bank | Strategic bank cluster labels (`cluster_id`) |
+| `bank_risk_predictions` | Annual per bank | Credit risk classifications (`risk_label`) and probability scores |
+| `fact_model_predictions` | Daily per stock/horizon | Rolling multi-horizon BID closing price forecasting |
 
 **BigQuery Optimizations:**
 - **Partitioning**: All high-volume fact tables partitioned by `date_key` as DATE

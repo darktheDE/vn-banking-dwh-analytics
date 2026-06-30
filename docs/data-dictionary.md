@@ -147,6 +147,34 @@ The following features are created during the Feature Engineering step and are n
 | `foreign_net_lag_1` | `foreign_net_volume` shifted by 1 day | Lagged foreign flow signal as LSTM regressor |
 | `prop_net_lag_1` | `prop_net_volume` shifted by 1 day | Lagged proprietary flow signal as LSTM regressor |
 
+### 4.2 Machine Learning Prediction Outputs
+
+These fields are populated by the ML training and inference runs and stored in target BigQuery tables:
+
+#### 4.2.1 `bank_cluster_assignments` (K-Means Clustering)
+- `bank_key` (INT64): References `dim_bank.bank_key`.
+- `bank_code` (STRING): Ticker code of the bank.
+- `bank_name` (STRING): Corporate name of the bank.
+- `bank_type` (STRING): Classification (`SOCB`/`JSCB`/`FOCB`).
+- `cluster_id` (INT64): Strategic cluster assigned to the bank.
+- `model_name` (STRING): Deployed model label (e.g. `'KMeans_PCA'`).
+
+#### 4.2.2 `bank_risk_predictions` (Random Forest Classification)
+- `bank_key` (INT64): References `dim_bank.bank_key`.
+- `bank_code` (STRING): Standard bank code.
+- `date_key` (INT64): Target reporting year key.
+- `risk_label` (INT64): Risk classification (`1` if NPL ratio ≥ 3%, `0` otherwise).
+- `risk_probability` (FLOAT64): RF model probability score.
+- `actual_npl_ratio` (FLOAT64): True historical NPL ratio.
+- `model_name` (STRING): Model label (e.g. `'RandomForest_Classifier'`).
+
+#### 4.2.3 `fact_model_predictions` (LSTM Time Series Forecasting)
+- `base_date_key` (INT64): The date of prediction generation.
+- `stock_key` (INT64): References `dim_stock.stock_key`.
+- `horizon` (STRING): Forecast window (`'T+1'` through `'T+5'`).
+- `predicted_close_price` (FLOAT64): Predicted close price in VND.
+- `model_name` (STRING): Model identifier (e.g. `'LSTM_Forecaster'`).
+
 ---
 
 ## 5. Data Quality Rules and Constraints
@@ -157,4 +185,5 @@ The following features are created during the Feature Engineering step and are n
 | DQ-02 | `fact_bank_performance` | `npl_ratio` must be in range [0.0, 1.0] | Flag for manual review |
 | DQ-03 | `fact_price_history` | `close_price` must be > 0 | Reject record; log error |
 | DQ-04 | `fact_bank_performance` | Missing values for years 2002–2005 must be imputed using column median | Impute during ETL Transform step |
+| DQ-05 | All tables | `audit_key` must be present and not null | Reject record; log error |
 | DQ-06 | `fact_foreign_trading` | `foreign_buy_volume` and `foreign_sell_volume` must be ≥ 0 | Reject negative values |

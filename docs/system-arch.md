@@ -43,8 +43,9 @@ Responsible for preparing the raw data for storage and modeling.
 The centralized “Single Source of Truth.”
 - **Technology Stack**: Google BigQuery as a Serverless Enterprise Data Warehouse.
 - **Design Pattern**: **Star Schema** optimized for OLAP aggregations.
-- **Dimension Tables**: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`.
+- **Dimension Tables**: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, `dim_audit`.
 - **Fact Tables**: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_bank_performance`.
+- **ML Output Tables**: `bank_cluster_assignments`, `bank_risk_predictions`, `fact_model_predictions`.
 - **Optimization**: Partitioning applied on `date_key` and Clustering applied on `stock_key` and `bank_key` to heavily reduce query latency and scanning costs for reporting.
 
 ### 2.4 Machine Learning & Analytics Layer
@@ -76,7 +77,7 @@ graph TD
     A[Raw Data: Excel Files] -->|Extract| B(Python ETL Pipeline)
     B -->|Transform & Clean| C{Google BigQuery}
 
-    C -->|Star Schema| D[(DWH: 4 Dims, 5 Facts)]
+    C -->|Star Schema| D[(DWH: 5 Dims, 5 Facts, 3 ML Tables)]
 
     D -->|Feature Query| E[ML Layer]
     E -->|1. LSTM: Predict Price| E1((Predictions))
