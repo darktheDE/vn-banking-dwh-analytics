@@ -37,7 +37,8 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 - Real-time or milli-second automated algorithmic trading execution systems.
 - Natural Language Processing for sentiment analysis from financial news or social media.
-- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected assets: BID, HPG, and 46 specific banks.
+- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected banking assets: BID, TCB, VCB, CTG, and the 46 commercial banks.
+
 
 ---
 
@@ -94,7 +95,7 @@ Financial analysts and risk managers currently lack a centralized system to cros
 | --- | --- | --- | --- |
 | **Foreign and Prop Trading BID** | Excel | Date, Net Volume, Value | 22 Trading Sessions |
 | **Price History and Order Stats BID** | Excel | OHLCV, Buy and Sell Orders, Matched Vol | 22 Trading Sessions |
-| **Intraday Ticks HPG** | Excel | Timestamp, Price, Cumulative Vol | ~10,000 Ticks |
+| **Intraday Ticks (Deprecated)** | Excel | Timestamp, Price, Cumulative Vol | Deprecated/Empty |
 | **Bank Financials for 46 Banks** | Excel | ROA, ROE, NPL, ETA, NIM, CIR | 20 Years from 2002 to 2022 |
 
 ---

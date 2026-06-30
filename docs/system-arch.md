@@ -19,9 +19,9 @@ The system is logically divided into 5 distinct layers:
 
 The origin of all data entering the system.
 - **Data Types**: Structured and semi-structured financial data.
-- **Sources**: 7 primary Excel files containing:
-- Intraday tick-level stock matches with over 10,000 ticks for HPG.
-- Daily aggregated stock order stats and foreign and proprietary trading values for BID.
+- **Sources**: Primary files containing:
+- Daily aggregated stock history, balance sheets, income statements, and cash flows for focus banks (BID, TCB, VCB, CTG).
+- Daily aggregated stock order stats, foreign and proprietary trading values for BID.
 - 20-year financial performance indicators based on CAMELS framework for 46 commercial banks.
 - **Characteristics**: Heterogeneous formats, missing values, and varying temporal granularities from tick-level to daily and annual.
 
@@ -52,7 +52,7 @@ The centralized “Single Source of Truth.”
 The core intelligence of the platform, executing both supervised and unsupervised learning tasks.
 - **Technology Stack**: Scikit-Learn and TensorFlow Keras.
 - **Models**:
-1. **Time Series Forecasting**: LSTM deep learning network forecasting short-term from T+1 to T+5 BID stock prices based on historical prices and cash flow regressors.
+1. **Time Series Forecasting**: LSTM deep learning networks forecasting short-term from T+1 to T+5 stock prices for focus banks (BID, TCB, VCB, CTG) based on historical price sequences.
 2. **Clustering**: PCA dimensionality reduction followed by K-Means unsupervised clustering to group the 46 banks by financial behavior.
 3. **Risk Classification**: Random Forest ensemble decision trees classifying banks into ‘High Risk’ with NPL greater than or equal to 3% versus ‘Healthy’, outputting clear Feature Importance metrics.
 - **MLOps Integration**: Models consume data directly from BigQuery Fact and Dim tables, run their inferences as Python Batch Jobs, and write the prediction outputs back into new Fact tables in BigQuery such as `fact_model_predictions`.

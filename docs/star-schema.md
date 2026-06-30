@@ -27,9 +27,9 @@ Stores calendar information to enable time-series analysis and granular aggregat
 
 Stores descriptive information about the traded stock assets.
 - `stock_key` of type INT64 as Primary Key: Unique surrogate key for the stock.
-- `ticker` of type STRING: Stock symbol like ‘BID’ and ‘HPG’.
+- `ticker` of type STRING: Stock symbol like 'BID', 'TCB', 'VCB', and 'CTG'.
 - `company_name` of type STRING: Full name of the company.
-- `exchange` of type STRING: Trading exchange like ‘HOSE’ and ‘HNX’.
+- `exchange` of type STRING: Trading exchange like 'HOSE'.
 - `industry` of type STRING: Sector classification.
 
 ### 2.3 `dim_bank`
@@ -100,13 +100,14 @@ Records daily statistics on market order placements representing supply and dema
 
 ### 3.5 `fact_intraday_matching`
 
-Records highly granular tick-level matched trades during the trading day specifically for the HPG dataset.
+Records highly granular tick-level matched trades during the trading day (currently deprecated/empty as HPG was removed to focus strictly on banking).
 - **Foreign Keys**: `date_key`, `stock_key`, `session_key`
 - **Metrics**:
 - `timestamp` of type TIMESTAMP: Exact time of the match.
 - `matched_price` of type FLOAT64
 - `matched_volume` of type INT64
 - `cumulative_volume` of type INT64
+
 
 ### 3.6 `fact_bank_performance`
 

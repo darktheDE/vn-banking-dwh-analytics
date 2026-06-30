@@ -68,10 +68,11 @@
 - `[x]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
   - *File*: `src/etl/load_order_stats.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[x]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (~10,000 rows for HPG).
+- `[x]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (Deprecated/Empty).
   - *File*: `src/etl/load_intraday_matching.py`
-  - *Rules*: `docs/etl-spec.md` Section 3.5. Session classification must be applied.
-  - *Verification*: Row count ≈ 10,000. No ticks outside valid HOSE hours. `cumulative_volume` is monotonically non-decreasing.
+  - *Rules*: `docs/etl-spec.md` Section 3.5.
+  - *Verification*: Table exists in BigQuery and is empty (HPG removed).
+
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
