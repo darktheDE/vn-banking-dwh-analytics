@@ -193,10 +193,10 @@ def show_intro_section():
     
     with col1:
         st.markdown("""
-        ### 📋 Phạm Vi & Kích Thước Dữ Liệu
-        *   **Dữ liệu Cổ Phiếu Trọng Điểm**: **11,835+ dòng** dữ liệu giá lịch sử hàng ngày (OHLCV) của 4 ngân hàng thương mại: **BID**, **TCB**, **VCB**, và **CTG**.
-        *   **Dữ liệu Giao Dịch Bổ Trợ**: **22 phiên giao dịch** chứa thông tin khớp lệnh mua/bán, khối lượng giao dịch khối ngoại và tự doanh bổ sung riêng cho cổ phiếu **BID**.
-        *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: **667 dòng** và **47+ cột** chỉ số tài chính, bao phủ **46 ngân hàng thương mại Việt Nam** trong suốt **20 năm** (2002–2022).
+        ### 📋 Nguồn Dữ Liệu & Quy Mô Hệ Thống
+        *   **Tích Hợp API Tài Chính (`vnstock` / VCI API)**: Toàn bộ dữ liệu giá giao dịch hàng ngày (OHLCV) và báo cáo tài chính (Cân đối kế toán, Kết quả kinh doanh, Lưu chuyển tiền tệ, Chỉ số tài chính) của 4 ngân hàng trọng điểm (**BID**, **TCB**, **VCB**, **CTG**) được tự động hóa trích xuất trực tiếp qua **API tài chính** tích hợp (đảm bảo tính cập nhật và tự động).
+        *   **Dữ liệu Báo Cáo Tài Chính CAMELS 20 năm**: Gồm **667 dòng** dữ liệu và **47+ cột** chỉ số hiệu năng cấu trúc tài chính, bao phủ toàn hệ thống **46 ngân hàng Việt Nam** trong suốt **2 thập kỷ (2002–2022)** được tổng hợp đồng bộ từ báo cáo kiểm toán lịch sử (phục vụ phân cụm và phân loại rủi ro dài hạn).
+        *   **Dữ liệu Giao Dịch Bổ Trợ**: Dòng tiền khớp lệnh mua/bán chủ động, khối lượng giao dịch khối ngoại và tự doanh bổ trợ riêng cho cổ phiếu **BID**.
         
         ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
         Dữ liệu được tổ chức dưới dạng Star Schema gồm **10 bảng** tối ưu cho OLAP:
