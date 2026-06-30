@@ -306,14 +306,17 @@ def show_eda_section():
             format_func=lambda x: ratio_vn_map[x]
         )
         
-        col_data = df[selected_col].dropna()
+        # Multiply by 100 to convert to percentage for readability
+        df_pct = df.copy()
+        df_pct[selected_col] = df_pct[selected_col] * 100
+        col_data = df_pct[selected_col].dropna()
         
         fig = px.histogram(
-            df,
+            df_pct,
             x=selected_col,
             marginal="box",
-            title=f"Phân phối và Biểu đồ hộp của {ratio_vn_map[selected_col]}",
-            labels={selected_col: ratio_vn_map[selected_col]},
+            title=f"Phân phối và Biểu đồ hộp của {ratio_vn_map[selected_col]} (%)",
+            labels={selected_col: f"{ratio_vn_map[selected_col]} (%)"},
             color_discrete_sequence=["#3b82f6"]
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
@@ -334,7 +337,7 @@ def show_eda_section():
         st.caption(selected_caption)
         
         stats = col_data.describe().to_frame().T
-        stats.columns = ["Số mẫu", "Trung bình", "Độ lệch chuẩn", "Tối thiểu", "25%", "Trung vị (50%)", "75%", "Tối đa"]
+        stats.columns = ["Số mẫu", "Trung bình (%)", "Độ lệch chuẩn (%)", "Tối thiểu (%)", "25% (%)", "Trung vị (50%) (%)", "75% (%)", "Tối đa (%)"]
         st.dataframe(stats, use_container_width=True)
 
     with tab2:
@@ -367,6 +370,7 @@ def show_eda_section():
         )
         
         yearly_avg = df.groupby(["year", "bank_type"])[trend_col].mean().reset_index()
+        yearly_avg[trend_col] = yearly_avg[trend_col] * 100
         type_map = {"SOCB": "Ngân hàng Nhà nước nắm quyền chi phối (SOCB)", "JSCB": "Ngân hàng TMCP tư nhân (JSCB)", "FOCB": "Ngân hàng nước ngoài/Liên doanh (FOCB)"}
         yearly_avg["bank_type"] = yearly_avg["bank_type"].map(type_map)
         
@@ -375,8 +379,8 @@ def show_eda_section():
             x="year",
             y=trend_col,
             color="bank_type",
-            title=f"Biến động trung bình {ratio_vn_map[trend_col]} giai đoạn 2002–2022",
-            labels={"year": "Năm Báo Cáo", trend_col: ratio_vn_map[trend_col], "bank_type": "Phân Loại Ngân Hàng"},
+            title=f"Biến động trung bình {ratio_vn_map[trend_col]} (%) giai đoạn 2002–2022",
+            labels={"year": "Năm Báo Cáo", trend_col: f"{ratio_vn_map[trend_col]} (%)", "bank_type": "Phân Loại Ngân Hàng"},
             markers=True
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
