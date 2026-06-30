@@ -7,6 +7,7 @@ using forward-fill (max 1 day), and saves it locally as a CSV.
 from __future__ import annotations
 
 import argparse
+import datetime
 import os
 from pathlib import Path
 import pandas as pd
@@ -18,11 +19,14 @@ logger = get_logger(__name__)
 BID_STOCK_KEY = 1
 
 
-def transform_proprietary_trading(df_raw: pd.DataFrame) -> pd.DataFrame:
+def transform_proprietary_trading(df_raw: pd.DataFrame, audit_key: int, now_ts: datetime.datetime, source_filename: str) -> pd.DataFrame:
     """Transform raw BID proprietary trading data.
 
     Args:
         df_raw: Raw proprietary trading DataFrame.
+        audit_key: Audit run key.
+        now_ts: Execution timestamp.
+        source_filename: Name of the source file.
 
     Returns:
         Transformed DataFrame.
@@ -89,6 +93,12 @@ def transform_proprietary_trading(df_raw: pd.DataFrame) -> pd.DataFrame:
     # Remove duplicates
     df = df.drop_duplicates(subset=["date_key", "stock_key"], keep="first").sort_values("date_key").reset_index(drop=True)
 
+    # Append dynamic auditing columns
+    df["audit_key"] = audit_key
+    df["_created_at"] = now_ts
+    df["_updated_at"] = now_ts
+    df["_source_file"] = source_filename
+
     return df
 
 
@@ -116,9 +126,13 @@ def main() -> int:
         logger.error("Input file %s not found.", input_file)
         return 1
 
+    # Auditing parameters
+    now = datetime.datetime.utcnow()
+    audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+
     logger.info("Reading proprietary trading from %s.", input_file)
     df_raw = pd.read_excel(input_file)
-    df_clean = transform_proprietary_trading(df_raw)
+    df_clean = transform_proprietary_trading(df_raw, audit_key, now, input_file.name)
 
     if len(df_clean) != 22:
         logger.warning("Row count is %d, expected 22 for sample dataset.", len(df_clean))

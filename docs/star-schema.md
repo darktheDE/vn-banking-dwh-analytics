@@ -52,6 +52,17 @@ Stores definitions of intraday trading sessions primarily used for high-frequenc
 - `start_time` of type TIME: Session start time.
 - `end_time` of type TIME: Session end time.
 
+### 2.5 `dim_audit`
+
+Stores run metadata for every ETL pipeline execution to track data lineage, processing status, and auditing.
+- `audit_key` of type INT64 as Primary Key: Dynamic integer key formatted as `YYYYMMDDHHMMSS` based on script execution start time.
+- `run_id` of type STRING: Unique UUID generated for the specific runtime execution.
+- `run_timestamp` of type TIMESTAMP: Execution start timestamp.
+- `script_name` of type STRING: The filename of the Python loader script that ran (e.g. `load_price_history.py`).
+- `source_file` of type STRING: The filename of the raw spreadsheet read.
+- `rows_processed` of type INT64: Count of data rows successfully processed.
+- `status` of type STRING: The execution status of the job (e.g. `RUNNING`, `SUCCESS`, `FAILED`).
+
 ---
 
 ## 3. Fact Tables
@@ -123,13 +134,15 @@ Records the annual and quarterly financial health indicators of the commercial b
     - One record in `dim_date` maps to multiple records across all Fact tables.
     - One record in `dim_stock` maps to multiple records in `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`, and `fact_order_stats`.
     - One record in `dim_bank` maps to multiple records in `fact_bank_performance`.
+    - One record in `dim_audit` maps to multiple records across all Dimension and Fact tables.
 
 ## 5. Google BigQuery Optimizations
 
 To ensure low latency and cost-efficiency when querying massive datasets:
 - **Partitioning**: Fact tables with high volumes such as `fact_price_history` will be strictly partitioned by `date_key` cast to DATE. This restricts the amount of data scanned when querying specific date ranges.
 - **Clustering**: Fact tables will be clustered by `stock_key` or `bank_key`. This optimizes performance when the Looker Studio dashboard applies ticker or bank-specific filters.
-- **DWH Auditing**: To support tracking, lineage, and data processing verification, all tables (both Fact and Dimension) dynamically append the following system columns during the transformation phase:
+- **DWH Auditing**: To support tracking, lineage, and data processing verification, all tables (both Fact and Dimension) include `audit_key` (referencing `dim_audit`) and dynamically append the following system columns during the transformation phase:
+    - `audit_key` of type INT64: The key pointing to the corresponding `dim_audit` execution row.
     - `_created_at` of type TIMESTAMP: The timestamp indicating when the row was first loaded.
     - `_updated_at` of type TIMESTAMP: The timestamp indicating when the row was last updated.
     - `_source_file` of type STRING: The filename of the source file from which this data row was extracted.

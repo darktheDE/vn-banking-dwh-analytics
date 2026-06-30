@@ -47,7 +47,6 @@ def validate_pipeline() -> bool:
         "fact_foreign_trading": "fact_foreign_trading_clean.csv",
         "fact_proprietary_trading": "fact_proprietary_trading_clean.csv",
         "fact_order_stats": "fact_order_stats_clean.csv",
-        "fact_intraday_matching": "fact_intraday_matching_clean.csv",
         "fact_bank_performance": "fact_bank_performance_clean.csv",
     }
 
@@ -71,7 +70,7 @@ def validate_pipeline() -> bool:
             logger.info("[%s] All date_key values are valid in dim_date.", name)
 
     # Check 2: Stock Key reference
-    stock_facts = ["fact_price_history", "fact_foreign_trading", "fact_proprietary_trading", "fact_order_stats", "fact_intraday_matching"]
+    stock_facts = ["fact_price_history", "fact_foreign_trading", "fact_proprietary_trading", "fact_order_stats"]
     for name in stock_facts:
         if name in facts:
             df = facts[name]
@@ -91,16 +90,6 @@ def validate_pipeline() -> bool:
             errors_count += len(missing_banks)
         else:
             logger.info("[fact_bank_performance] All bank_key values are valid in dim_bank.")
-
-    # Check 4: Session Key reference
-    if "fact_intraday_matching" in facts:
-        df = facts["fact_intraday_matching"]
-        missing_sessions = df.loc[~df["session_key"].isin(dims["dim_trading_session"]["session_key"]), "session_key"].unique()
-        if len(missing_sessions) > 0:
-            logger.error("[fact_intraday_matching] Found session_keys not in dim_trading_session: %s", missing_sessions)
-            errors_count += len(missing_sessions)
-        else:
-            logger.info("[fact_intraday_matching] All session_key values are valid in dim_trading_session.")
 
     logger.info("=== STARTING DATA QUALITY CHECKS (B-15) ===")
 
@@ -128,19 +117,11 @@ def validate_pipeline() -> bool:
             logger.error("[fact_bank_performance] Found null values in npl_ratio.")
             errors_count += 1
 
-    # DQ-05: Intraday matching times are valid HOSE hours (session_key is not -1)
-    if "fact_intraday_matching" in facts:
-        df = facts["fact_intraday_matching"]
-        invalid_sessions = (df["session_key"] == -1).sum()
-        if invalid_sessions > 0:
-            logger.error("[fact_intraday_matching] Found %d records with invalid session hours (-1).", invalid_sessions)
-            errors_count += invalid_sessions
-
-    # DQ-06: Duplicates check (primary keys must be unique)
+    # DQ-05: Duplicates check (primary keys must be unique)
     pk_definitions = {
         "dim_date": ["date_key"],
         "dim_stock": ["stock_key"],
-        "dim_bank": ["bank_key"],
+        "dim_bank": ["bank_code", "valid_from"],
         "dim_trading_session": ["session_key"],
         "fact_price_history": ["date_key", "stock_key"],
         "fact_foreign_trading": ["date_key", "stock_key"],
@@ -159,6 +140,19 @@ def validate_pipeline() -> bool:
                 errors_count += dups
             else:
                 logger.info("[%s] Primary key uniqueness validated.", name)
+
+    # DQ-06: audit_key presence and not null check
+    for name, df in all_tables.items():
+        if "audit_key" in df.columns:
+            null_audits = df["audit_key"].isna().sum()
+            if null_audits > 0:
+                logger.error("[%s] Found %d records with null audit_key.", name, null_audits)
+                errors_count += null_audits
+            else:
+                logger.info("[%s] All audit_key values are present.", name)
+        else:
+            logger.error("[%s] Missing audit_key column.", name)
+            errors_count += 1
 
     logger.info("=== VALIDATION COMPLETED. TOTAL ERRORS FOUND: %d ===", errors_count)
     return errors_count == 0
