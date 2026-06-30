@@ -164,7 +164,7 @@ def generate_page1_market_movement():
         "pred_t5": df_pred["predicted_close_price"].iloc[-1],
     }
 
-
+#test commit 2
 def generate_page2_bank_profiling():
     """Page 2 — Bank Profiling (K-Means Clustering).
 
