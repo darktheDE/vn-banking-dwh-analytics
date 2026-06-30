@@ -173,3 +173,4 @@ The project is officially complete when **all** of the following are true:
 - `[ ]` K-Means Silhouette Score is logged and clusters are interpretable.
 - `[ ]` All 3 Looker Studio dashboard pages render from live BigQuery data.
 - `[ ]` All ML model metrics are logged to the Python `logging` system (no bare `print()` statements).
+
