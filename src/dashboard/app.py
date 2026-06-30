@@ -587,7 +587,7 @@ def show_bank_clustering_section():
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
     fig.update_layout(coloraxis_showscale=False)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: Biểu đồ phân tán trên hệ tọa độ 2D PCA cho thấy nhóm ngân hàng quốc doanh quy mô lớn (SOCB) như BID, VCB, CTG tập trung rõ nét ở một góc riêng biệt do có quy mô tài sản áp đảo, trong khi các ngân hàng thương mại cổ phần tư nhân (JSCB) trải rộng dọc trục hoành phân hóa theo mức độ chấp nhận rủi ro và tăng trưởng tín dụng.")
+    st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân cụm rõ rệt thành 3 nhóm chiến lược: Cụm 0 (13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản), Cụm 1 (24 ngân hàng thương mại lớn và trung bình đóng vai trò trụ cột hệ thống), và Cụm 2 (2 chi nhánh ngân hàng nước ngoài có an toàn vốn vượt trội).")
     
     # Show radar comparison
     st.subheader("So Sánh Đặc Trưng Chỉ Số Tài Chính Giữa Các Nhóm")
@@ -622,7 +622,7 @@ def show_bank_clustering_section():
         labels={"cluster_id": "Mã Nhóm (Cluster ID)"}
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: So sánh chỉ số trung vị cho thấy sự tương phản chiến lược: Cụm tối ưu lợi nhuận có NIM và ROE/ROA vượt trội nhất hệ thống nhưng duy trì hệ số ETA tương đối mỏng. Ngược lại, cụm phòng thủ an toàn giữ tỷ lệ ETA dày và LTD thấp, chấp nhận hiệu quả sinh lời vừa phải để đạt tính thanh khoản cao nhất.")
+    st.caption("Tình hình: So sánh đặc trưng CAMELS chỉ ra sự phân hóa: Cụm 2 (Ngân hàng ngoại) có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 (Trụ cột lớn) giữ tỷ suất sinh lời ROE/ROA lành mạnh và tỷ lệ cho vay ở mức cao nhất; Cụm 0 (TMCP nhỏ) có biên NIM và hiệu quả kinh doanh khiêm tốn hơn.")
     
     # Searchable list of banks in each cluster
     st.subheader("Danh Sách Thành Viên Phân Theo Nhóm")

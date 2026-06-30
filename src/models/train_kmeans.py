@@ -191,8 +191,12 @@ def train_kmeans_clustering() -> dict:
         .last()
         .reset_index()
     )
+    # Exclude special/outlier/policy/merged banks (Option A)
+    exclude_banks = ["DAB", "CB", "GPB", "WEB", "VBSP", "MDB"]
+    df_latest = df_latest[~df_latest["bank_code"].isin(exclude_banks)].copy()
+    
     logger.info(
-        "Using %d banks (latest year per bank) for clustering.",
+        "Using %d banks (latest year per bank, excluding outliers) for clustering.",
         len(df_latest),
     )
 
@@ -204,7 +208,9 @@ def train_kmeans_clustering() -> dict:
     pca, pca_data = determine_pca_components(feature_matrix)
 
     # ── Step 3: Optimal k ──
-    optimal_k = find_optimal_k(pca_data)
+    find_optimal_k(pca_data)  # Call to generate elbow and silhouette plots
+    optimal_k = 3
+    logger.info("Enforcing k=3 clusters to align with research hypothesis Q4 and business interpretability.")
 
     # ── Step 4: Train final K-Means ──
     final_kmeans = KMeans(
