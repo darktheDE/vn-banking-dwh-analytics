@@ -156,6 +156,185 @@ def fetch_credit_risk_predictions():
     return df
 
 
+
+@st.cache_data(ttl=600)
+def fetch_eda_data():
+    client = get_bigquery_client()
+    perf_table = get_full_table_id("fact_bank_performance")
+    bank_table = get_full_table_id("dim_bank")
+    query = f"""
+        SELECT
+            CAST(DIV(p.date_key, 10000) AS INT64) as year,
+            b.bank_code,
+            b.bank_type,
+            b.bank_name,
+            p.npl_ratio, p.roa, p.roe, p.nim, p.cir, p.eta, p.etd, p.lta, p.ltd, p.gta,
+            p.total_assets, p.total_deposits, p.total_loans, p.total_equity,
+            p.is_imputed
+        FROM `{perf_table}` p
+        LEFT JOIN `{bank_table}` b ON p.bank_key = b.bank_key
+        ORDER BY year, b.bank_code
+    """
+    df = client.query(query).to_dataframe(create_bqstorage_client=False)
+    return df
+
+
+# ─────────────────────────────────────────────────────────────
+# Phân hệ 0.1: Tổng quan dự án
+# ─────────────────────────────────────────────────────────────
+def show_intro_section():
+    st.header("🎯 Tổng Quan Dự Án & Kiến Trúc Hệ Thống")
+    st.markdown("""
+    Chào mừng bạn đến với **Hệ thống Phân Tích Dữ Liệu Lịch Sử & Dự Báo ML Ngành Ngân Hàng Việt Nam**. 
+    Hệ thống này tích hợp kho dữ liệu đám mây Google BigQuery và các mô hình Học Máy tiên tiến nhằm cung cấp các góc nhìn phân tích sâu rộng cho các nhà quản lý rủi ro và các nhà đầu tư tài chính.
+    """)
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.markdown("""
+        ### 📋 Phạm Vi Nghiệp Vụ
+        *   **Dữ liệu Giao Dịch Chứng Khoán**: Lịch sử giá ngày (OHLCV) và các chỉ số giao dịch khớp lệnh của 4 ngân hàng thương mại trọng điểm: **BID**, **TCB**, **VCB**, và **CTG**.
+        *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: Chuỗi dữ liệu 20 năm (2002–2022) của **46 ngân hàng thương mại Việt Nam** với đầy đủ các thước đo về quy mô, chất lượng tài sản, hiệu quả hoạt động, thanh khoản và độ nhạy cảm thị trường.
+        
+        ### 🏗️ Thiết Kế Kho Dữ Liệu Star Schema (BigQuery)
+        Dữ liệu được tổ chức tối ưu cho truy vấn OLAP dưới dạng Star Schema gồm **9 bảng**:
+        *   **Bảng Dimension (4 bảng)**:
+            *   `dim_date`: Lịch ngày giao dịch, kiểm soát ngày nghỉ/cuối tuần.
+            *   `dim_stock`: Thông tin chi tiết về mã cổ phiếu, sàn giao dịch (HOSE).
+            *   `dim_bank`: Danh mục 46 ngân hàng thương mại, hỗ trợ so sánh phân loại (SCD Type 2).
+            *   `dim_trading_session`: Phân định các phiên giao dịch khớp lệnh trong ngày (ATO, Liên tục, ATC).
+        *   **Bảng Fact (5 bảng)**:
+            *   `fact_price_history`: Lịch sử giá cổ phiếu ngày.
+            *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại và tự doanh.
+            *   `fact_order_stats`: Thống kê lệnh mua/bán và khối lượng khớp.
+            *   `fact_bank_performance`: Các chỉ tiêu tài chính và tỷ số CAMELS hàng năm.
+        """)
+        
+    with col2:
+        st.markdown("""
+        ### 🤖 Các Mô Hồi Học Máy Tích Hợp
+        1.  **Dự Báo Chuỗi Thời Gian (LSTM)**:
+            *   **Mục tiêu**: Dự báo giá đóng cửa từ T+1 đến T+5 cho các cổ phiếu BID, TCB, VCB, CTG.
+            *   **Kiến trúc**: Mô hình học sâu Stacked LSTM thích ứng với khối lượng dữ liệu thực tế của từng ngân hàng.
+        2.  **Phân Nhóm Ngân Hàng (K-Means + PCA)**:
+            *   **Mục tiêu**: Phân đoạn 46 ngân hàng thương mại Việt Nam thành các nhóm có hành vi tài chính tương đồng dựa trên 10 chỉ số CAMELS cốt lõi sau khi đã giảm chiều bằng PCA.
+        3.  **Phân Loại Rủi Ro Tín Dụng (Random Forest)**:
+            *   **Mục tiêu**: Nhận diện sớm nguy cơ nợ xấu của các ngân hàng thương mại (khi tỷ lệ nợ xấu NPL ≥ 3%).
+        """)
+        
+    st.markdown("---")
+    st.subheader("🔗 Luồng Dữ Liệu Hệ Thống (Data Flow)")
+    st.markdown("""
+    ```mermaid
+    graph TD
+        A[Dữ liệu thô: Files Excel/CSV] -->|Trích xuất - Extract| B(Python ETL Pipeline - Pandas)
+        B -->|Làm sạch & Gán Khóa Ngoại| C{Kho dữ liệu Google BigQuery}
+        C -->|Star Schema| D[(Dimension & Fact Tables)]
+        D -->|Feature Engineering| E[Machine Learning Layer]
+        E -->|Huấn Luyện & Dự Báo| E1(Model LSTM / K-Means / Random Forest)
+        E1 -->|Ghi nhận dự báo| D
+        D -->|BigQuery Python SDK| F[Streamlit Dashboard]
+    ```
+    """)
+
+
+# ─────────────────────────────────────────────────────────────
+# Phân hệ 0.2: Phân tích khám phá dữ liệu (EDA)
+# ─────────────────────────────────────────────────────────────
+def show_eda_section():
+    st.header("📊 Phân Tích Khám Phá Dữ Liệu (EDA) CAMELS")
+    st.write("Khám phá phân phối, mối tương quan và xu hướng lịch sử của 46 ngân hàng thương mại dựa trên dữ liệu hiệu quả hoạt động CAMELS.")
+    
+    df = fetch_eda_data()
+    if df.empty:
+        st.error("Không tìm thấy dữ liệu phân tích CAMELS.")
+        return
+        
+    tab1, tab2, tab3 = st.tabs(["📊 Phân Phối Chỉ Số", "🌡️ Ma Trận Tương Quan", "📈 Xu Hướng Theo Thời Gian"])
+    
+    feature_cols = ["npl_ratio", "roa", "roe", "nim", "cir", "eta", "etd", "lta", "ltd", "gta"]
+    ratio_vn_map = {
+        "npl_ratio": "Tỷ lệ nợ xấu (NPL)",
+        "roa": "Tỷ suất sinh lời/Tài sản (ROA)",
+        "roe": "Tỷ suất sinh lời/Vốn CSH (ROE)",
+        "nim": "Biên lãi thuần (NIM)",
+        "cir": "Tỷ lệ chi phí/Thu nhập (CIR)",
+        "eta": "Vốn CSH/Tổng tài sản (ETA)",
+        "etd": "Vốn CSH/Tiền gửi (ETD)",
+        "lta": "Dư nợ cho vay/Tổng tài sản (LTA)",
+        "ltd": "Dư nợ cho vay/Tiền gửi (LTD)",
+        "gta": "Cho vay gộp/Tổng tài sản (GTA)"
+    }
+    
+    with tab1:
+        st.subheader("Phân Phối & Giới Hạn Của Các Chỉ Số Tài Chính")
+        selected_col = st.selectbox(
+            "Chọn chỉ số tài chính cần quan sát",
+            list(ratio_vn_map.keys()),
+            format_func=lambda x: ratio_vn_map[x]
+        )
+        
+        col_data = df[selected_col].dropna()
+        
+        fig = px.histogram(
+            df,
+            x=selected_col,
+            marginal="box",
+            title=f"Phân phối và Biểu đồ hộp của {ratio_vn_map[selected_col]}",
+            labels={selected_col: ratio_vn_map[selected_col]},
+            color_discrete_sequence=["#3b82f6"]
+        )
+        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        
+        stats = col_data.describe().to_frame().T
+        stats.columns = ["Số mẫu", "Trung bình", "Độ lệch chuẩn", "Tối thiểu", "25%", "Trung vị (50%)", "75%", "Tối đa"]
+        st.dataframe(stats, use_container_width=True)
+
+    with tab2:
+        st.subheader("Ma Trận Tương Quan Tuyến Tính Giữa Các Chỉ Số CAMELS")
+        st.write("Giúp phân tích xem các biến tài chính có xu hướng đồng biến hay nghịch biến với nhau.")
+        
+        corr_df = df[feature_cols].corr()
+        corr_df.columns = [ratio_vn_map[c] for c in corr_df.columns]
+        corr_df.index = [ratio_vn_map[c] for c in corr_df.index]
+        
+        fig = px.imshow(
+            corr_df,
+            text_auto=".2f",
+            aspect="auto",
+            color_continuous_scale="RdBu_r",
+            zmin=-1,
+            zmax=1,
+            title="Hệ Số Tương Quan Pearson Giữa Các Tỷ Số CAMELS"
+        )
+        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+
+    with tab3:
+        st.subheader("Xu Hướng Tài Chính Qua Các Năm")
+        trend_col = st.selectbox(
+            "Chọn chỉ số tài chính theo dõi theo thời gian",
+            list(ratio_vn_map.keys()),
+            key="trend_select",
+            format_func=lambda x: ratio_vn_map[x]
+        )
+        
+        yearly_avg = df.groupby(["year", "bank_type"])[trend_col].mean().reset_index()
+        type_map = {"SOCB": "Ngân hàng Nhà nước nắm quyền chi phối (SOCB)", "JSCB": "Ngân hàng TMCP tư nhân (JSCB)", "FOCB": "Ngân hàng nước ngoài/Liên doanh (FOCB)"}
+        yearly_avg["bank_type"] = yearly_avg["bank_type"].map(type_map)
+        
+        fig = px.line(
+            yearly_avg,
+            x="year",
+            y=trend_col,
+            color="bank_type",
+            title=f"Biến động trung bình {ratio_vn_map[trend_col]} giai đoạn 2002–2022",
+            labels={"year": "Năm Báo Cáo", trend_col: ratio_vn_map[trend_col], "bank_type": "Phân Loại Ngân Hàng"},
+            markers=True
+        )
+        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+
+
 # ─────────────────────────────────────────────────────────────
 # Giao diện chính của Dashboard
 # ─────────────────────────────────────────────────────────────
@@ -165,11 +344,12 @@ def main():
     st.title("🏦 Phân Tích Dữ Liệu Lịch Sử & Dự Báo ML Ngành Ngân Hàng")
     st.markdown("---")
     
-    # Menu bên trái (Sidebar)
     st.sidebar.title("Điều Hướng")
     app_mode = st.sidebar.radio(
         "Chọn phân hệ báo cáo",
         [
+            "Tổng Quan Dự Án",
+            "Phân Tích Khám Phá (EDA)",
             "Dự Báo Giá Cổ Phiếu (LSTM)",
             "Phân Nhóm Ngân Hàng (K-Means)",
             "Phân Loại Rủi Ro Tín Dụng (Random Forest)",
@@ -180,7 +360,11 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.info("Nguồn dữ liệu: Google BigQuery Star Schema Data Warehouse")
     
-    if app_mode == "Dự Báo Giá Cổ Phiếu (LSTM)":
+    if app_mode == "Tổng Quan Dự Án":
+        show_intro_section()
+    elif app_mode == "Phân Tích Khám Phá (EDA)":
+        show_eda_section()
+    elif app_mode == "Dự Báo Giá Cổ Phiếu (LSTM)":
         show_price_forecasting_section()
     elif app_mode == "Phân Nhóm Ngân Hàng (K-Means)":
         show_bank_clustering_section()
