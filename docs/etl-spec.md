@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This document specifies the exact Extract, Transform, and Load logic for each of the 7 source Excel files. It serves as the authoritative implementation contract for the Data Engineering role (Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng). All Python ETL scripts in `src/etl/` must conform to these rules.
+This document specifies the exact Extract, Transform, and Load logic for each of the 6 source Excel/CSV files. It serves as the authoritative implementation contract for the Data Engineering role (Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng). All Python ETL scripts in `src/etl/` must conform to these rules.
 
 **Execution Model**: Scheduled Batch Jobs. Stock data runs End-of-Day (EOD). Bank financial data runs Quarterly, aligned with official bank reporting cycles.
 
@@ -22,6 +22,8 @@ These rules apply universally before loading to BigQuery:
 | **Surrogate Key Generation** | Surrogate keys (`stock_key`, `bank_key`, `session_key`) are generated as sequential integers during the Transform step using a lookup dictionary before loading. |
 | **Duplicate Removal** | After loading, duplicate rows by primary key combination must be dropped with `keep='first'`. |
 | **Logging** | Every load step must log the exact row count successfully written to BigQuery using `logging.info()`. |
+| **Incremental Loading** | High-volume fact/dim tables must utilize BigQuery `MERGE` (upsert) queries to insert new and update existing rows, maintaining idempotency. |
+| **DWH Auditing** | Every loaded table must append system fields `_created_at` (current timestamp), `_updated_at` (current timestamp), and `_source_file` (the filename of the raw spreadsheet, e.g. `BID_price_history.xlsx`). |
 
 ---
 
@@ -98,14 +100,7 @@ These rules apply universally before loading to BigQuery:
 
 ---
 
-### 3.5 File F5 — HPG Intraday Ticks (Deprecated/Removed)
-
-This file and task are deprecated/removed as HPG was removed to focus strictly on the banking sector. The table `fact_intraday_matching` remains in the schema but is empty.
-
-
----
-
-### 3.6 Files F6–F7 — Bank Financials → `fact_bank_performance`
+### 3.5 Files F6–F7 — Bank Financials → `fact_bank_performance`
 
 **Expected Volume**: ~667 rows, 47+ columns, covering 46 banks from 2002 to 2022.
 
@@ -150,6 +145,16 @@ Generated programmatically using `pandas.date_range()` covering 2002-01-01 to 20
 
 Populated from the bank identifier columns in the raw CAMELS files (bank code, full name, bank type). `bank_type` must be one of: `SOCB` (State-owned), `JSCB` (Joint Stock), `FOCB` (Foreign-owned).
 
+**SCD Type 2 Ingestion Logic**:
+To track changes in bank attributes (such as `charter_capital`) over time:
+1. When loading a bank record, check if a record with the same `bank_code` already exists in `dim_bank` with `is_current = TRUE`.
+2. If it does not exist, insert it with `valid_from = current_date`, `valid_to = '9999-12-31'`, and `is_current = TRUE`.
+3. If it exists, compare the values of `charter_capital`, `bank_name`, and `bank_type`.
+4. If any attribute has changed:
+   - Perform an UPDATE on the existing record to set `valid_to = current_date - 1` and `is_current = FALSE`.
+   - Perform an INSERT of the new bank record version with `valid_from = current_date`, `valid_to = '9999-12-31'`, and `is_current = TRUE`.
+5. If no attributes changed, ignore/do nothing.
+
 ### 4.4 `dim_trading_session`
 
 | `session_key` | `session_name` | `start_time` | `end_time` |
@@ -163,17 +168,27 @@ Populated from the bank identifier columns in the raw CAMELS files (bank code, f
 
 ## 5. BigQuery Load Configuration
 
-All Fact tables must be loaded using `pandas_gbq` or the `google-cloud-bigquery` Python client with the following settings:
+To enable robust incremental loading (upserts) and guarantee idempotency without creating duplicate records, loading must utilize BigQuery `MERGE` SQL statements.
 
-```python
-job_config = bigquery.LoadJobConfig(
-    write_disposition="WRITE_APPEND",  # Use WRITE_TRUNCATE for full reloads
-    time_partitioning=bigquery.TimePartitioning(
-        type_=bigquery.TimePartitioningType.DAY,
-        field="date_key",  # Cast to DATE in BigQuery table definition
-    ),
-    clustering_fields=["stock_key"],  # or ["bank_key"] for bank fact tables
-)
+### BigQuery MERGE Upsert Template
+
+For daily fact tables (e.g. `fact_price_history`), the incremental loading logic should follow this template:
+
+```sql
+MERGE INTO `{project_id}.{dataset_id}.fact_price_history` target
+USING `{project_id}.{dataset_id}.staging_fact_price_history` staging
+ON target.date_key = staging.date_key AND target.stock_key = staging.stock_key
+WHEN MATCHED THEN
+  UPDATE SET
+    target.open_price = staging.open_price,
+    target.high_price = staging.high_price,
+    target.low_price = staging.low_price,
+    target.close_price = staging.close_price,
+    target.trading_volume = staging.trading_volume,
+    target._updated_at = CURRENT_TIMESTAMP()
+WHEN NOT MATCHED THEN
+  INSERT (date_key, stock_key, open_price, high_price, low_price, close_price, trading_volume, _created_at, _updated_at, _source_file)
+  VALUES (staging.date_key, staging.stock_key, staging.open_price, staging.high_price, staging.low_price, staging.close_price, staging.trading_volume, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), staging._source_file)
 ```
 
-**Idempotency**: Before appending, the ETL script must check if records for the target date already exist in BigQuery and skip the load to prevent duplicates.
+For dimension tables with SCD Type 2 tracking (`dim_bank`), updates must be performed using transactional SQL or multi-step MERGE queries that expire older rows and insert new rows with appropriate valid date windows.

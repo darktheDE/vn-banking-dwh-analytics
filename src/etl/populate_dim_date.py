@@ -58,6 +58,16 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     
     df_date = generate_dim_date()
+    
+    # Append dynamic auditing columns
+    import datetime
+    now = datetime.datetime.utcnow()
+    audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+    df_date["audit_key"] = audit_key
+    df_date["_created_at"] = now
+    df_date["_updated_at"] = now
+    df_date["_source_file"] = "populate_dim_date.py"
+    
     output_path = output_dir / "dim_date_clean.csv"
     df_date.to_csv(output_path, index=False)
     

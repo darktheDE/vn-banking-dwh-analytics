@@ -418,11 +418,10 @@ def save_processed_outputs(
 	eda_path = output_dir / "fact_bank_performance_eda_summary.csv"
 
 	fact_df.to_csv(fact_path, index=False)
-	dim_bank_df.to_csv(dim_path, index=False)
+	# dim_bank_df.to_csv(dim_path, index=False) # Do not overwrite SCD Type 2 version
 	eda_df.to_csv(eda_path, index=False)
 
 	logger.info("Saved cleaned fact data to %s.", fact_path)
-	logger.info("Saved cleaned dim_bank data to %s.", dim_path)
 	logger.info("Saved EDA summary to %s.", eda_path)
 
 	return fact_path, dim_path, eda_path
@@ -470,7 +469,18 @@ def main() -> int:
 	processed_data_path = os.getenv("PROCESSED_DATA_PATH", "./data/processed/")
 	output_dir = Path(args.output_dir) if args.output_dir else Path(processed_data_path)
 
+	import datetime
+	now = datetime.datetime.utcnow()
+	audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+
 	fact_df, dim_bank_df, eda_df = run_bank_performance_etl()
+	
+	# Append dynamic auditing columns
+	fact_df["audit_key"] = audit_key
+	fact_df["_created_at"] = now
+	fact_df["_updated_at"] = now
+	fact_df["_source_file"] = WORKBOOK_NAME
+
 	save_processed_outputs(fact_df, dim_bank_df, eda_df, output_dir)
 
 	logger.info("Bank ETL and EDA complete.")

@@ -11,7 +11,7 @@
 
 Build an automated, end-to-end **data pipeline and ML analytics platform** for the Vietnamese
 financial market, covering:
-- Intraday stock tick data for **BID** (BIDV) and **HPG** (Hoa Phat).
+- Daily stock data (price history, foreign/proprietary trading, order statistics) for bank assets: **BID**, **TCB**, **VCB**, and **CTG** (HPG stock data and intraday ticks have been removed to focus strictly on the banking sector).
 - 20-year CAMELS performance data for **46 Vietnamese commercial banks** (2002–2022).
 
 The output is a Google BigQuery Star Schema Data Warehouse serving 3 machine learning models
@@ -46,18 +46,20 @@ and 3 Looker Studio dashboards.
 
 Memorize these facts. They appear in nearly every task.
 
-### 3.1 BigQuery Star Schema (10 tables total)
+### 3.1 BigQuery Star Schema (9 tables total)
 
 **Dimension Tables** (4):
 
 | Table | Primary Key | Key Fields |
 |-------|------------|-----------|
 | `dim_date` | `date_key` INT64 | `full_date`, `year`, `month`, `quarter`, `is_trading_day` |
-| `dim_stock` | `stock_key` INT64 | `ticker_code` (BID=1, HPG=2), `exchange` (HOSE) |
-| `dim_bank` | `bank_key` INT64 | `bank_code`, `bank_name`, `bank_type` (SOCB/JSCB/FOCB) |
+| `dim_stock` | `stock_key` INT64 | `ticker` (BID, TCB, VCB, CTG), `exchange` (HOSE) |
+| `dim_bank` | `bank_key` INT64 | `bank_code`, `bank_name`, `bank_type` (SOCB/JSCB/FOCB), `valid_from`, `valid_to`, `is_current` (SCD Type 2) |
 | `dim_trading_session` | `session_key` INT64 | `session_name`, `start_time`, `end_time` |
 
-**Fact Tables** (6):
+*Note: All Dimension and Fact tables dynamically append system auditing columns: _created_at (TIMESTAMP), _updated_at (TIMESTAMP), and _source_file (STRING).*
+
+**Fact Tables** (5):
 
 | Table | Foreign Keys | Partitioned By | Clustered By |
 |-------|-------------|----------------|--------------|
@@ -65,7 +67,6 @@ Memorize these facts. They appear in nearly every task.
 | `fact_foreign_trading` | `date_key`, `stock_key` | `date_key` | `stock_key` |
 | `fact_proprietary_trading` | `date_key`, `stock_key` | `date_key` | `stock_key` |
 | `fact_order_stats` | `date_key`, `stock_key` | `date_key` | `stock_key` |
-| `fact_intraday_matching` | `date_key`, `stock_key`, `session_key` | `date_key` | `stock_key` |
 | `fact_bank_performance` | `date_key`, `bank_key` | `date_key` | `bank_key` |
 
 ### 3.2 Trading Session Boundaries (HOSE)
@@ -81,15 +82,14 @@ Memorize these facts. They appear in nearly every task.
 
 | Data | Expected Rows |
 |------|--------------|
-| `fact_price_history` (BID) | 22 rows |
+| `fact_price_history` (BID, TCB, VCB, CTG) | ~11,835 rows |
 | `fact_foreign_trading` (BID) | 22 rows |
 | `fact_proprietary_trading` (BID) | 22 rows |
 | `fact_order_stats` (BID) | 22 rows |
-| `fact_intraday_matching` (HPG) | ~10,000 rows |
 | `fact_bank_performance` (46 banks × ~20 years) | ~667 rows |
 | `dim_date` (2002–2026) | ~9,131 rows |
 | `dim_bank` | 46 rows |
-| `dim_stock` | 2 rows |
+| `dim_stock` | 4 rows |
 | `dim_trading_session` | 4 rows |
 
 ---
@@ -142,10 +142,11 @@ These thresholds are non-negotiable acceptance criteria. Never generate a model 
 | **Surrogate keys** | Generated as sequential integers via lookup dict during Transform step |
 | **Duplicates** | Drop by primary key combination with `keep='first'` after load |
 | **Bank missing values (2002–2005)** | Median imputation per bank; global median fallback; flag with `is_imputed: bool` |
-| **Intraday missing values** | Forward-fill max 1 tick; reject ticks outside HOSE hours |
 | **Daily stock missing values** | Forward-fill max 1 day; log a warning |
 | **`close_price` null** | Reject the row entirely; log `ERROR` |
 | **`npl_ratio` null** | Median imputation mandatory (never forward-fill — this is the classification target) |
+| **Incremental Load** | Perform upserts using BigQuery `MERGE` statements on primary keys (idempotency) |
+| **System Auditing** | Append `_created_at` (current timestamp), `_updated_at` (current timestamp), and `_source_file` (spreadsheet filename) to all rows during transform |
 
 ---
 
@@ -162,6 +163,7 @@ NEVER use ARIMA as a deployed model. It is a baseline benchmark only.
 NEVER load data to BigQuery with WRITE_TRUNCATE unless explicitly performing a full reload.
 NEVER commit .env files, *.json key files, or files in data/raw/ to git.
 NEVER skip the validate_integrity.py check after running ETL scripts.
+NEVER overwrite or corrupt SCD Type 2 history in dim_bank; always expire older records and insert new ones.
 ```
 
 ---

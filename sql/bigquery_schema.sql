@@ -14,7 +14,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_date` (
   month INT64 NOT NULL,
   year INT64 NOT NULL,
   quarter INT64 NOT NULL,
-  is_trading_day BOOLEAN NOT NULL
+  is_trading_day BOOLEAN NOT NULL,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 );
 
 CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_stock` (
@@ -22,7 +26,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_stock` (
   ticker STRING NOT NULL,
   company_name STRING,
   exchange STRING,
-  industry STRING
+  industry STRING,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 );
 
 CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_bank` (
@@ -30,14 +38,35 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_bank` (
   bank_code STRING NOT NULL,
   bank_name STRING,
   bank_type STRING,
-  charter_capital FLOAT64
+  charter_capital FLOAT64,
+  valid_from DATE,
+  valid_to DATE,
+  is_current BOOLEAN,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 );
 
 CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_trading_session` (
   session_key INT64 NOT NULL,
   session_name STRING NOT NULL,
   start_time TIME,
-  end_time TIME
+  end_time TIME,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
+);
+
+CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_audit` (
+  audit_key INT64 NOT NULL,
+  run_id STRING NOT NULL,
+  run_timestamp TIMESTAMP NOT NULL,
+  script_name STRING NOT NULL,
+  source_file STRING,
+  rows_processed INT64,
+  status STRING
 );
 
 -- ------------------------------------------------------------
@@ -51,7 +80,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_price_history` (
   high_price FLOAT64,
   low_price FLOAT64,
   close_price FLOAT64,
-  trading_volume INT64
+  trading_volume INT64,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY stock_key;
@@ -63,7 +96,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_foreign_trading` (
   foreign_sell_volume INT64,
   foreign_net_volume INT64,
   foreign_net_value FLOAT64,
-  foreign_ownership_ratio FLOAT64
+  foreign_ownership_ratio FLOAT64,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY stock_key;
@@ -74,7 +111,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_proprietary_trading` (
   prop_buy_volume INT64,
   prop_sell_volume INT64,
   prop_net_volume INT64,
-  prop_net_value FLOAT64
+  prop_net_value FLOAT64,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY stock_key;
@@ -86,19 +127,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_order_stats` (
   total_buy_volume INT64,
   total_sell_orders INT64,
   total_sell_volume INT64,
-  matched_volume INT64
-)
-PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
-CLUSTER BY stock_key;
-
-CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_intraday_matching` (
-  date_key INT64 NOT NULL,
-  stock_key INT64 NOT NULL,
-  session_key INT64 NOT NULL,
-  timestamp TIMESTAMP,
-  matched_price FLOAT64,
   matched_volume INT64,
-  cumulative_volume INT64
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY stock_key;
@@ -134,7 +167,11 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_bank_performance` (
   lta FLOAT64,
   ltd FLOAT64,
   gta FLOAT64,
-  is_imputed BOOLEAN
+  is_imputed BOOLEAN,
+  audit_key INT64 NOT NULL,
+  _created_at TIMESTAMP,
+  _updated_at TIMESTAMP,
+  _source_file STRING
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY bank_key;

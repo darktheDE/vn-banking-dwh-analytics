@@ -1,46 +1,46 @@
-bank_key,bank_name,bank_code,bank_type,charter_capital
-1,An Binh Commercial Joint Stock Bank,ABB,JSCB,
-2,Asia Commercial Joint Stock Bank,ACB,JSCB,
-3,Vietnam Bank for Agriculture and Rural Development,AGB,SOCB,
-4,Joint Stock Commercial Bank for Investment and Development of Vietnam,BIDV,SOCB,
-5,BacA Joint Stock Commercial Bank,BAB,JSCB,
-6,Bao Viet Joint Stock Commercial Bank,BVB,JSCB,
-7,Construction Bank (former name: Trustbank),CB,JSCB,
-8,Vietnam Joint Stock Commercial Bank of Industry and Trade,CTG,SOCB,
-9,DongA Joint Stock Commercial Bank,DAB,JSCB,
-10,Vietnam Export Import Commercial Joint Stock Bank,EIB,JSCB,
-11,First Joint Stock Commercial Bank,FCB,JSCB,
-12,Great Asia Commercial Joint Stock Bank,GAB,JSCB,
-13,Global Petro Commercial Joint Stock Bank,GPB,JSCB,
-14,Hanoi Building Commercial Joint Stock Bank,HBB,JSCB,
-15,Ho Chi Minh City Development Joint Stock Commercial Bank,HDB,JSCB,
-16,HSBC Bank (Vietnam) Limited,HSBC,FOCB,
-17,Indovina Bank Ltd.,IVB,JSCB,
-18,Kienlong Commercial Joint Stock Bank,KLB,JSCB,
-19,Lien Viet Post Joint Stock Commercial Bank,LVB,JSCB,
-20,Military Commercial Joint Stock Bank,MB,JSCB,
-21,Vietnam Maritime Commercial Joint Stock Bank,MSB,JSCB,
-22,Mekong Development Joint Stock Commercial Bank,MDB,JSCB,
-23,Mekong Housing Bank,MHB,JSCB,
-24,Nam A Commercial Joint Stock Bank,NAB,JSCB,
-25,National Citizen Bank,NCB,JSCB,
-26,Ocean Commercial One Member Limited Liability Bank,OB,JSCB,
-27,Orient Commercial Joint Stock Bank,OCB,JSCB,
-28,Petrolimex Group Commercial Joint Stock Bank,PGB,JSCB,
-29,Southern Commercial Joint Stock Bank,PNB,JSCB,
-30,Vietnam Public Joint Stock Commercial Bank,PVB,JSCB,
-31,Saigon Commercial Bank,SCB,JSCB,
-32,South East Asia Joint Stock Commercial Bank,SEAB,JSCB,
-33,Saigon Bank for Industry & Trade,SGB,JSCB,
-34,Saigon – Hanoi Commercial Joint Stock Bank,SHB,JSCB,
-35,Saigon Thuong Tin Commercial Joint Stock Bank,STB,JSCB,
-36,Viet Nam Technological and Commercial Joint Stock Bank,TCB,JSCB,
-37,VietNam Tin Nghia Commercial Joint Stock Bank,TNB,JSCB,
-38,TienPhong Commercial Joint Stock Bank,TPB,JSCB,
-39,Viet A Joint Stock Commercial Bank,VAB,JSCB,
-40,Vietnam Bank for Social Policies,VBSP,PB,
-41,Joint Stock Commercial Bank for Foreign Trade of Vietnam,VCB,SOCB,
-42,Viet Capital Commercial Joint Stock Bank,VCPB,JSCB,
-43,Vietnam International Commercial Joint Stock Bank,VIB,JSCB,
-44,Vietnam Commercial Joint Stock Bank for Private Enterprise,VPB,JSCB,
-45,Western Commercial Joint Stock Bank,WEB,JSCB,
+bank_key,bank_name,bank_code,bank_type,charter_capital,valid_from,valid_to,is_current,audit_key,_created_at,_updated_at,_source_file
+1,An Binh Commercial Joint Stock Bank,ABB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+2,Asia Commercial Joint Stock Bank,ACB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+3,Vietnam Bank for Agriculture and Rural Development,AGB,SOCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+4,Joint Stock Commercial Bank for Investment and Development of Vietnam,BIDV,SOCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+5,BacA Joint Stock Commercial Bank,BAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+6,Bao Viet Joint Stock Commercial Bank,BVB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+7,Construction Bank (former name: Trustbank),CB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+8,Vietnam Joint Stock Commercial Bank of Industry and Trade,CTG,SOCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+9,DongA Joint Stock Commercial Bank,DAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+10,Vietnam Export Import Commercial Joint Stock Bank,EIB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+11,First Joint Stock Commercial Bank,FCB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+12,Great Asia Commercial Joint Stock Bank,GAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+13,Global Petro Commercial Joint Stock Bank,GPB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+14,Hanoi Building Commercial Joint Stock Bank,HBB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+15,Ho Chi Minh City Development Joint Stock Commercial Bank,HDB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+16,HSBC Bank (Vietnam) Limited,HSBC,FOCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+17,Indovina Bank Ltd.,IVB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+18,Kienlong Commercial Joint Stock Bank,KLB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+19,Lien Viet Post Joint Stock Commercial Bank,LVB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+20,Military Commercial Joint Stock Bank,MB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+21,Vietnam Maritime Commercial Joint Stock Bank,MSB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+22,Mekong Development Joint Stock Commercial Bank,MDB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+23,Mekong Housing Bank,MHB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+24,Nam A Commercial Joint Stock Bank,NAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+25,National Citizen Bank,NCB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+26,Ocean Commercial One Member Limited Liability Bank,OB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+27,Orient Commercial Joint Stock Bank,OCB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+28,Petrolimex Group Commercial Joint Stock Bank,PGB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+29,Southern Commercial Joint Stock Bank,PNB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+30,Vietnam Public Joint Stock Commercial Bank,PVB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+31,Saigon Commercial Bank,SCB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+32,South East Asia Joint Stock Commercial Bank,SEAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+33,Saigon Bank for Industry & Trade,SGB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+34,Saigon – Hanoi Commercial Joint Stock Bank,SHB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+35,Saigon Thuong Tin Commercial Joint Stock Bank,STB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+36,Viet Nam Technological and Commercial Joint Stock Bank,TCB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+37,VietNam Tin Nghia Commercial Joint Stock Bank,TNB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+38,TienPhong Commercial Joint Stock Bank,TPB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+39,Viet A Joint Stock Commercial Bank,VAB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+40,Vietnam Bank for Social Policies,VBSP,PB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+41,Joint Stock Commercial Bank for Foreign Trade of Vietnam,VCB,SOCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+42,Viet Capital Commercial Joint Stock Bank,VCPB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+43,Vietnam International Commercial Joint Stock Bank,VIB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+44,Vietnam Commercial Joint Stock Bank for Private Enterprise,VPB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx
+45,Western Commercial Joint Stock Bank,WEB,JSCB,,2002-01-01,9999-12-31,True,20260630144044,2026-06-30 07:40:44.306461,2026-06-30 07:40:44.306461,VN banks dataset (updated August 2023).xlsx

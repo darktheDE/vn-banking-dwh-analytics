@@ -71,6 +71,16 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     df_stock = generate_dim_stock()
+    
+    # Append dynamic auditing columns
+    import datetime
+    now = datetime.datetime.utcnow()
+    audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+    df_stock["audit_key"] = audit_key
+    df_stock["_created_at"] = now
+    df_stock["_updated_at"] = now
+    df_stock["_source_file"] = "populate_dim_stock.py"
+    
     output_path = output_dir / "dim_stock_clean.csv"
     df_stock.to_csv(output_path, index=False)
 

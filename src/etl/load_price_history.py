@@ -8,6 +8,7 @@ locally as a CSV file.
 from __future__ import annotations
 
 import argparse
+import datetime
 import os
 from pathlib import Path
 import pandas as pd
@@ -17,12 +18,15 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def transform_price_history(df_raw: pd.DataFrame, stock_key: int) -> pd.DataFrame:
+def transform_price_history(df_raw: pd.DataFrame, stock_key: int, audit_key: int, now_ts: datetime.datetime, source_filename: str) -> pd.DataFrame:
     """Transform raw/processed price history data.
 
     Args:
         df_raw: Raw price history DataFrame.
         stock_key: Stock surrogate key to assign.
+        audit_key: Audit run key.
+        now_ts: Execution timestamp.
+        source_filename: Name of the source file.
 
     Returns:
         Transformed DataFrame.
@@ -96,6 +100,12 @@ def transform_price_history(df_raw: pd.DataFrame, stock_key: int) -> pd.DataFram
     # Remove duplicates
     df = df.drop_duplicates(subset=["date_key", "stock_key"], keep="first").sort_values("date_key").reset_index(drop=True)
     
+    # Add audit metadata columns
+    df["audit_key"] = audit_key
+    df["_created_at"] = now_ts
+    df["_updated_at"] = now_ts
+    df["_source_file"] = source_filename
+    
     return df
 
 
@@ -111,6 +121,10 @@ def main() -> int:
     processed_data_path = os.getenv("PROCESSED_DATA_PATH", "./data/processed/")
     output_dir = Path(args.output_dir) if args.output_dir else Path(processed_data_path)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Auditing parameters
+    now = datetime.datetime.utcnow()
+    audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
     
     stock_configs = [
         {"symbol": "BID", "key": 1, "path": "bid/bid_stock_history.csv"},
@@ -127,7 +141,7 @@ def main() -> int:
             logger.info("Processing price history for %s (key %d) from %s...", config["symbol"], config["key"], file_path)
             try:
                 df_raw = pd.read_csv(file_path)
-                df_clean = transform_price_history(df_raw, config["key"])
+                df_clean = transform_price_history(df_raw, config["key"], audit_key, now, file_path.name)
                 all_dfs.append(df_clean)
             except Exception as e:
                 logger.error("Error transforming %s: %s", config["symbol"], str(e))
@@ -140,7 +154,7 @@ def main() -> int:
         if raw_excel.exists():
             logger.info("Falling back to raw Excel: %s", raw_excel)
             df_raw = pd.read_excel(raw_excel)
-            df_clean = transform_price_history(df_raw, 1)
+            df_clean = transform_price_history(df_raw, 1, audit_key, now, raw_excel.name)
             all_dfs.append(df_clean)
 
     if not all_dfs:
