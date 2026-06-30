@@ -317,7 +317,7 @@ def _write_clusters_to_bigquery(
     from google.cloud import bigquery as bq
 
     job_config = bq.LoadJobConfig(
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
     )
 
     job = client.load_table_from_dataframe(

@@ -57,7 +57,7 @@ st.markdown("""
 # ─────────────────────────────────────────────────────────────
 # Các hàm tải dữ liệu (trực tiếp từ BigQuery DWH)
 # ─────────────────────────────────────────────────────────────
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_stock_dimension():
     client = get_bigquery_client()
     table_id = get_full_table_id("dim_stock")
@@ -66,7 +66,7 @@ def fetch_stock_dimension():
     return df
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_actual_price_history(stock_key: int, limit: int = 60):
     client = get_bigquery_client()
     price_table = get_full_table_id("fact_price_history")
@@ -90,7 +90,7 @@ def fetch_actual_price_history(stock_key: int, limit: int = 60):
     return df.sort_values("full_date").reset_index(drop=True)
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_lstm_predictions(stock_key: int):
     client = get_bigquery_client()
     pred_table = get_full_table_id("fact_model_predictions")
@@ -109,7 +109,7 @@ def fetch_lstm_predictions(stock_key: int):
     return df
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_bank_clusters():
     client = get_bigquery_client()
     cluster_table = get_full_table_id("bank_cluster_assignments")
@@ -138,7 +138,7 @@ def fetch_bank_clusters():
     return df
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_credit_risk_predictions():
     client = get_bigquery_client()
     pred_table = get_full_table_id("bank_risk_predictions")
@@ -157,7 +157,7 @@ def fetch_credit_risk_predictions():
 
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=10)
 def fetch_eda_data():
     client = get_bigquery_client()
     perf_table = get_full_table_id("fact_bank_performance")
