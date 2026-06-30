@@ -90,6 +90,8 @@ def fetch_actual_price_history(stock_key: int, limit: int = 60):
 def fetch_lstm_predictions(stock_key: int):
     client = get_bigquery_client()
     pred_table = get_full_table_id("fact_model_predictions")
+    # Training uses WRITE_TRUNCATE (all 4 stocks in one atomic write),
+    # so each stock always has exactly 5 rows — one per T+1 to T+5 horizon.
     query = f"""
         SELECT
             horizon,

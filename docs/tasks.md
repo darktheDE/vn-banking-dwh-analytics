@@ -176,8 +176,8 @@ The project is officially complete when **all** of the following are true:
 
 - `[x]` ETL pipeline runs without errors and all 10 BigQuery tables are populated.
 - `[x]` Data quality validation (B-14, B-15) passes with zero critical errors.
-- `[ ]` LSTM RMSE is lower than the ARIMA baseline.
-- `[ ]` Random Forest achieves AUC-ROC > 0.80 and Recall ≥ 85% for the High Risk class.
-- `[ ]` K-Means Silhouette Score is logged and clusters are interpretable.
+- `[x]` LSTM RMSE is lower than the ARIMA baseline.
+- `[x]` Random Forest achieves AUC-ROC > 0.80 and Recall ≥ 85% for the High Risk class.
+- `[x]` K-Means Silhouette Score is logged and clusters are interpretable.
 - `[ ]` All 3 Looker Studio dashboard pages render from live BigQuery data.
 - `[x]` All ML model metrics are logged to the Python `logging` system (no bare `print()` statements).
