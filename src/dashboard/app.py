@@ -485,15 +485,21 @@ def show_dwh_status_section():
     
     query = f"""
         SELECT
-            table_id as `Tên Bảng (Table ID)`,
-            row_count as `Số Bản Ghi (Row Count)`,
-            ROUND(size_bytes / 1024, 2) as `Dung Lượng (KB)`
+            table_id,
+            row_count,
+            ROUND(size_bytes / 1024, 2) as size_kb
         FROM `{os.getenv("GCP_PROJECT_ID")}.{dataset_id}.__TABLES__`
         ORDER BY row_count DESC
     """
     
     try:
         meta_df = client.query(query).to_dataframe(create_bqstorage_client=False)
+        # Thay đổi tên cột hiển thị tiếng Việt trên tầng ứng dụng Pandas thay vì SQL
+        meta_df = meta_df.rename(columns={
+            "table_id": "Tên Bảng (Table ID)",
+            "row_count": "Số Bản Ghi (Row Count)",
+            "size_kb": "Dung Lượng (KB)"
+        })
         st.table(meta_df)
         
         st.success("Tất cả 10 bảng DWH đang hoạt động ổn định và kết nối thành công!")
