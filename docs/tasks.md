@@ -34,9 +34,9 @@
   - *File*: `sql/bigquery_schema.sql`
   - *Verification*: Dataset visible in GCP Console.
 
-- `[ ]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
+- `[x]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
   - *Verification*: All 4 tables exist with correct schemas matching `docs/star-schema.md`.
-- `[ ]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
+- `[x]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
   - *Verification*: All 6 tables exist. `fact_intraday_matching` and `fact_price_history` have DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
@@ -95,7 +95,7 @@
 
 ### C-1: Feature Engineering
 
-- `[ ]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
+- `[x]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
   - *File*: `src/models/feature_engineering_stock.py`
   - *Verification*: DataFrame has 22 rows, all columns from `docs/data-dictionary.md` Section 4 (derived features included).
 - `[x]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
