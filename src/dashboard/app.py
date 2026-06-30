@@ -450,6 +450,62 @@ def show_price_forecasting_section():
     selected_ticker = st.selectbox("Chọn mã cổ phiếu ngân hàng", list(stock_options.keys()))
     stock_key = stock_options[selected_ticker]
     
+    # LSTM Parameters and Metrics
+    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+    meta_col1, meta_col2 = st.columns([1, 1])
+    
+    if selected_ticker == "BID":
+        hp_info = {
+            "window": "5 ngày (Short window)",
+            "epochs": "50 Epochs",
+            "batch": "8",
+            "units": "64 LSTM Units (Single Layer)",
+            "features": "12 chỉ số (Gồm Dòng tiền Khối ngoại & Tự doanh)",
+            "lstm_rmse": "0.8801",
+            "arima_rmse": "1.1696",
+            "gain": "+24.7% (Vượt trội)"
+        }
+    else:
+        rmse_map = {
+            "TCB": ("1.3093", "9.4864", "+86.2%"),
+            "VCB": ("3.0529", "4.4900", "+32.0%"),
+            "CTG": ("1.4231", "11.3624", "+87.5%")
+        }
+        l_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A"))
+        hp_info = {
+            "window": "30 ngày (Long window)",
+            "epochs": "150 Epochs",
+            "batch": "32",
+            "units": "Stacked LSTM (128 units + 64 units)",
+            "features": "7 chỉ số (OHLCV & Biến động giá/khối lượng)",
+            "lstm_rmse": l_rmse,
+            "arima_rmse": a_rmse,
+            "gain": f"{gain_val} (Vượt trội)"
+        }
+        
+    with meta_col1:
+        st.markdown(f"""
+        **⚙️ Hyperparameters (Tham số huấn luyện):**
+        *   **Thuật toán**: Mạng học sâu Stacked LSTM (Keras)
+        *   **Cửa sổ trượt (Sliding Window)**: {hp_info["window"]}
+        *   **Số chu kỳ (Epochs)**: {hp_info["epochs"]} | **Batch Size**: {hp_info["batch"]}
+        *   **Cấu trúc lớp**: {hp_info["units"]}
+        *   **Số biến đầu vào (Features)**: {hp_info["features"]}
+        *   **Optimizer**: Adam | **Loss Function**: Mean Squared Error (MSE)
+        """)
+        
+    with meta_col2:
+        st.markdown(f"""
+        **📊 Performance Metrics (Chỉ số kiểm thử):**
+        *   **Độ phân tách dữ liệu**: 80% Train / 20% Test (Phân tách theo thời gian thực tế)
+        *   **LSTM RMSE (Thực nghiệm)**: ` {hp_info["lstm_rmse"]} `
+        *   **ARIMA RMSE (Baseline đối chứng)**: ` {hp_info["arima_rmse"]} `
+        *   **Cải thiện so với Baseline**: **{hp_info["gain"]}**
+        *   *Ý nghĩa*: RMSE của LSTM thấp hơn hẳn so với ARIMA chứng minh năng lực học các mẫu phi tuyến tính của chuỗi thời gian chứng khoán Việt Nam.
+        """)
+        
+    st.markdown("---")
+    
     col1, col2 = st.columns([3, 1])
     
     with col1:
@@ -559,6 +615,31 @@ def show_bank_clustering_section():
         st.error("Không tìm thấy dữ liệu phân nhóm ngân hàng.")
         return
         
+    # K-Means Parameters and Metrics
+    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+    meta_col1, meta_col2 = st.columns([1, 1])
+    
+    with meta_col1:
+        st.markdown("""
+        **⚙️ PCA & K-Means Hyperparameters (Tham số mô hình):**
+        *   **Thuật toán**: K-Means Clustering kết hợp Giảm chiều PCA
+        *   **Số thành phần chính (PCA Components)**: $n=2$ (phục vụ vẽ đồ thị 2D. Mô hình gốc giữ lại 3 thành phần chính để giải thích **85.92%** phương sai gốc).
+        *   **Số cụm tối ưu (k)**: $k=3$ (Được lựa chọn qua Phương pháp Khuỷu tay - Elbow Method và Phân tích Hệ số Dáng điệu - Silhouette Analysis).
+        *   **Lọc dữ liệu nhiễu**: Đã loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (`DAB`, `CB`, `GPB`, `WEB`, `VBSP`, `MDB`).
+        *   **Random State**: `42` | **Khởi tạo**: `k-means++`
+        """)
+        
+    with meta_col2:
+        st.markdown("""
+        **📊 Clustering Metrics (Chỉ số chất lượng phân cụm):**
+        *   **Hệ số Dáng điệu (Silhouette Score)**: **`0.4431`** (chứng minh các cụm có ranh giới rõ ràng và độ tách biệt tốt sau khi loại bỏ nhiễu).
+        *   **Chỉ số Davies-Bouldin Index**: **`0.8122`** (giá trị thấp thể hiện các cụm có độ co cụm nội bộ cao và phân tách ngoại bộ tốt).
+        *   **Danh sách biến CAMELS đầu vào**: 10 chỉ số (`npl_ratio`, `roa`, `roe`, `nim`, `cir`, `eta`, `etd`, `lta`, `ltd`, `gta`).
+        *   **Phương pháp chuẩn hóa**: `StandardScaler` (đưa tất cả các biến về phân phối chuẩn trước khi tính khoảng cách Euclidean).
+        """)
+        
+    st.markdown("---")
+    
     st.subheader("Không Gian Phân Tích Phân Nhóm 2D PCA")
     # Standardize and calculate first 2 PCA components on the fly for visualization
     from sklearn.decomposition import PCA
@@ -691,6 +772,31 @@ def show_credit_risk_section():
     # Get the latest predictions
     latest_date_key = pred_df["date_key"].max()
     latest_preds = pred_df[pred_df["date_key"] == latest_date_key].copy()
+    # Random Forest Parameters and Metrics
+    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+    meta_col1, meta_col2 = st.columns([1, 1])
+    
+    with meta_col1:
+        st.markdown("""
+        **⚙️ Random Forest Hyperparameters (Tham số huấn luyện):**
+        *   **Thuật toán**: Random Forest Classifier (Scikit-Learn)
+        *   **Số cây quyết định (Estimators)**: `100` | **Chiều sâu tối đa (Max Depth)**: `5`
+        *   **Cân bằng trọng số lớp (Class Weight)**: `balanced` (do tỷ lệ mẫu rủi ro nợ xấu $\ge$ 3% chỉ chiếm khoảng 5.36% hệ thống).
+        *   **Ngưỡng phân loại tối ưu (Decision Threshold)**: **`0.2327`** (đã hạ từ 0.5 xuống để tối đa hóa chỉ số Recall, ưu tiên cảnh báo sớm rủi ro).
+        *   **Độ phân tách dữ liệu**: Phân tách theo thời gian (Train: 2002-2018, Test: 2019-2022) nhằm chống rò rỉ dữ liệu (data leakage).
+        """)
+        
+    with meta_col2:
+        st.markdown("""
+        **📊 Performance Metrics (Chỉ số kiểm thử trên Test Set):**
+        *   **Độ chính xác toàn cục (Accuracy)**: **`94.44%`**
+        *   **AUC-ROC Score**: **`0.9752`** (Baseline Logistic Regression đối chứng: `0.7811`).
+        *   **Tỷ lệ bắt trúng nợ xấu (Recall Class 1)**: **`91.67%`** (vượt xa ngưỡng cam kết nghiệm thu $\ge 85\%$; Logistic Regression: `66.67%`).
+        *   **Điểm F1-Score (Class 1 - Rủi Ro)**: **`0.8000`** | **Điểm F1-Score (Class 0 - An Toàn)**: **`0.9636`**
+        *   **Mục tiêu tối thượng**: Bảo vệ dòng vốn bằng cách nhận diện sớm 91.67% các ngân hàng có rủi ro nợ xấu bùng phát.
+        """)
+        
+    st.markdown("---")
     
     # Create layout 1:1
     col1, col2 = st.columns([1, 1])
