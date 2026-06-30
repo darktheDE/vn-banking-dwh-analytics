@@ -199,12 +199,13 @@ def show_intro_section():
         *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: **667 dòng** và **47+ cột** chỉ số tài chính, bao phủ **46 ngân hàng thương mại Việt Nam** trong suốt **20 năm** (2002–2022).
         
         ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
-        Dữ liệu được tổ chức dưới dạng Star Schema gồm **9 bảng** tối ưu cho OLAP:
-        *   **Bảng Chiều (4 Dimension tables)**:
+        Dữ liệu được tổ chức dưới dạng Star Schema gồm **10 bảng** tối ưu cho OLAP:
+        *   **Bảng Chiều (5 Dimension tables)**:
             *   `dim_date`: Quản lý thời gian, kiểm soát ngày giao dịch.
             *   `dim_stock`: Thông tin mã cổ phiếu, sàn giao dịch (HOSE).
             *   `dim_bank`: SCD Type 2 quản lý lịch sử thông tin 46 ngân hàng.
             *   `dim_trading_session`: Phiên giao dịch trong ngày (ATO, ATC, Liên tục).
+            *   `dim_audit`: Quản lý nhật ký thực thi ETL, kiểm toán hệ thống và lineage.
         *   **Bảng Thực Thể (5 Fact tables)**:
             *   `fact_price_history`: Lịch sử giá đóng/mở cửa, khối lượng giao dịch ngày.
             *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại & tự doanh.
@@ -243,12 +244,12 @@ def show_intro_section():
     dot_code = """
     digraph G {
         graph [bgcolor="transparent", rankdir=TB, pad=0.3]
-        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=2.6, height=0.5]
+        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=3.0, height=0.5]
         edge [color="#60a5fa", arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#4b5563"]
 
         raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
         etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
-        bq [label="Kho Dữ Liệu DWH\\n(Google BigQuery)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+        bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 5 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
         ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
         app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
 
@@ -309,6 +310,7 @@ def show_eda_section():
             color_discrete_sequence=["#3b82f6"]
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Biểu đồ phân phối tần suất (Histogram) giúp trực quan hóa mật độ tập trung dữ liệu, kết hợp biểu đồ hộp (Boxplot) bên trên để phát hiện các giá trị ngoại lệ (outliers) và khoảng tứ phân vị.")
         
         stats = col_data.describe().to_frame().T
         stats.columns = ["Số mẫu", "Trung bình", "Độ lệch chuẩn", "Tối thiểu", "25%", "Trung vị (50%)", "75%", "Tối đa"]
@@ -332,6 +334,7 @@ def show_eda_section():
             title="Hệ Số Tương Quan Pearson Giữa Các Tỷ Số CAMELS"
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Ma trận tương quan thể hiện mối liên hệ tuyến tính giữa các cặp chỉ số (từ -1 đến 1). Màu đỏ sẫm thể hiện đồng biến mạnh, màu xanh sẫm thể hiện nghịch biến mạnh.")
 
     with tab3:
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
@@ -356,6 +359,7 @@ def show_eda_section():
             markers=True
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Đồ thị đường biểu diễn xu hướng phát triển trung bình của chỉ số tài chính được chọn qua giai đoạn 2002–2022, được phân tách theo ba loại hình ngân hàng để so sánh định hướng chiến lược.")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -461,6 +465,7 @@ def show_price_forecasting_section():
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
             )
             st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+            st.caption("Biểu đồ so sánh giá trị giao dịch lịch sử thực tế (màu xanh) với giá đóng cửa dự báo T+1 đến T+5 (màu đỏ nét đứt) từ mô hình Stacked LSTM để hiển thị xu hướng biến động ngắn hạn.")
         else:
             st.warning("Không đủ dữ liệu trong Kho dữ liệu để biểu diễn đồ thị dự báo.")
             
@@ -537,6 +542,7 @@ def show_bank_clustering_section():
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
     fig.update_layout(coloraxis_showscale=False)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+    st.caption("Biểu đồ phân tán chiếu các ngân hàng lên 2 thành phần chính (PC1 & PC2) của phân tích PCA. Các ngân hàng nằm gần nhau có chung đặc tính tài chính, màu sắc biểu thị cụm phân nhóm K-Means.")
     
     # Show radar comparison
     st.subheader("So Sánh Đặc Trưng Chỉ Số Tài Chính Giữa Các Nhóm")
@@ -571,6 +577,7 @@ def show_bank_clustering_section():
         labels={"cluster_id": "Mã Nhóm (Cluster ID)"}
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
+    st.caption("Biểu đồ cột so sánh hồ sơ tài chính CAMELS trung bình giữa các cụm giúp định vị nhanh chiến lược hoạt động và các thế mạnh/yếu điểm tài chính đặc trưng của từng nhóm ngân hàng.")
     
     # Searchable list of banks in each cluster
     st.subheader("Danh Sách Thành Viên Phân Theo Nhóm")
@@ -632,6 +639,7 @@ def show_credit_risk_section():
         )
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Biểu đồ tròn phân phối trạng thái sức khỏe tín dụng của 46 ngân hàng. Nhóm 'Rủi Ro Cao' (màu đỏ) đại diện cho các ngân hàng được cảnh báo có tỷ lệ nợ xấu NPL ≥ 3%.")
         
     with col2:
         st.subheader("Độ Quan Trọng Của Các Chỉ Số (Feature Importance)")
@@ -659,6 +667,7 @@ def show_credit_risk_section():
         )
         fig_imp.update_layout(height=400, coloraxis_showscale=False)
         st.plotly_chart(fig_imp, use_container_width=True, theme="streamlit")
+        st.caption("Trọng số ảnh hưởng của các tỷ số CAMELS trong mô hình Random Forest. Chỉ số có cột càng dài thể hiện vai trò quyết định càng lớn đối với việc dự báo phân loại rủi ro nợ xấu.")
         
     st.markdown("---")
     st.subheader(f"Bảng Giám Sát Rủi Ro Các Ngân Hàng Thương Mại (Năm: {str(latest_date_key)[:4]})")
