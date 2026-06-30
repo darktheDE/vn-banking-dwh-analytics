@@ -1,6 +1,6 @@
 """Task B-05: Populate dim_stock.
 
-Generates stock dimension records for BID, HPG, TCB, VCB, and CTG, and saves them locally
+Generates stock dimension records for BID, TCB, VCB, and CTG, and saves them locally
 as a CSV file in the processed data directory.
 """
 
@@ -32,27 +32,20 @@ def generate_dim_stock() -> pd.DataFrame:
         },
         {
             "stock_key": 2,
-            "ticker": "HPG",
-            "company_name": "Hoa Phat Group",
-            "exchange": "HOSE",
-            "industry": "Steel / Manufacturing",
-        },
-        {
-            "stock_key": 3,
             "ticker": "TCB",
             "company_name": "Vietnam Technological and Commercial Joint Stock Bank",
             "exchange": "HOSE",
             "industry": "Banking",
         },
         {
-            "stock_key": 4,
+            "stock_key": 3,
             "ticker": "VCB",
             "company_name": "Joint Stock Commercial Bank for Foreign Trade of Vietnam",
             "exchange": "HOSE",
             "industry": "Banking",
         },
         {
-            "stock_key": 5,
+            "stock_key": 4,
             "ticker": "CTG",
             "company_name": "Vietnam Joint Stock Commercial Bank for Industry and Trade",
             "exchange": "HOSE",
@@ -60,7 +53,7 @@ def generate_dim_stock() -> pd.DataFrame:
         },
     ]
     df = pd.DataFrame(records)
-    logger.info("Generated %d stock records (BID, HPG, TCB, VCB, CTG).", len(df))
+    logger.info("Generated %d stock records (BID, TCB, VCB, CTG).", len(df))
     return df
 
 

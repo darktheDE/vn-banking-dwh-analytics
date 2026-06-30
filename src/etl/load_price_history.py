@@ -114,9 +114,9 @@ def main() -> int:
     
     stock_configs = [
         {"symbol": "BID", "key": 1, "path": "bid/bid_stock_history.csv"},
-        {"symbol": "TCB", "key": 3, "path": "tcb/tcb_stock_history.csv"},
-        {"symbol": "VCB", "key": 4, "path": "vcb/vcb_stock_history.csv"},
-        {"symbol": "CTG", "key": 5, "path": "ctg/ctg_stock_history.csv"},
+        {"symbol": "TCB", "key": 2, "path": "tcb/tcb_stock_history.csv"},
+        {"symbol": "VCB", "key": 3, "path": "vcb/vcb_stock_history.csv"},
+        {"symbol": "CTG", "key": 4, "path": "ctg/ctg_stock_history.csv"},
     ]
     
     all_dfs = []
