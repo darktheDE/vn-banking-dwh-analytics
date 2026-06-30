@@ -90,9 +90,8 @@ def fetch_actual_price_history(stock_key: int, limit: int = 60):
 def fetch_lstm_predictions(stock_key: int):
     client = get_bigquery_client()
     pred_table = get_full_table_id("fact_model_predictions")
-    # Filter to the single latest training run using trained_at timestamp.
-    # This deduplicates WRITE_APPEND rows when DML DELETE is unavailable (free tier).
-    # Falls back to base_date_key for older rows that pre-date the trained_at column.
+    # Training uses WRITE_TRUNCATE (all 4 stocks in one atomic write),
+    # so each stock always has exactly 5 rows — one per T+1 to T+5 horizon.
     query = f"""
         SELECT
             horizon,
@@ -100,12 +99,6 @@ def fetch_lstm_predictions(stock_key: int):
         FROM `{pred_table}`
         WHERE stock_key = {stock_key}
           AND model_name = 'LSTM'
-          AND COALESCE(trained_at, TIMESTAMP('1970-01-01')) = (
-              SELECT MAX(COALESCE(trained_at, TIMESTAMP('1970-01-01')))
-              FROM `{pred_table}`
-              WHERE stock_key = {stock_key}
-                AND model_name = 'LSTM'
-          )
         ORDER BY horizon
     """
     df = client.query(query).to_dataframe(create_bqstorage_client=False)

@@ -150,10 +150,10 @@ The following results were obtained from the latest production training run exec
 
 | Bank | Model File | Scaler File | LSTM RMSE | ARIMA RMSE | Acceptance |
 |------|-----------|-------------|-----------|------------|------------|
-| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | Lower than ARIMA | Baseline | PASSED |
-| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | Lower than ARIMA | Baseline | PASSED |
-| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | Lower than ARIMA | Baseline | PASSED |
-| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | Lower than ARIMA | Baseline | PASSED |
+| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | 0.8801 | 1.1696 | PASSED |
+| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | 1.3093 | 9.4864 | PASSED |
+| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | 3.0529 | 4.4900 | PASSED |
+| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | 1.4231 | 11.3624 | PASSED |
 
 - **Feature Adaptation**: BID uses 12 features (OHLCV + foreign/proprietary trading signals). TCB, VCB, and CTG use 7 features (OHLCV + derived price/volume change) due to limited raw trading data availability for those banks.
 - **Output**: T+1 to T+5 predictions written to `fact_model_predictions` in BigQuery.

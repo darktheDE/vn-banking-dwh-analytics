@@ -287,8 +287,8 @@ def train_and_evaluate_stock(stock_key: int, config) -> dict:
         pickle.dump(scaler, f)
     logger.info("Scaler saved to %s", scaler_path)
 
-    # ── Step 7: Generate final predictions and write to BigQuery ──
-    _write_predictions_to_bigquery(df, model, scaler, stock_key, features_list, config, window_size)
+    # ── Step 7: Collect predictions for batch write ──
+    predictions_df = _write_predictions_to_bigquery(df, model, scaler, stock_key, features_list, config, window_size)
 
     return {
         "symbol": symbol,
@@ -297,6 +297,7 @@ def train_and_evaluate_stock(stock_key: int, config) -> dict:
         "arima_rmse": arima_rmse,
         "arima_mae": baseline_metrics["arima_mae"],
         "per_horizon": lstm_metrics,
+        "predictions_df": predictions_df,
     }
 
 
@@ -308,8 +309,13 @@ def _write_predictions_to_bigquery(
     features_list: list,
     config,
     window_size: int = 30,
-) -> None:
-    """Generate T+1 to T+5 predictions from the latest data and write to BigQuery."""
+) -> pd.DataFrame:
+    """Generate T+1 to T+5 predictions from the latest data and return as DataFrame.
+
+    Returns the predictions DataFrame for batch collection. The caller
+    (train_all_lstm_models) is responsible for the final BigQuery write
+    using WRITE_TRUNCATE to atomically replace all stale predictions.
+    """
     feature_data = df[features_list].values
     scaled_data = scaler.transform(feature_data)
 
@@ -329,61 +335,77 @@ def _write_predictions_to_bigquery(
     last_date_key = int(df["date_key"].iloc[-1])
     symbol = STOCK_CONFIGS[stock_key]["symbol"]
 
-    # Build the predictions DataFrame
-    trained_at = pd.Timestamp.utcnow()
+    # Build the predictions DataFrame (no trained_at: existing BQ schema is fixed)
     predictions_df = pd.DataFrame({
         "base_date_key": [last_date_key] * FORECAST_HORIZON,
         "stock_key": [stock_key] * FORECAST_HORIZON,
         "horizon": [f"T+{i + 1}" for i in range(FORECAST_HORIZON)],
         "predicted_close_price": predicted_prices,
         "model_name": ["LSTM"] * FORECAST_HORIZON,
-        "trained_at": [trained_at] * FORECAST_HORIZON,
     })
 
-    logger.info("%s Predictions to write:\n%s", symbol, predictions_df.to_string())
+    logger.info("%s Predictions:\n%s", symbol, predictions_df.to_string())
+    return predictions_df
 
-    # Write to BigQuery (delete old predictions for this stock first, then append)
+
+def _flush_all_predictions_to_bigquery(
+    all_predictions: pd.DataFrame, config
+) -> None:
+    """Write all LSTM predictions for all stocks in a single WRITE_TRUNCATE job.
+
+    Using WRITE_TRUNCATE atomically replaces all previous predictions without
+    requiring DML DELETE, which is unavailable on the BigQuery free tier.
+    """
+    from google.cloud import bigquery as bq
+
     client = get_bigquery_client()
     table_id = get_full_table_id(config.bq_predictions_table)
 
-    from google.cloud import bigquery as bq
-
-    # Remove stale predictions for this stock
-    delete_query = f"""
-        DELETE FROM `{table_id}`
-        WHERE stock_key = {stock_key} AND model_name = 'LSTM'
-    """
-    try:
-        client.query(delete_query).result()
-        logger.info("Deleted old LSTM predictions for stock_key %d.", stock_key)
-    except Exception as e:
-        logger.warning("Could not delete old predictions (may not exist yet): %s", str(e))
-
     job_config = bq.LoadJobConfig(
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
     )
 
     job = client.load_table_from_dataframe(
-        predictions_df, table_id, job_config=job_config
+        all_predictions, table_id, job_config=job_config
     )
-    job.result()  # Wait for completion
+    job.result()
 
     logger.info(
-        "Successfully wrote %d LSTM predictions for %s to %s.",
-        len(predictions_df),
-        symbol,
+        "Flushed %d total LSTM predictions (%d stocks) to %s using WRITE_TRUNCATE.",
+        len(all_predictions),
+        all_predictions["stock_key"].nunique(),
         table_id,
     )
 
 
 def train_all_lstm_models():
-    """Train LSTM forecasting models for all focus banking stocks."""
+    """Train LSTM forecasting models for all focus banking stocks.
+
+    Collects predictions from all 4 stocks and performs a single WRITE_TRUNCATE
+    into BigQuery. This atomically replaces all stale predictions without
+    requiring DML DELETE (which is billing-restricted on the free tier).
+    """
     config = load_config()
     results = {}
+    all_predictions = []
+
     for sk in STOCK_CONFIGS.keys():
         res = train_and_evaluate_stock(sk, config)
         if res:
             results[res["symbol"]] = res
+            if "predictions_df" in res:
+                all_predictions.append(res["predictions_df"])
+
+    if all_predictions:
+        combined = pd.concat(all_predictions, ignore_index=True)
+        logger.info(
+            "All training complete. Writing combined predictions:\n%s",
+            combined.to_string()
+        )
+        _flush_all_predictions_to_bigquery(combined, config)
+    else:
+        logger.error("No predictions collected — BigQuery write skipped.")
+
     logger.info("All LSTM training pipelines complete. Final metrics: %s", results)
 
 
