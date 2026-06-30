@@ -1,4 +1,4 @@
-"""Task C-03: ARIMA and Moving Average baseline for BID stock price forecasting.
+"""Task C-03: ARIMA and Moving Average baseline for banking stock price forecasting.
 
 Used as a performance comparison baseline against LSTM. NOT a production
 deployment. ARIMA is never deployed — it exists solely as a benchmark
@@ -6,6 +6,8 @@ deployment. ARIMA is never deployed — it exists solely as a benchmark
 
 See docs/ml-spec.md Section 4.1.
 """
+
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -70,31 +72,44 @@ def arima_baseline(
         "Fitting ARIMA%s on %d training samples...", order, len(train)
     )
 
-    model = ARIMA(train, order=order)
-    fitted = model.fit()
-
-    # Forecast the length of the test set
-    predictions = fitted.forecast(steps=len(test))
-
-    rmse = float(np.sqrt(mean_squared_error(test.values, predictions.values)))
-    mae = float(mean_absolute_error(test.values, predictions.values))
+    try:
+        model = ARIMA(train, order=order)
+        fitted = model.fit()
+        # Forecast the length of the test set
+        predictions = fitted.forecast(steps=len(test))
+        rmse = float(np.sqrt(mean_squared_error(test.values, predictions.values)))
+        mae = float(mean_absolute_error(test.values, predictions.values))
+    except Exception as e:
+        logger.error("ARIMA baseline fitting failed: %s. Using mean fallback.", str(e))
+        # Fallback to mean prediction
+        mean_pred = train.mean()
+        predictions = pd.Series([mean_pred] * len(test))
+        rmse = float(np.sqrt(mean_squared_error(test.values, predictions.values)))
+        mae = float(mean_absolute_error(test.values, predictions.values))
 
     logger.info("ARIMA%s baseline — RMSE: %.4f, MAE: %.4f", order, rmse, mae)
     return predictions.values, rmse, mae
 
 
-def run_baselines() -> dict:
+def run_baselines(stock_key: int = 1) -> dict:
     """Execute both baseline models and return their metrics.
+
+    Args:
+        stock_key: Stock key (1: BID, 2: TCB, 3: VCB, 4: CTG)
 
     Returns:
         Dictionary with keys 'arima_rmse', 'arima_mae', 'ma_rmse', 'ma_mae'.
     """
     # Load features (only need close_price for baselines)
-    df = build_stock_features()
+    df = build_stock_features(stock_key)
+    if df.empty:
+        logger.error("No features found to run baselines for stock_key %d.", stock_key)
+        return {"arima_rmse": 999.0, "arima_mae": 999.0, "ma_rmse": 999.0, "ma_mae": 999.0}
+
     close_prices = df["close_price"].reset_index(drop=True)
 
     logger.info(
-        "Running baselines on %d trading day records.", len(close_prices)
+        "Running baselines for stock_key %d on %d trading day records.", stock_key, len(close_prices)
     )
 
     # Train/test split — strictly sequential for time series
@@ -119,10 +134,11 @@ def run_baselines() -> dict:
         "ma_mae": ma_mae,
     }
 
-    logger.info("Baseline results: %s", results)
+    logger.info("Baseline results for stock_key %d: %s", stock_key, results)
     return results
 
 
 if __name__ == "__main__":
-    baseline_metrics = run_baselines()
-    logger.info("Baseline evaluation complete. Metrics: %s", baseline_metrics)
+    for sk in [1, 2, 3, 4]:
+        baseline_metrics = run_baselines(sk)
+        logger.info("Baseline evaluation complete for stock_key %d.", sk)

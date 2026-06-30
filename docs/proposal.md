@@ -6,8 +6,9 @@
 
 Việc khai thác và phân tích dữ liệu trong lĩnh vực tài chính ngân hàng tại Việt Nam đang ngày càng trở nên cấp thiết, đặc biệt trong các bài toán đánh giá rủi ro, định giá tài sản và phân tích cấu trúc thị trường. Tuy nhiên, trong quá trình vận hành thực tế, các dữ liệu cốt lõi thường nằm rải rác ở nhiều định dạng, thiếu sự liên kết và gây ra nút thắt lớn về khả năng truy xuất cũng như tổng hợp thông tin. Điều này làm giảm đáng kể năng lực phân tích định lượng của các tổ chức.
 
-Mặc dù đã có nhiều công cụ phân tích tài chính trên thị trường, phần lớn các hệ thống hiện tại hoặc chỉ tập trung vào mảng chứng khoán ngắn hạn, hoặc chỉ báo cáo tài chính ngân hàng một cách rời rạc. Sự thiếu vắng một hệ thống tích hợp toàn diện tạo ra một khoảng trống ứng dụng rõ ràng. Nghiên cứu này đề xuất xây dựng một luồng xử lý dữ liệu đầu cuối toàn diện, bao gồm việc thiết kế Kho dữ liệu Data Warehouse trên nền tảng Google BigQuery với kiến trúc Star Schema, kết hợp triển khai các mô hình Học máy để phân tích tập dữ liệu của 46 ngân hàng Việt Nam trong giai đoạn 2002 đến 2022 và giao dịch của các cổ phiếu tiêu biểu như BID hay HPG.
+Mặc dù đã có nhiều công cụ phân tích tài chính trên thị trường, phần lớn các hệ thống hiện tại hoặc chỉ tập trung vào mảng chứng khoán ngắn hạn, hoặc chỉ báo cáo tài chính ngân hàng một cách rời rạc. Sự thiếu vắng một hệ thống tích hợp toàn diện tạo ra một khoảng trống ứng dụng rõ ràng. Nghiên cứu này đề xuất xây dựng một luồng xử lý dữ liệu đầu cuối toàn diện, bao gồm việc thiết kế Kho dữ liệu Data Warehouse trên nền tảng Google BigQuery với kiến trúc Star Schema, kết hợp triển khai các mô hình Học máy để phân tích tập dữ liệu của 46 ngân hàng Việt Nam trong giai đoạn 2002 đến 2022 và giao dịch của các cổ phiếu ngân hàng tiêu biểu như BID, TCB, VCB, CTG.
 Phạm vi đánh giá tập trung vào ba khía cạnh chính: tính toàn vẹn của hệ thống lưu trữ, độ chính xác của các mô hình dự báo phân loại, và giá trị diễn giải tài chính của các cụm dữ liệu.
+
 
 ## 2 Giới thiệu
 
@@ -29,7 +30,8 @@ Nghiên cứu đặt ra câu hỏi liệu việc chuẩn hóa dữ liệu tập 
 
 ## 5 Phạm vi nghiên cứu
 
-Nghiên cứu này tập trung vào bộ dữ liệu lịch sử đã thu thập từ thị trường Việt Nam. Khối lượng thông tin bao gồm dữ liệu giao dịch cổ phiếu BID và HPG vào giữa năm 2026 cùng bộ dữ liệu tài chính của 46 ngân hàng Việt Nam trong khoảng thời gian hai thập kỷ từ 2002 đến 2022. Phạm vi xây dựng mô hình tập trung vào các thuật toán Machine Learning cổ điển như Random Forest, XGBoost, K-Means và mạng học sâu LSTM căn bản.
+Nghiên cứu này tập trung vào bộ dữ liệu lịch sử đã thu thập từ thị trường Việt Nam. Khối lượng thông tin bao gồm dữ liệu giao dịch cổ phiếu của các ngân hàng trọng tâm BID, TCB, VCB, CTG cùng bộ dữ liệu tài chính của 46 ngân hàng Việt Nam trong khoảng thời gian hai thập kỷ từ 2002 đến 2022. Phạm vi xây dựng mô hình tập trung vào các thuật toán Machine Learning cổ điển như Random Forest, XGBoost, K-Means và mạng học sâu LSTM căn bản.
+
 
 Nghiên cứu không mở rộng sang bài toán giao dịch thuật toán tự động với tần suất mili-giây, không đi sâu vào phân tích ngôn ngữ tự nhiên từ tin tức hay văn bản, và cũng không bao quát toàn bộ các mã chứng khoán trên cả ba sàn giao dịch. Trọng tâm của bài báo là đánh giá thực nghiệm các quy trình chuẩn hóa và phân tích học máy trong bối cảnh chuẩn mực tài chính Việt Nam.
 

@@ -37,7 +37,8 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 - Real-time or milli-second automated algorithmic trading execution systems.
 - Natural Language Processing for sentiment analysis from financial news or social media.
-- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected assets: BID, HPG, and 46 specific banks.
+- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected banking assets: BID, TCB, VCB, CTG, and the 46 commercial banks.
+
 
 ---
 
@@ -52,8 +53,9 @@ Financial analysts and risk managers currently lack a centralized system to cros
 ### FR2: Data Warehousing
 
 - **FR2.1**: The system must store data in a centralized Star Schema architecture on Google BigQuery.
-- **FR2.2**: The schema must include exactly 4 Dimension tables: `dim_date`, `dim_stock`, `dim_bank`, and `dim_trading_session`.
-- **FR2.3**: The schema must include exactly 6 Fact tables: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_intraday_matching`, and `fact_bank_performance`.
+- **FR2.2**: The schema must include 5 Dimension tables: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, and `dim_audit`.
+- **FR2.3**: The schema must include 5 Fact tables: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, and `fact_bank_performance`.
+- **FR2.4**: The schema must support 3 Machine Learning output tables for model predictions: `bank_cluster_assignments`, `bank_risk_predictions`, and `fact_model_predictions`.
 
 ### FR3: Machine Learning Analytics
 
@@ -94,7 +96,6 @@ Financial analysts and risk managers currently lack a centralized system to cros
 | --- | --- | --- | --- |
 | **Foreign and Prop Trading BID** | Excel | Date, Net Volume, Value | 22 Trading Sessions |
 | **Price History and Order Stats BID** | Excel | OHLCV, Buy and Sell Orders, Matched Vol | 22 Trading Sessions |
-| **Intraday Ticks HPG** | Excel | Timestamp, Price, Cumulative Vol | ~10,000 Ticks |
 | **Bank Financials for 46 Banks** | Excel | ROA, ROE, NPL, ETA, NIM, CIR | 20 Years from 2002 to 2022 |
 
 ---

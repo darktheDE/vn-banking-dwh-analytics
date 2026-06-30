@@ -17,8 +17,8 @@
 **Q1:** Dòng tiền từ nhà đầu tư nước ngoài và khối tự doanh có tác động như thế nào đến biến động giá ngắn hạn của cổ phiếu ngân hàng BID?
 -> **Giả thuyết:** Hành vi mua ròng liên tục từ khối ngoại và tự doanh có tương quan thuận chiều mạnh mẽ với xu hướng tăng giá của cổ phiếu BID trong khung thời gian T+1 đến T+5.
 
-**Q2:** Sự phân bổ dòng lệnh mua bán trong phiên giao dịch intraday của cổ phiếu HPG phản ánh điều gì về tâm lý thị trường?
--> **Giả thuyết:** Tỷ trọng lệnh mua chủ động ở các bước giá cao chiếm ưu thế vào thời điểm cuối phiên ATO và trước ATC, cho thấy tâm lý kỳ vọng giá tăng từ các nhà đầu tư tổ chức.
+**Q2:** Xu hướng biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng BID, TCB, VCB, CTG có sự đồng pha hay phân hóa?
+-> **Giả thuyết:** Có sự đồng pha mạnh mẽ trong ngắn hạn giữa các cổ phiếu thuộc nhóm quốc doanh (BID, VCB, CTG), trong khi nhóm cổ phần tư nhân (TCB) có xu hướng biến động độc lập hơn.
 
 **Q3:** Những chỉ số tài chính nào quyết định việc một ngân hàng rơi vào nhóm có rủi ro nợ xấu cao?
 -> **Giả thuyết:** Các ngân hàng có tỷ lệ chi phí trên thu nhập cao và tỷ lệ vốn chủ sở hữu trên tổng tài sản thấp sẽ có khả năng rơi vào nhóm rủi ro nợ xấu vượt mức 3%.
@@ -34,8 +34,8 @@
 
 **Kích thước:**
 
-- Dữ liệu cổ phiếu BID: 4 tệp dữ liệu, mỗi tệp chứa 22 quan sát tương ứng với 22 ngày giao dịch từ giữa tháng 5 đến tháng 6 năm 2026.
-- Dữ liệu cổ phiếu HPG: Hơn 10.000 dòng dữ liệu giao dịch khớp lệnh chi tiết theo từng mức giá và thời gian thực trong ngày 19 tháng 6 năm 2026.
+- Dữ liệu cổ phiếu BID, TCB, VCB, CTG: Hơn 11,835 dòng dữ liệu giá lịch sử hàng ngày.
+
 - Dữ liệu ngân hàng: 667 dòng và hơn 47 cột, bao phủ 46 ngân hàng trong khoảng thời gian 20 năm từ 2002 đến 2022.
 
 **Các biến chính - Data Dictionary sơ lược:**

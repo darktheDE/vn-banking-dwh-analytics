@@ -67,6 +67,16 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     df_session = generate_dim_trading_session()
+    
+    # Append dynamic auditing columns
+    import datetime
+    now = datetime.datetime.utcnow()
+    audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+    df_session["audit_key"] = audit_key
+    df_session["_created_at"] = now
+    df_session["_updated_at"] = now
+    df_session["_source_file"] = "populate_dim_trading_session.py"
+    
     output_path = output_dir / "dim_trading_session_clean.csv"
     df_session.to_csv(output_path, index=False)
 

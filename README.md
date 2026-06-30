@@ -61,7 +61,7 @@ This project is driven by four core research questions:
 | # | Research Question | Hypothesis |
 |---|------------------|------------|
 | **Q1** | How do foreign investor and proprietary desk cash flows affect short-term BID stock price movements? | Sustained net buying from foreign and proprietary desks has a strong positive correlation with BID price trends in the T+1 to T+5 window. |
-| **Q2** | What does the intraday order flow distribution of HPG reveal about market sentiment? | Active buy orders at higher price levels dominate near ATO and before ATC sessions, indicating institutional accumulation behavior. |
+| **Q2** | Do the short-term closing price movements of the four banking stocks (BID, TCB, VCB, CTG) exhibit co-movement or divergence? | There is a strong short-term co-movement among state-owned commercial banks (BID, VCB, CTG), while the joint-stock commercial bank (TCB) exhibits more independent price movements. |
 | **Q3** | Which financial indicators determine whether a bank falls into a high NPL risk group? | Banks with a high Cost-to-Income Ratio and low Equity-to-Asset ratio are most likely to exceed the 3% NPL threshold. |
 | **Q4** | Can Vietnamese bank operating strategies be clearly segmented based on financial data? | Analysis will reveal 3 distinct clusters: state-owned banks optimizing scale, joint-stock banks optimizing profitability, and foreign banks optimizing capital safety. |
 
@@ -72,14 +72,14 @@ This project is driven by four core research questions:
 The platform is designed as a **5-layer, modular, batch-processing pipeline** following the CRISP-DM lifecycle.
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  DATA SOURCE    │     │  ETL PIPELINE    │     │  DATA WAREHOUSE  │
-│                 │     │                  │     │                  │
-│  7 Excel Files  │────▶│ Extract          │────▶│ Google BigQuery  │
-│  - BID (4 files)│     │ Transform/Clean  │     │ Star Schema      │
-│  - HPG (1 file) │     │ Load via API     │     │ 4 Dims · 6 Facts │
-│  - Banks (2)    │     │ Python + Pandas  │     │                  │
-└─────────────────┘     └──────────────────┘     └────────┬─────────┘
+┌───────────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  DATA SOURCE          │     │  ETL PIPELINE    │     │  DATA WAREHOUSE  │
+│                       │     │                  │     │                  │
+│  Excel & CSV Files    │────▶│ Extract          │────▶│ Google BigQuery  │
+│  - Stocks (4 symbols) │     │ Transform/Clean  │     │ Star Schema      │
+│    (BID, TCB, VCB, CTG)     │ Load via API     │     │5 Dims·5 Facts·3ML│
+│  - Banks (2 files)    │     │ Python + Pandas  │     │                  │
+└───────────────────────┘     └──────────────────┘     └────────┬─────────┘
                                                            │
                         ┌──────────────────┐     ┌────────▼─────────┐
                         │  PRESENTATION    │     │  ML & ANALYTICS  │
@@ -119,16 +119,19 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 
 ### Schema Summary
 
-**4 Dimension Tables** (descriptive context):
+**5 Dimension Tables** (descriptive context):
 
 | Table | Description |
 |-------|-------------|
 | `dim_date` | Calendar dimension with trading day flag (2002–2026) |
-| `dim_stock` | BID and HPG stock descriptors |
-| `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification |
+| `dim_stock` | BID, TCB, VCB, CTG stock descriptors (HPG removed to focus strictly on banking) |
+| `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification and SCD Type 2 tracking (`valid_from`, `valid_to`, `is_current`) |
 | `dim_trading_session` | ATO, Morning, Afternoon, ATC session definitions |
+| `dim_audit` | ETL execution run log registry table |
 
-**6 Fact Tables** (quantitative measurements):
+*Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
+
+**5 Fact Tables** (quantitative measurements):
 
 | Table | Granularity | Key Metrics |
 |-------|-------------|-------------|
@@ -136,8 +139,15 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 | `fact_foreign_trading` | Daily per stock | Foreign net volume and value |
 | `fact_proprietary_trading` | Daily per stock | Proprietary desk net volume |
 | `fact_order_stats` | Daily per stock | Buy/sell order counts and matched volume |
-| `fact_intraday_matching` | Tick-level (HPG) | Timestamp, matched price, cumulative volume |
 | `fact_bank_performance` | Annual per bank | Full CAMELS indicators — ROA, ROE, NIM, CIR, NPL, ETA |
+
+**3 Machine Learning Output Tables** (model predictions and clusterings):
+
+| Table | Granularity | Key Metrics |
+|-------|-------------|-------------|
+| `bank_cluster_assignments` | Per bank | Strategic bank cluster labels (`cluster_id`) |
+| `bank_risk_predictions` | Annual per bank | Credit risk classifications (`risk_label`) and probability scores |
+| `fact_model_predictions` | Daily per stock/horizon | Rolling multi-horizon BID closing price forecasting |
 
 **BigQuery Optimizations:**
 - **Partitioning**: All high-volume fact tables partitioned by `date_key` as DATE
@@ -207,8 +217,8 @@ For full model specifications, hyperparameter strategies, and MLOps retraining s
 
 | Source | Description | Volume | Link |
 |--------|-------------|--------|------|
-| **BID Stock Data** | Intraday and daily trading data for BIDV stock — price history, foreign trading, proprietary trading, order statistics | 22 trading sessions (May–June 2026) | [CafeF — BID](https://cafef.vn/du-lieu/lich-su-giao-dich/hose/bid-1.chn) |
-| **HPG Intraday Ticks** | Tick-level matched trade data for Hoa Phat Group on 2026-06-19 | ~10,000 ticks | HOSE market feed |
+| **Stock Price History (BID, TCB, VCB, CTG)** | Daily historical trading data for banking stocks (BID, TCB, VCB, CTG) | 11,835+ rows | [CafeF](https://cafef.vn/) |
+| **BID Stock Daily Stats** | Daily trading stats for BID — foreign trading, proprietary trading, order statistics | 22 trading sessions | [CafeF — BID](https://cafef.vn/du-lieu/lich-su-giao-dich/hose/bid-1.chn) |
 | **VN Bank CAMELS Dataset** | 20-year CAMELS financial performance data for 46 Vietnamese commercial banks (2002–2022) | 667 rows × 47+ columns | [Harvard Dataverse — DOI:10.7910/DVN/RIWA3B](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RIWA3B) |
 
 ### Key Financial Indicators (CAMELS Framework)
@@ -354,12 +364,11 @@ python -m src.etl.populate_dim_stock
 python -m src.etl.populate_dim_bank
 python -m src.etl.populate_dim_trading_session
 
-# Load fact tables (place raw Excel files in data/raw/ first)
+# Load fact tables incrementally via MERGE (place raw Excel/CSV files in data/raw/ first)
 python -m src.etl.load_price_history
 python -m src.etl.load_foreign_trading
 python -m src.etl.load_proprietary_trading
 python -m src.etl.load_order_stats
-python -m src.etl.load_intraday_matching
 python -m src.etl.load_bank_performance
 
 # Validate data integrity
@@ -385,6 +394,14 @@ python -m src.models.train_random_forest   # Train RF; risk labels → BigQuery
 3. Authenticate with your GCP account that has `BigQuery Data Viewer` access
 4. Select your `GCP_PROJECT_ID` and `BQ_DATASET_ID`
 5. Build dashboards per the specifications in [`docs/dashboard-spec.md`](docs/dashboard-spec.md)
+
+### Step 6 — Run the Streamlit Dashboard App
+
+To view the predictions, classifications, and clustering results on a local interactive web interface, execute:
+```bash
+streamlit run src/dashboard/app.py
+```
+Open `http://localhost:8501` in your browser.
 
 ---
 
