@@ -44,9 +44,9 @@
 - `[x]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
   - *File*: `src/etl/populate_dim_date.py`
   - *Verification*: Table row count ≈ 9,131 rows. `is_trading_day` column exists.
-- `[x]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
+- `[x]` **B-05**: Populate `dim_stock` with focus banks (BID, TCB, VCB, CTG) records (4 rows).
   - *File*: `src/etl/populate_dim_stock.py`
-  - *Verification*: 2 rows in table.
+  - *Verification*: 4 rows in table.
 - `[x]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
   - *File*: `src/etl/populate_dim_bank.py`
   - *Verification*: 46 rows in table. No null `bank_code` values.
@@ -55,10 +55,10 @@
 
 ### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
-- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
+- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (Consolidated daily history for BID, TCB, VCB, CTG - 11,835 rows).
   - *File*: `src/etl/load_price_history.py`
   - *Rules*: `docs/etl-spec.md` Section 3.1.
-  - *Verification*: 22 rows in table. No null `close_price`. Log confirms row count.
+  - *Verification*: 11,835 rows in table. No null `close_price`. Log confirms row count.
 - `[x]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
   - *File*: `src/etl/load_foreign_trading.py`
   - *Verification*: 22 rows. Log confirms load.
