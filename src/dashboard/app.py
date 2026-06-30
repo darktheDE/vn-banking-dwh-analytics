@@ -310,6 +310,7 @@ def show_eda_section():
             color_discrete_sequence=["#3b82f6"]
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Biểu đồ phân phối tần suất (Histogram) giúp trực quan hóa mật độ tập trung dữ liệu, kết hợp biểu đồ hộp (Boxplot) bên trên để phát hiện các giá trị ngoại lệ (outliers) và khoảng tứ phân vị.")
         
         stats = col_data.describe().to_frame().T
         stats.columns = ["Số mẫu", "Trung bình", "Độ lệch chuẩn", "Tối thiểu", "25%", "Trung vị (50%)", "75%", "Tối đa"]
@@ -333,6 +334,7 @@ def show_eda_section():
             title="Hệ Số Tương Quan Pearson Giữa Các Tỷ Số CAMELS"
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Ma trận tương quan thể hiện mối liên hệ tuyến tính giữa các cặp chỉ số (từ -1 đến 1). Màu đỏ sẫm thể hiện đồng biến mạnh, màu xanh sẫm thể hiện nghịch biến mạnh.")
 
     with tab3:
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
@@ -357,6 +359,7 @@ def show_eda_section():
             markers=True
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Đồ thị đường biểu diễn xu hướng phát triển trung bình của chỉ số tài chính được chọn qua giai đoạn 2002–2022, được phân tách theo ba loại hình ngân hàng để so sánh định hướng chiến lược.")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -462,6 +465,7 @@ def show_price_forecasting_section():
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
             )
             st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+            st.caption("Biểu đồ so sánh giá trị giao dịch lịch sử thực tế (màu xanh) với giá đóng cửa dự báo T+1 đến T+5 (màu đỏ nét đứt) từ mô hình Stacked LSTM để hiển thị xu hướng biến động ngắn hạn.")
         else:
             st.warning("Không đủ dữ liệu trong Kho dữ liệu để biểu diễn đồ thị dự báo.")
             
@@ -538,6 +542,7 @@ def show_bank_clustering_section():
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
     fig.update_layout(coloraxis_showscale=False)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+    st.caption("Biểu đồ phân tán chiếu các ngân hàng lên 2 thành phần chính (PC1 & PC2) của phân tích PCA. Các ngân hàng nằm gần nhau có chung đặc tính tài chính, màu sắc biểu thị cụm phân nhóm K-Means.")
     
     # Show radar comparison
     st.subheader("So Sánh Đặc Trưng Chỉ Số Tài Chính Giữa Các Nhóm")
@@ -572,6 +577,7 @@ def show_bank_clustering_section():
         labels={"cluster_id": "Mã Nhóm (Cluster ID)"}
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
+    st.caption("Biểu đồ cột so sánh hồ sơ tài chính CAMELS trung bình giữa các cụm giúp định vị nhanh chiến lược hoạt động và các thế mạnh/yếu điểm tài chính đặc trưng của từng nhóm ngân hàng.")
     
     # Searchable list of banks in each cluster
     st.subheader("Danh Sách Thành Viên Phân Theo Nhóm")
@@ -633,6 +639,7 @@ def show_credit_risk_section():
         )
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+        st.caption("Biểu đồ tròn phân phối trạng thái sức khỏe tín dụng của 46 ngân hàng. Nhóm 'Rủi Ro Cao' (màu đỏ) đại diện cho các ngân hàng được cảnh báo có tỷ lệ nợ xấu NPL ≥ 3%.")
         
     with col2:
         st.subheader("Độ Quan Trọng Của Các Chỉ Số (Feature Importance)")
@@ -660,6 +667,7 @@ def show_credit_risk_section():
         )
         fig_imp.update_layout(height=400, coloraxis_showscale=False)
         st.plotly_chart(fig_imp, use_container_width=True, theme="streamlit")
+        st.caption("Trọng số ảnh hưởng của các tỷ số CAMELS trong mô hình Random Forest. Chỉ số có cột càng dài thể hiện vai trò quyết định càng lớn đối với việc dự báo phân loại rủi ro nợ xấu.")
         
     st.markdown("---")
     st.subheader(f"Bảng Giám Sát Rủi Ro Các Ngân Hàng Thương Mại (Năm: {str(latest_date_key)[:4]})")
