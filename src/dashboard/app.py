@@ -494,7 +494,15 @@ def show_price_forecasting_section():
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
             )
             st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-            st.caption("Tình hình: Giá cổ phiếu lịch sử và 5 ngày dự báo từ mô hình LSTM (đường đỏ đứt nét) bám sát xu hướng biến động ngắn hạn. Đối với BID, mô hình tích hợp các tín hiệu dòng tiền khối ngoại và tự doanh để điều chỉnh dự báo chính xác, phản ánh đà giá thực tế thị trường.")
+            # Tình hình phân tích động dựa trên mã cổ phiếu được chọn
+            stock_caption_map = {
+                "BID": "Tình hình: Giá cổ phiếu BID biến động nhạy cảm với dòng tiền lớn. Dự báo LSTM tích hợp sâu các tín hiệu Net Volume và Net Value của tự doanh và khối ngoại phiên hôm trước, giúp mô hình bắt nhanh các xu hướng đảo chiều ngắn hạn và tối ưu hóa đà giá dự kiến.",
+                "TCB": "Tình hình: Cổ phiếu TCB có tính độc lập cao và biên độ biến động lớn so với nhóm quốc doanh. Dự báo LSTM phản ánh đúng tính chu kỳ của Techcombank, bám sát các nhịp tích lũy trước khi bứt phá theo cung cầu thị trường bán lẻ.",
+                "VCB": "Tình hình: VCB là cổ phiếu đầu ngành đóng vai trò giữ nhịp VN-Index với tính ổn định cao nhất. Dự báo LSTM của VCB thể hiện xu hướng củng cố nền tảng giá vững chắc, ít biến động đột biến và phản ánh xu thế tăng trưởng dài hạn vững vàng.",
+                "CTG": "Tình hình: CTG có độ tương quan và đồng pha rất cao với nhóm ngân hàng quốc doanh (VCB, BID). Dự báo LSTM bắt đúng các sóng phục hồi kỹ thuật ngắn hạn và các nhịp tích lũy chặt chẽ quanh vùng giá hỗ trợ lịch sử."
+            }
+            selected_stock_caption = stock_caption_map.get(selected_ticker, "Tình hình: Dự báo LSTM bám sát giá cổ phiếu đóng cửa lịch sử nhằm mô phỏng chính xác xu thế biến động giá ngắn hạn tiếp theo.")
+            st.caption(selected_stock_caption)
         else:
             st.warning("Không đủ dữ liệu trong Kho dữ liệu để biểu diễn đồ thị dự báo.")
             
