@@ -195,7 +195,7 @@ project_id = "my-actual-project-id"
 
 | Data Type | Strategy | Reference |
 |-----------|----------|-----------|
-| Intraday stock ticks (HPG) | Forward-fill, max 1 tick | `docs/etl-spec.md` §3.5 |
+| Intraday stock ticks (HPG) | Forward-fill, max 1 tick (Deprecated/Empty) | `docs/etl-spec.md` §3.5 |
 | Bank financial ratios 2002–2005 | Column-median imputation | `docs/etl-spec.md` §3.6 |
 | Daily BID data (price, foreign, prop) | Forward-fill, max 1 day | `docs/etl-spec.md` §3.1–3.3 |
 | Critical fields (`close_price`, `npl_ratio`) | Reject row; log error | `docs/data-dictionary.md` §5 |
@@ -392,7 +392,7 @@ This script checks:
 - `npl_ratio` values are in the range [0.0, 1.0]
 - `close_price` values are strictly positive
 - No null values remain in any CAMELS ratio column after imputation
-- HPG intraday ticks are within valid HOSE session hours
+- HPG intraday ticks are within valid HOSE session hours (if data is present; empty in production)
 
 ### 7.2 Model Acceptance Validation
 

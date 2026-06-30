@@ -11,7 +11,7 @@
 
 Build an automated, end-to-end **data pipeline and ML analytics platform** for the Vietnamese
 financial market, covering:
-- Intraday stock tick data for **BID** (BIDV) and **HPG** (Hoa Phat).
+- Daily stock data (price history, foreign/proprietary trading, order statistics) for bank assets: **BID**, **TCB**, **VCB**, and **CTG** (HPG stock data and intraday ticks have been removed to focus strictly on the banking sector).
 - 20-year CAMELS performance data for **46 Vietnamese commercial banks** (2002–2022).
 
 The output is a Google BigQuery Star Schema Data Warehouse serving 3 machine learning models
@@ -53,7 +53,7 @@ Memorize these facts. They appear in nearly every task.
 | Table | Primary Key | Key Fields |
 |-------|------------|-----------|
 | `dim_date` | `date_key` INT64 | `full_date`, `year`, `month`, `quarter`, `is_trading_day` |
-| `dim_stock` | `stock_key` INT64 | `ticker_code` (BID=1, HPG=2), `exchange` (HOSE) |
+| `dim_stock` | `stock_key` INT64 | `ticker` (BID, TCB, VCB, CTG), `exchange` (HOSE) |
 | `dim_bank` | `bank_key` INT64 | `bank_code`, `bank_name`, `bank_type` (SOCB/JSCB/FOCB) |
 | `dim_trading_session` | `session_key` INT64 | `session_name`, `start_time`, `end_time` |
 
@@ -81,15 +81,15 @@ Memorize these facts. They appear in nearly every task.
 
 | Data | Expected Rows |
 |------|--------------|
-| `fact_price_history` (BID) | 22 rows |
+| `fact_price_history` (BID, TCB, VCB, CTG) | ~11,835 rows |
 | `fact_foreign_trading` (BID) | 22 rows |
 | `fact_proprietary_trading` (BID) | 22 rows |
 | `fact_order_stats` (BID) | 22 rows |
-| `fact_intraday_matching` (HPG) | ~10,000 rows |
+| `fact_intraday_matching` | 0 rows (deprecated/empty) |
 | `fact_bank_performance` (46 banks × ~20 years) | ~667 rows |
 | `dim_date` (2002–2026) | ~9,131 rows |
 | `dim_bank` | 46 rows |
-| `dim_stock` | 2 rows |
+| `dim_stock` | 4 rows |
 | `dim_trading_session` | 4 rows |
 
 ---
@@ -142,7 +142,7 @@ These thresholds are non-negotiable acceptance criteria. Never generate a model 
 | **Surrogate keys** | Generated as sequential integers via lookup dict during Transform step |
 | **Duplicates** | Drop by primary key combination with `keep='first'` after load |
 | **Bank missing values (2002–2005)** | Median imputation per bank; global median fallback; flag with `is_imputed: bool` |
-| **Intraday missing values** | Forward-fill max 1 tick; reject ticks outside HOSE hours |
+| **Intraday missing values** | Forward-fill max 1 tick; reject ticks outside HOSE hours (deprecated/empty) |
 | **Daily stock missing values** | Forward-fill max 1 day; log a warning |
 | **`close_price` null** | Reject the row entirely; log `ERROR` |
 | **`npl_ratio` null** | Median imputation mandatory (never forward-fill — this is the classification target) |
