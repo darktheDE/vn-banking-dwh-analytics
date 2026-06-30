@@ -29,9 +29,9 @@ These rules apply universally before loading to BigQuery:
 
 ## 3. Per-File Transformation Specification
 
-### 3.1 File F3 — BID Price History → `fact_price_history`
+### 3.1 File F3 — Consolidated Price History (BID, TCB, VCB, CTG) → `fact_price_history`
 
-**Source Sheet**: Sheet 1 of the BID Price file.
+**Source**: Processed CSV files per bank in `data/processed/<ticker>/<ticker>_stock_history.csv`.
 
 **Column Mappings**:
 
@@ -44,9 +44,11 @@ These rules apply universally before loading to BigQuery:
 | Close / Đóng cửa | `close_price` | Cast to `float64`. This is the **LSTM target variable**. |
 | Volume / Khối lượng | `trading_volume` | Cast to `Int64`. Remove commas before casting. |
 
+**Stock Key Assignment**: BID=1, TCB=2, VCB=3, CTG=4.
+
 **Missing Value Rule**: No forward-fill. If `close_price` is null for any row, reject the row and log a warning.
 
-**Validation**: Row count after load must equal 22. If not, raise a critical error.
+**Validation**: Consolidated row count after load equals 11,835 across all 4 banks.
 
 ---
 

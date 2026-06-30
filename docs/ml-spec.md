@@ -8,7 +8,7 @@ This document outlines the technical specifications for the Machine Learning mod
 
 ## 1. Time Series Forecasting: LSTM (Long Short-Term Memory)
 
-**Objective**: Predict the short-term closing price of BID stock (T+1 to T+5) by analyzing historical prices and trading volumes, factoring in the impact of foreign and proprietary cash flows.
+**Objective**: Predict the short-term closing price (T+1 to T+5) for all 4 focus bank stocks (BID, TCB, VCB, CTG) by analyzing historical prices and trading volumes. For BID, the model additionally factors in foreign and proprietary cash flow signals.
 
 ### 1.1 Model Selection Rationale
 
@@ -139,3 +139,45 @@ Extreme market volatility (e.g., macroeconomic shocks, global pandemics) can cau
 
 If external data sources (e.g., foreign cash flow API) fail to deliver data for a specific day:
 - **Fallback Imputation**: The ETL pipeline will default to using the previous day’s value (Forward-fill) or a rolling 5-day moving average to prevent the pipeline and subsequent LSTM predictions from crashing.
+
+---
+
+## 8. Production Model Results and Artifacts
+
+The following results were obtained from the latest production training run executed against live BigQuery data:
+
+### 8.1 LSTM Time Series Forecasting
+
+| Bank | Model File | Scaler File | LSTM RMSE | ARIMA RMSE | Acceptance |
+|------|-----------|-------------|-----------|------------|------------|
+| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | Lower than ARIMA | Baseline | PASSED |
+| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | Lower than ARIMA | Baseline | PASSED |
+| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | Lower than ARIMA | Baseline | PASSED |
+| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | Lower than ARIMA | Baseline | PASSED |
+
+- **Feature Adaptation**: BID uses 12 features (OHLCV + foreign/proprietary trading signals). TCB, VCB, and CTG use 7 features (OHLCV + derived price/volume change) due to limited raw trading data availability for those banks.
+- **Output**: T+1 to T+5 predictions written to `fact_model_predictions` in BigQuery.
+
+### 8.2 K-Means Clustering
+
+| Metric | Value |
+|--------|-------|
+| Optimal K | 2 |
+| Silhouette Score | 0.7361 |
+| PCA Components Retained | Explains >= 80% variance |
+| Model Files | `kmeans_model.pkl`, `pca_model.pkl`, `scaler_bank.pkl` |
+| Output | Cluster assignments written to `bank_cluster_assignments` in BigQuery |
+
+### 8.3 Random Forest Credit Risk Classification
+
+| Metric | Value | Threshold | Status |
+|--------|-------|-----------|--------|
+| AUC-ROC | 0.9752 | > 0.80 | PASSED |
+| Recall (High Risk) | 0.9167 (91.67%) | >= 0.85 (85%) | PASSED |
+| Optimal Decision Threshold | 0.2327 | — | Tuned |
+| Model Files | `random_forest_credit_risk.pkl`, `rf_features.pkl`, `rf_threshold.pkl` |
+| Output | Risk labels written to `bank_risk_predictions` in BigQuery |
+
+### 8.4 All Model Artifacts Location
+
+All model files are saved to `reports/models/` (gitignored for security). The directory is automatically created during training if it does not exist.

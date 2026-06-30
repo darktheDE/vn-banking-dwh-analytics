@@ -60,12 +60,17 @@ The core intelligence of the platform, executing both supervised and unsupervise
 ### 2.5 Presentation & Serving Layer
 
 The front-end interface where stakeholders interact with the data and insights.
-- **Technology Stack**: Looker Studio.
-- **Data Connection**: Native, direct connector to Google BigQuery eliminating manual CSV exports.
-- **Dashboards**:
-- **Market Movement**: Visualizes historical vs. LSTM-predicted prices alongside foreign and proprietary cash flow volume bars.
-- **Bank Profiling**: Scatter plots and radar charts displaying K-Means clustering results.
-- **Risk Monitoring**: Risk classification matrix detailing which banks are approaching or exceeding the 3% NPL threshold based on Random Forest predictions.
+- **Technology Stack**: Streamlit (implemented) and Looker Studio (planned).
+- **Data Connection**: Native, direct connector to Google BigQuery eliminating manual CSV exports. Streamlit uses `google-cloud-bigquery` Python SDK with `create_bqstorage_client=False` to bypass Storage API permission restrictions.
+- **Streamlit Dashboard** (`src/dashboard/app.py`):
+    - **Market Price Forecasting (LSTM)**: Interactive line chart of historical vs. LSTM-predicted closing prices for BID, TCB, VCB, and CTG with T+1 to T+5 forecast horizon table.
+    - **Bank Clustering (K-Means)**: PCA 2D scatter plot of 46 banks color-coded by cluster, grouped bar chart comparing average CAMELS ratios across clusters, and filterable bank member tables.
+    - **Credit Risk Classifier (RF)**: Pie chart of risk distribution, horizontal bar chart of Random Forest feature importances, and a live searchable risk monitoring table with color-coded alert labels.
+    - **DWH System Status**: Real-time row counts and schema metadata for all 10 Star Schema tables.
+- **Looker Studio Dashboards** (planned):
+    - **Market Movement**: Visualizes historical vs. LSTM-predicted prices alongside foreign and proprietary cash flow volume bars.
+    - **Bank Profiling**: Scatter plots and radar charts displaying K-Means clustering results.
+    - **Risk Monitoring**: Risk classification matrix detailing which banks are approaching or exceeding the 3% NPL threshold based on Random Forest predictions.
 
 ---
 
@@ -85,8 +90,10 @@ graph TD
 
     E1 -->|Load Outputs| D
 
-    D -->|Native Connection| F[Looker Studio]
-    F -->|Render| G([Interactive Dashboards])
+    D -->|BigQuery Python SDK| F1[Streamlit Dashboard]
+    D -->|Native Connection| F2[Looker Studio - Planned]
+    F1 -->|Render| G([Interactive Dashboards])
+    F2 -->|Render| G
 ```
 
 ---

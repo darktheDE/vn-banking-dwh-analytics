@@ -116,15 +116,40 @@ Records daily statistics on market order placements representing supply and dema
 
 Records the annual and quarterly financial health indicators of the commercial banks.
 - **Foreign Keys**: `date_key` pointing to the financial reporting date, `bank_key`
-- **Metrics for CAMELS framework extracts**:
-- `total_assets` of type FLOAT64
-- `total_deposits` of type FLOAT64
-- `total_loans` of type FLOAT64
-- `npl_ratio` of type FLOAT64: Non-Performing Loan ratio
+- **Scale Metrics**:
+- `total_assets` of type FLOAT64: Total assets (VND billions)
+- `total_deposits` of type FLOAT64: Total customer deposits (VND billions)
+- `total_loans` of type FLOAT64: Total loan portfolio (VND billions)
+- `total_equity` of type FLOAT64: Total shareholder equity (VND billions)
+- `num_employees` of type INT64: Number of employees
+- `num_branches` of type INT64: Number of branches
+- **Asset Quality Metrics**:
+- `npl_amount` of type FLOAT64: Non-Performing Loan balance (VND billions)
+- `loan_loss_provision` of type FLOAT64: Loan Loss Provision balance (VND billions)
+- `npl_ratio` of type FLOAT64: NPL / Total Loans (Classification target, threshold >= 3%)
+- `llp_ratio` of type FLOAT64: LLP / Total Loans
+- **Income and Expense Metrics**:
+- `interest_income` of type FLOAT64
+- `interest_expense` of type FLOAT64
+- `net_interest_income` of type FLOAT64
+- `non_interest_expense` of type FLOAT64
+- `personnel_expense` of type FLOAT64
+- `other_expense` of type FLOAT64
+- `profit_before_tax` of type FLOAT64
+- `profit_after_tax` of type FLOAT64
+- `off_balance_sheet` of type FLOAT64
+- **CAMELS Performance Ratios**:
 - `roa` of type FLOAT64: Return on Assets
 - `roe` of type FLOAT64: Return on Equity
 - `nim` of type FLOAT64: Net Interest Margin
 - `cir` of type FLOAT64: Cost to Income Ratio
+- `eta` of type FLOAT64: Equity to Total Assets (Capital Adequacy)
+- `etd` of type FLOAT64: Equity to Total Deposits
+- `lta` of type FLOAT64: Loans to Total Assets (Liquidity)
+- `ltd` of type FLOAT64: Loans to Total Deposits
+- `gta` of type FLOAT64: Gross Loans to Total Assets (Sensitivity)
+- **ETL Flag**:
+- `is_imputed` of type BOOLEAN: True if any value was median-imputed (2002-2005 data)
 
 ---
 
