@@ -235,7 +235,7 @@ def _build_bank_lookup(banks_df: pd.DataFrame) -> pd.DataFrame:
 	lookup["bank_code"] = lookup["bank_code"].astype(str).str.strip().str.upper()
 	lookup["bank_name"] = lookup["bank_name"].astype(str).str.strip()
 	lookup["bank_type"] = lookup["bank_type"].astype(str).str.strip().str.upper()
-	lookup["charter_capital"] = pd.NA
+	lookup["charter_capital"] = pd.NA  # Raw Excel does not contain charter capital data; initialized as NULL for future extension
 	lookup = lookup.dropna(subset=["bank_key", "bank_code", "bank_name", "bank_type"])
 	lookup = lookup.drop_duplicates(subset=["bank_code"], keep="first").reset_index(drop=True)
 	return lookup
