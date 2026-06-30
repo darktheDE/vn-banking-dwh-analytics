@@ -270,6 +270,14 @@ def show_eda_section():
     st.header("📊 Phân Tích Khám Phá Dữ Liệu (EDA) CAMELS")
     st.write("Khám phá phân phối, mối tương quan và xu hướng lịch sử của 46 ngân hàng thương mại dựa trên dữ liệu hiệu quả hoạt động CAMELS.")
     
+    with st.expander("💡 Câu Chuyện Dữ Liệu: Mối Tương Quan & Phân Phối CAMELS", expanded=True):
+        st.markdown("""
+        Khi phân tích dữ liệu CAMELS của 46 ngân hàng Việt Nam giai đoạn 2002–2022, chúng ta thấy một câu chuyện rõ rệt về **sự đánh đổi giữa lợi nhuận và an toàn vốn**:
+        1. **Tương quan sinh lời**: ROA và ROE có mối tương quan thuận mạnh mẽ, phản ánh hiệu quả sử dụng tài sản chuyển hóa trực tiếp thành giá trị cổ đông. Tuy nhiên, các ngân hàng có ROE quá cao đôi khi đi kèm với tỷ lệ an toàn vốn ETA (Vốn chủ sở hữu / Tổng tài sản) thấp, cho thấy đòn bẩy tài chính đang được sử dụng ở mức cao.
+        2. **Tỷ lệ chi phí và Lợi nhuận**: Hệ số CIR (Chi phí hoạt động / Thu nhập hoạt động) tỷ lệ nghịch với hiệu quả sinh lời. Những ngân hàng tối ưu hóa quy trình vận hành tốt (CIR thấp) thường duy trì được mức NIM và ROA vượt trội.
+        3. **Xu hướng phân hóa dài hạn**: Nhóm ngân hàng Nhà nước nắm quyền chi phối (SOCB) thường chấp nhận biên lãi ròng NIM thấp hơn để hỗ trợ nền kinh tế, bù lại họ có quy mô tài sản vượt trội. Ngược lại, nhóm ngân hàng thương mại cổ phần tư nhân (JSCB) năng động hơn trong việc tối ưu NIM nhưng biến động nợ xấu (NPL) cũng nhạy cảm hơn với chu kỳ kinh tế.
+        """)
+    
     df = fetch_eda_data()
     if df.empty:
         st.error("Không tìm thấy dữ liệu phân tích CAMELS.")
@@ -408,6 +416,13 @@ def show_price_forecasting_section():
     st.header("📈 Dự Báo Giá Cổ Phiếu Trọng Điểm (LSTM)")
     st.write("Mô hình học sâu LSTM thực hiện dự báo giá đóng cửa của các cổ phiếu ngân hàng trong 5 ngày giao dịch tiếp theo (T+1 đến T+5).")
     
+    with st.expander("💡 Câu Chuyện Dữ Liệu: Dự Báo Xu Hướng Giá Cổ Phiếu Ngân Hàng", expanded=True):
+        st.markdown("""
+        Giá cổ phiếu ngân hàng trên sàn HOSE không chỉ vận động theo quy luật ngẫu nhiên mà chịu ảnh hưởng lớn bởi **xu hướng ngắn hạn và dòng tiền thông minh**:
+        1. **Dòng tiền khối ngoại và Tự doanh**: Lịch sử giao dịch chứng minh hành vi mua/bán ròng liên tục của khối ngoại và tự doanh là tín hiệu dẫn dắt thị trường (leading indicators). Dòng tiền ròng ngày hôm trước (`lag 1`) có tương quan thuận chiều với giá đóng cửa của các phiên tiếp theo.
+        2. **Dự báo chuỗi thời gian**: Mô hình LSTM học các đặc trưng phi tuyến từ chuỗi trượt 5 ngày giao dịch. Dự báo T+1 đến T+5 cung cấp cái nhìn định lượng về đà giá (momentum), giúp nhà đầu tư đưa ra quyết định giao dịch ngắn hạn tối ưu, thay thế các phương pháp kỹ thuật thủ công.
+        """)
+    
     # Load stocks
     stocks_df = fetch_stock_dimension()
     if stocks_df.empty:
@@ -504,6 +519,14 @@ def show_price_forecasting_section():
 def show_bank_clustering_section():
     st.header("📊 Phân Nhóm & Phác Họa Đặc Trưng Ngân Hàng (K-Means)")
     st.write("Phân nhóm 46 ngân hàng thương mại Việt Nam dựa trên 10 tỷ số tài chính CAMELS đã được chuẩn hóa và giảm chiều bằng PCA.")
+    
+    with st.expander("💡 Câu Chuyện Dữ Liệu: Phân Cụm Chiến Lược Hoạt Động Ngân Hàng", expanded=True):
+        st.markdown("""
+        Sử dụng PCA để giảm từ 10 biến CAMELS về 2 không gian tọa độ chính đã bộc lộ **3 phong cách hoạt động kinh doanh ngân hàng rõ rệt tại Việt Nam**:
+        1. **Cụm Quy Mô & Vận Hành (Thường là SOCB)**: Sở hữu quy mô tổng tài sản khổng lồ nhưng biên NIM ở mức vừa phải và hệ số ETA mỏng do đòn bẩy cao.
+        2. **Cụm Tối Ưu Lợi Nhuận (Thường là các JSCB lớn như TCB, VPB)**: Đặc trưng bởi NIM rất cao, CIR được tối ưu hóa sâu sắc và ROE/ROA ấn tượng, đi kèm với đòn bẩy tài chính linh hoạt.
+        3. **Cụm An Toàn & Thận Trọng (Thường là FOCB hoặc các ngân hàng nhỏ tự tái cơ cấu)**: Duy trì hệ số ETA cực kỳ dày, tỷ lệ LTD thấp để phòng ngừa rủi ro thanh khoản, chấp nhận tăng trưởng tín dụng chậm để bảo vệ chất lượng tài sản.
+        """)
     
     # Load clusters data
     clusters_df = fetch_bank_clusters()
@@ -611,6 +634,13 @@ def show_bank_clustering_section():
 def show_credit_risk_section():
     st.header("🛡️ Phân Loại & Giám Sát Rủi Ro Tín Dụng (Random Forest)")
     st.write("Nhận diện các ngân hàng có rủi ro tín dụng cao (tỷ lệ nợ xấu NPL thực tế hoặc dự báo vượt ngưỡng kiểm soát 3%).")
+    
+    with st.expander("💡 Câu Chuyện Dữ Liệu: Cảnh Báo Sớm Rủi Ro Nợ Xấu Ngân Hàng", expanded=True):
+        st.markdown("""
+        Trong quản trị rủi ro tín dụng ngân hàng, **phòng bệnh luôn tốt hơn chữa bệnh**. Mốc tỷ lệ nợ xấu 3% là ranh giới pháp lý quan trọng được Ngân hàng Nhà nước giám sát chặt chẽ.
+        1. **Khả năng dự báo sớm**: Thay vì đợi nợ xấu thực tế bùng phát trên báo cáo tài chính cuối năm, mô hình Random Forest phân tích các tín hiệu dẫn đường như Tỷ lệ trích lập dự phòng (llp_ratio), hệ số ETA, CIR để phát hiện các dấu hiệu suy yếu sức khỏe tài chính trước 1 đến 2 chu kỳ báo cáo.
+        2. **Ý nghĩa các trọng số rủi ro**: Biểu đồ Feature Importance chỉ ra rằng Tỷ lệ dự phòng rủi ro tín dụng (`llp_ratio`) đóng vai trò quan trọng nhất. Ngân hàng có xu hướng trích lập dự phòng mỏng để 'làm đẹp' lợi nhuận trước mắt thường là những đơn vị dễ rơi vào nhóm nguy cơ cao nhất khi chu kỳ tín dụng đi xuống.
+        """)
     
     # Load prediction results
     pred_df = fetch_credit_risk_predictions()
