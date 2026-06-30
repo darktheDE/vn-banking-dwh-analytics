@@ -16,7 +16,7 @@ This document defines all data entities, source fields, and derived variables us
 | `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_proprietary_trading` | Daily (22 sessions) |
 | `F3` | BID — Price History (OHLCV) | `fact_price_history` | Daily (22 sessions) |
 | `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_order_stats` | Daily (22 sessions) |
-| `F6–F7` | 46 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
+| `F6–F7` | 45 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
 
 ---
 
@@ -75,7 +75,7 @@ This document defines all data entities, source fields, and derived variables us
 
 ## 3. Bank Financial Variables — CAMELS Framework
 
-**Source**: 46 commercial banks, 2002–2022 (approximately 667 rows, 47+ columns).
+**Source**: 45 commercial banks, 2002–2022 (approximately 667 rows, 47+ columns).
 
 ### 3.1 Identification Variables
 

@@ -22,7 +22,7 @@ The origin of all data entering the system.
 - **Sources**: Primary files containing:
 - Daily aggregated stock history, balance sheets, income statements, and cash flows for focus banks (BID, TCB, VCB, CTG).
 - Daily aggregated stock order stats, foreign and proprietary trading values for BID.
-- 20-year financial performance indicators based on CAMELS framework for 46 commercial banks.
+- 20-year financial performance indicators based on CAMELS framework for 45 commercial banks.
 - **Characteristics**: Heterogeneous formats, missing values, and varying temporal granularities from tick-level to daily and annual.
 
 ### 2.2 Data Ingestion & Processing Layer
@@ -54,7 +54,7 @@ The core intelligence of the platform, executing both supervised and unsupervise
 - **Technology Stack**: Scikit-Learn and TensorFlow Keras.
 - **Models**:
 1. **Time Series Forecasting**: LSTM deep learning networks forecasting short-term from T+1 to T+5 stock prices for focus banks (BID, TCB, VCB, CTG) based on historical price sequences.
-2. **Clustering**: PCA dimensionality reduction followed by K-Means unsupervised clustering to group the 46 banks by financial behavior.
+2. **Clustering**: PCA dimensionality reduction followed by K-Means unsupervised clustering to group the 45 banks by financial behavior.
 3. **Risk Classification**: Random Forest ensemble decision trees classifying banks into ‘High Risk’ with NPL greater than or equal to 3% versus ‘Healthy’, outputting clear Feature Importance metrics.
 - **MLOps Integration**: Models consume data directly from BigQuery Fact and Dim tables, run their inferences as Python Batch Jobs, and write the prediction outputs back into new Fact tables in BigQuery such as `fact_model_predictions`.
 
@@ -65,7 +65,7 @@ The front-end interface where stakeholders interact with the data and insights.
 - **Data Connection**: Native, direct connector to Google BigQuery eliminating manual CSV exports. Streamlit uses `google-cloud-bigquery` Python SDK with `create_bqstorage_client=False` to bypass Storage API permission restrictions.
 - **Streamlit Dashboard** (`src/dashboard/app.py`):
     - **Market Price Forecasting (LSTM)**: Interactive line chart of historical vs. LSTM-predicted closing prices for BID, TCB, VCB, and CTG with T+1 to T+5 forecast horizon table.
-    - **Bank Clustering (K-Means)**: PCA 2D scatter plot of 46 banks color-coded by cluster, grouped bar chart comparing average CAMELS ratios across clusters, and filterable bank member tables.
+    - **Bank Clustering (K-Means)**: PCA 2D scatter plot of 45 banks color-coded by cluster, grouped bar chart comparing average CAMELS ratios across clusters, and filterable bank member tables.
     - **Credit Risk Classifier (RF)**: Pie chart of risk distribution, horizontal bar chart of Random Forest feature importances, and a live searchable risk monitoring table with color-coded alert labels.
     - **DWH System Status**: Real-time row counts and schema metadata for all 10 Star Schema tables.
 - **Looker Studio Dashboards** (planned):

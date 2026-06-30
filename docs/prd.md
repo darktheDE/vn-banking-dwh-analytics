@@ -37,7 +37,7 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 - Real-time or milli-second automated algorithmic trading execution systems.
 - Natural Language Processing for sentiment analysis from financial news or social media.
-- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected banking assets: BID, TCB, VCB, CTG, and the 46 commercial banks.
+- Expansion to all stock tickers across the VN-Index. Focus is strictly limited to selected banking assets: BID, TCB, VCB, CTG, and the 45 commercial banks.
 
 
 ---
@@ -59,8 +59,8 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 ### FR3: Machine Learning Analytics
 
-- **FR3.1**: The system must predict the short-term from T+1 to T+5 closing price of the BID stock using an LSTM deep learning network.
-- **FR3.2**: The system must segment the 46 banks into distinct financial behavior clusters using K-Means clustering combined with PCA for dimensionality reduction.
+- **FR3.1**: The system must predict the short-term from T+1 to T+5 closing prices of the banking stocks (BID, TCB, VCB, CTG) using an LSTM deep learning network.
+- **FR3.2**: The system must segment the 45 banks into distinct financial behavior clusters using K-Means clustering combined with PCA for dimensionality reduction.
 - **FR3.3**: The system must classify banks into ‘Healthy’ or ‘High Risk’ with NPL greater than or equal to 3% categories using a Random Forest algorithm based on CAMELS indicators.
 
 ### FR4: Visualization and Reporting
@@ -96,7 +96,7 @@ Financial analysts and risk managers currently lack a centralized system to cros
 | --- | --- | --- | --- |
 | **Foreign and Prop Trading BID** | Excel | Date, Net Volume, Value | 22 Trading Sessions |
 | **Price History and Order Stats BID** | Excel | OHLCV, Buy and Sell Orders, Matched Vol | 22 Trading Sessions |
-| **Bank Financials for 46 Banks** | Excel | ROA, ROE, NPL, ETA, NIM, CIR | 20 Years from 2002 to 2022 |
+| **Bank Financials for 45 Banks** | Excel | ROA, ROE, NPL, ETA, NIM, CIR | 20 Years from 2002 to 2022 |
 
 ---
 
