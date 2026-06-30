@@ -16,12 +16,12 @@ This document defines all data entities, source fields, and derived variables us
 | `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_proprietary_trading` | Daily (22 sessions) |
 | `F3` | BID — Price History (OHLCV) | `fact_price_history` | Daily (22 sessions) |
 | `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_order_stats` | Daily (22 sessions) |
-| `F5` | HPG — Intraday Tick Matching (~10,000 ticks) | `fact_intraday_matching` | Tick-level (1 session: 2026-06-19) |
+| `F5` | Intraday Tick Matching (Deprecated/Removed) | `fact_intraday_matching` | Tick-level (Deprecated/Empty) |
 | `F6–F7` | 46 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
 
 ---
 
-## 2. Stock Market Variables (BID and HPG)
+## 2. Stock Market Variables (BID, TCB, VCB, CTG)
 
 ### 2.1 Foreign Trading (`fact_foreign_trading`)
 
@@ -70,17 +70,10 @@ This document defines all data entities, source fields, and derived variables us
 | Total Sell Volume | `total_sell_volume` | INT64 | Total volume in sell orders |
 | Matched Volume | `matched_volume` | INT64 | Total volume successfully matched |
 
-### 2.5 Intraday Tick Matching — HPG (`fact_intraday_matching`)
+### 2.5 Intraday Tick Matching (Deprecated/Removed)
 
-| Raw Column | Canonical Field | BigQuery Type | Description |
-|------------|-----------------|---------------|-------------|
-| Timestamp | `timestamp` | TIMESTAMP | Exact HH:MM:SS of the matched trade |
-| Date | `date_key` | INT64 (FK) | Trading date (2026-06-19) |
-| Ticker | `stock_key` | INT64 (FK) | References `dim_stock` (HPG) |
-| Session | `session_key` | INT64 (FK) | References `dim_trading_session` |
-| Matched Price | `matched_price` | FLOAT64 | Price at which the order was executed (VND) |
-| Matched Volume | `matched_volume` | INT64 | Volume executed at this tick |
-| Cumulative Volume | `cumulative_volume` | INT64 | Running total of matched volume within the session |
+This dataset is deprecated/removed as HPG was removed to focus strictly on the banking sector. The table `fact_intraday_matching` remains in the schema but is empty.
+
 
 ---
 

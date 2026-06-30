@@ -1,7 +1,8 @@
 """Task B-08: Load fact_price_history.
 
-Reads the raw BID price history data, cleans and standardizes the prices,
-and saves the cleaned DataFrame locally as a CSV file.
+Reads raw/processed price history data for focus banks (BID, TCB, VCB, CTG),
+cleans and standardizes the prices, and saves a consolidated fact DataFrame
+locally as a CSV file.
 """
 
 from __future__ import annotations
@@ -15,14 +16,13 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-BID_STOCK_KEY = 1
 
-
-def transform_price_history(df_raw: pd.DataFrame) -> pd.DataFrame:
-    """Transform raw BID price history data.
+def transform_price_history(df_raw: pd.DataFrame, stock_key: int) -> pd.DataFrame:
+    """Transform raw/processed price history data.
 
     Args:
         df_raw: Raw price history DataFrame.
+        stock_key: Stock surrogate key to assign.
 
     Returns:
         Transformed DataFrame.
@@ -70,7 +70,7 @@ def transform_price_history(df_raw: pd.DataFrame) -> pd.DataFrame:
         logger.warning("Dropped %d rows with null close_price.", dropped)
         
     # Standardize types
-    df["stock_key"] = BID_STOCK_KEY
+    df["stock_key"] = stock_key
     df["open_price"] = pd.to_numeric(df["open_price"], errors="coerce").astype("float64")
     df["high_price"] = pd.to_numeric(df["high_price"], errors="coerce").astype("float64")
     df["low_price"] = pd.to_numeric(df["low_price"], errors="coerce").astype("float64")
@@ -100,12 +100,7 @@ def transform_price_history(df_raw: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Clean and load price history locally.")
-    parser.add_argument(
-        "--input-file",
-        default=None,
-        help="Path to raw price history file. Defaults to data/bid_stock_history.csv or data/raw/BID_price_history.xlsx.",
-    )
+    parser = argparse.ArgumentParser(description="Clean and load price history locally for all focus stocks.")
     parser.add_argument(
         "--output-dir",
         default=None,
@@ -114,45 +109,49 @@ def main() -> int:
     args = parser.parse_args()
 
     processed_data_path = os.getenv("PROCESSED_DATA_PATH", "./data/processed/")
-    raw_data_path = os.getenv("RAW_DATA_PATH", "./data/raw/")
     output_dir = Path(args.output_dir) if args.output_dir else Path(processed_data_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Resolve input file
-    input_file = None
-    if args.input_file:
-        input_file = Path(args.input_file)
-    else:
-        # Try raw excel first, then fallback to bid_stock_history.csv
-        raw_excel = Path(raw_data_path) / "BID_price_history.xlsx"
-        if raw_excel.exists():
-            input_file = raw_excel
-        else:
-            local_csv = Path("./data/bid_stock_history.csv")
-            if local_csv.exists():
-                input_file = local_csv
-
-    if not input_file or not input_file.exists():
-        logger.error("Input file not found.")
-        return 1
-
-    logger.info("Reading price history from %s.", input_file)
-    if input_file.suffix == ".xlsx":
-        df_raw = pd.read_excel(input_file)
-    else:
-        df_raw = pd.read_csv(input_file)
-        
-    df_clean = transform_price_history(df_raw)
+    stock_configs = [
+        {"symbol": "BID", "key": 1, "path": "bid/bid_stock_history.csv"},
+        {"symbol": "TCB", "key": 2, "path": "tcb/tcb_stock_history.csv"},
+        {"symbol": "VCB", "key": 3, "path": "vcb/vcb_stock_history.csv"},
+        {"symbol": "CTG", "key": 4, "path": "ctg/ctg_stock_history.csv"},
+    ]
     
-    # If using the specific raw test file (with 22 rows), validate the count
-    if input_file.name == "BID_price_history.xlsx":
-        if len(df_clean) != 22:
-            logger.error("Row count mismatch. Expected 22, got %d.", len(df_clean))
-            return 1
+    all_dfs = []
+    
+    for config in stock_configs:
+        file_path = Path(processed_data_path) / config["path"]
+        if file_path.exists():
+            logger.info("Processing price history for %s (key %d) from %s...", config["symbol"], config["key"], file_path)
+            try:
+                df_raw = pd.read_csv(file_path)
+                df_clean = transform_price_history(df_raw, config["key"])
+                all_dfs.append(df_clean)
+            except Exception as e:
+                logger.error("Error transforming %s: %s", config["symbol"], str(e))
+        else:
+            logger.warning("Stock history file not found for %s at %s.", config["symbol"], file_path)
             
+    # Fallback if no files found
+    if not all_dfs:
+        raw_excel = Path("./data/raw/BID_price_history.xlsx")
+        if raw_excel.exists():
+            logger.info("Falling back to raw Excel: %s", raw_excel)
+            df_raw = pd.read_excel(raw_excel)
+            df_clean = transform_price_history(df_raw, 1)
+            all_dfs.append(df_clean)
+
+    if not all_dfs:
+        logger.error("No stock price history files found to process.")
+        return 1
+        
+    df_final = pd.concat(all_dfs, ignore_index=True)
+    
     output_path = output_dir / "fact_price_history_clean.csv"
-    df_clean.to_csv(output_path, index=False)
-    logger.info("Saved fact_price_history to %s. Rows: %d", output_path, len(df_clean))
+    df_final.to_csv(output_path, index=False)
+    logger.info("Saved consolidated fact_price_history to %s. Total rows: %d", output_path, len(df_final))
     return 0
 
 

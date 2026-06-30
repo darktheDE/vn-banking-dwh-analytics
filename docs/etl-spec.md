@@ -98,26 +98,10 @@ These rules apply universally before loading to BigQuery:
 
 ---
 
-### 3.5 File F5 — HPG Intraday Ticks → `fact_intraday_matching`
+### 3.5 File F5 — HPG Intraday Ticks (Deprecated/Removed)
 
-**Expected Volume**: ~10,000 rows for trading date 2026-06-19.
+This file and task are deprecated/removed as HPG was removed to focus strictly on the banking sector. The table `fact_intraday_matching` remains in the schema but is empty.
 
-**Column Mappings**:
-
-| Raw Column Name | Canonical Field | Transform Rule |
-|-----------------|-----------------|----------------|
-| Time / Thời gian | `timestamp` | Combine with date 2026-06-19 to form a full TIMESTAMP. Parse HH:MM:SS. |
-| Matched Price | `matched_price` | Cast to `float64` |
-| Matched Volume | `matched_volume` | Cast to `Int64` |
-| Cumulative Volume | `cumulative_volume` | Cast to `Int64`. Validate that values are monotonically non-decreasing within each session. |
-
-**Session Classification**: Map timestamp ranges to `dim_trading_session` `session_key`:
-- ATO: 09:00:00 – 09:14:59
-- Morning Continuous: 09:15:00 – 11:29:59
-- Afternoon Continuous: 13:00:00 – 14:29:59
-- ATC: 14:30:00 – 14:45:00
-
-**Missing Value Rule**: Forward-fill `matched_price` for at most 1 tick. Reject ticks outside valid HOSE trading hours.
 
 ---
 
@@ -157,7 +141,10 @@ Generated programmatically using `pandas.date_range()` covering 2002-01-01 to 20
 | `stock_key` | `ticker` | `company_name` | `exchange` | `industry` |
 |-------------|----------|----------------|------------|------------|
 | 1 | BID | BIDV — Joint Stock Commercial Bank for Investment and Development of Vietnam | HOSE | Banking |
-| 2 | HPG | Hoa Phat Group | HOSE | Steel / Manufacturing |
+| 2 | TCB | Vietnam Technological and Commercial Joint Stock Bank | HOSE | Banking |
+| 3 | VCB | Joint Stock Commercial Bank for Foreign Trade of Vietnam | HOSE | Banking |
+| 4 | CTG | Vietnam Joint Stock Commercial Bank for Industry and Trade | HOSE | Banking |
+
 
 ### 4.3 `dim_bank`
 
