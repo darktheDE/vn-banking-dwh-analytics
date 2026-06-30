@@ -34,9 +34,9 @@
   - *File*: `sql/bigquery_schema.sql`
   - *Verification*: Dataset visible in GCP Console.
 
-- `[ ]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
+- `[x]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
   - *Verification*: All 4 tables exist with correct schemas matching `docs/star-schema.md`.
-- `[ ]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
+- `[x]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
   - *Verification*: All 6 tables exist. `fact_intraday_matching` and `fact_price_history` have DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
@@ -95,7 +95,7 @@
 
 ### C-1: Feature Engineering
 
-- `[ ]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
+- `[x]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
   - *File*: `src/models/feature_engineering_stock.py`
   - *Verification*: DataFrame has 22 rows, all columns from `docs/data-dictionary.md` Section 4 (derived features included).
 - `[x]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
@@ -140,6 +140,9 @@
 ## Track D — Business Intelligence (Đỗ Kiến Hưng & Phạm Minh Quân)
 *Depends on C-05, C-08, and C-12 being complete.*
 
+- `[x]` **D-00**: Prototype and validate all three dashboard pages (Market Movement, Bank Profiling, Risk Monitoring) locally using processed CSV files.
+  - *File*: `src/models/local/generate_dashboard_plots.py`
+  - *Verification*: Plots generated successfully in `reports/figures/dashboard/` and business interpretation report saved to `docs/process/bao_cao_dashboard_ml_local.md`.
 - `[ ]` **D-01**: Connect Looker Studio to the BigQuery Dataset using the Native Connector.
   - *Verification*: Connection established without errors. All Fact and Dimension tables visible.
 - `[ ]` **D-02**: Build the **Market Movement** dashboard page.
