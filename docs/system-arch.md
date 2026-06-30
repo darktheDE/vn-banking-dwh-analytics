@@ -32,7 +32,7 @@ Responsible for preparing the raw data for storage and modeling.
 - **Process Flow**:
 - **Extract**: Read raw Excel documents into DataFrames.
 - **Transform**:
-- Handle missing values using Forward-fill for intraday data and Statistical Imputation for missing 2002-2005 bank data.
+- Handle missing values using Forward-fill for daily stock data and Statistical Imputation for missing 2002-2005 bank data.
 - Standardize date-time strings to standard ISO formats.
 - Normalize numerical features using StandardScaler and MinMaxScaler preparing them for downstream ML.
 - **Load**: Push cleaned and structured DataFrames into the Cloud DWH using the Google Cloud BigQuery API.
@@ -44,7 +44,7 @@ The centralized “Single Source of Truth.”
 - **Technology Stack**: Google BigQuery as a Serverless Enterprise Data Warehouse.
 - **Design Pattern**: **Star Schema** optimized for OLAP aggregations.
 - **Dimension Tables**: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`.
-- **Fact Tables**: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_intraday_matching`, `fact_bank_performance`.
+- **Fact Tables**: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_bank_performance`.
 - **Optimization**: Partitioning applied on `date_key` and Clustering applied on `stock_key` and `bank_key` to heavily reduce query latency and scanning costs for reporting.
 
 ### 2.4 Machine Learning & Analytics Layer
@@ -76,7 +76,7 @@ graph TD
     A[Raw Data: Excel Files] -->|Extract| B(Python ETL Pipeline)
     B -->|Transform & Clean| C{Google BigQuery}
 
-    C -->|Star Schema| D[(DWH: 4 Dims, 6 Facts)]
+    C -->|Star Schema| D[(DWH: 4 Dims, 5 Facts)]
 
     D -->|Feature Query| E[ML Layer]
     E -->|1. LSTM: Predict Price| E1((Predictions))

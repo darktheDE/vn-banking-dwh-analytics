@@ -111,8 +111,8 @@ vn-banking-dwh-analytics/
 ```
 data/raw/*.xlsx
     │
-    ▼  (src/etl/)
-Google BigQuery (Star Schema: 4 Dims + 6 Facts)
+    ▼  (src/etl/ using BigQuery MERGE for Incremental Upsert and SCD Type 2)
+Google BigQuery (Star Schema: 4 Dims + 5 Facts + Audit Metadata)
     │
     ▼  (src/models/)
 ML Predictions → BigQuery (fact_model_predictions, cluster assignments, risk labels)
@@ -151,32 +151,35 @@ import pandas as pd
 from google.cloud import bigquery
 
 
-def load_to_bigquery(
+def load_incremental_to_bigquery(
     df: pd.DataFrame,
     table_id: str,
     client: bigquery.Client,
-    write_disposition: str = "WRITE_APPEND",
+    primary_keys: list[str],
 ) -> int:
-    """Load a cleaned DataFrame into a Google BigQuery table.
+    """Load a cleaned DataFrame incrementally into BigQuery using a MERGE query.
+
+    Ensures idempotency by updating existing records and inserting new ones
+    based on the primary keys. Also populates system auditing columns.
 
     Args:
-        df: The cleaned and transformed DataFrame ready for loading.
+        df: Cleaned and transformed DataFrame.
         table_id: Fully qualified BigQuery table ID in the format
             'project.dataset.table'.
         client: An authenticated BigQuery client instance.
-        write_disposition: BigQuery write disposition. One of WRITE_APPEND,
-            WRITE_TRUNCATE, or WRITE_EMPTY.
+        primary_keys: Key columns for the MERGE join condition.
 
     Returns:
-        The number of rows successfully loaded to BigQuery.
-
-    Raises:
-        google.api_core.exceptions.GoogleAPIError: If the BigQuery API
-            returns an error during the load job.
+        The number of rows successfully processed.
     """
-    job_config = bigquery.LoadJobConfig(write_disposition=write_disposition)
-    job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
-    job.result()
+    # System audit columns are appended dynamically:
+    # df["_created_at"] = pd.Timestamp.now()
+    # df["_updated_at"] = pd.Timestamp.now()
+    # df["_source_file"] = source_filename
+    ...
+    # MERGE INTO target USING staging ON join_condition
+    # WHEN MATCHED THEN UPDATE ...
+    # WHEN NOT MATCHED THEN INSERT ...
     return len(df)
 ```
 
@@ -195,10 +198,10 @@ project_id = "my-actual-project-id"
 
 | Data Type | Strategy | Reference |
 |-----------|----------|-----------|
-| Intraday stock ticks (HPG) | Forward-fill, max 1 tick (Deprecated/Empty) | `docs/etl-spec.md` §3.5 |
 | Bank financial ratios 2002–2005 | Column-median imputation | `docs/etl-spec.md` §3.6 |
 | Daily BID data (price, foreign, prop) | Forward-fill, max 1 day | `docs/etl-spec.md` §3.1–3.3 |
 | Critical fields (`close_price`, `npl_ratio`) | Reject row; log error | `docs/data-dictionary.md` §5 |
+| System Audit Columns | Append `_created_at`, `_updated_at`, and `_source_file` | `docs/star-schema.md` §5 |
 
 ### 4.5 DataFrame Best Practices
 
@@ -392,7 +395,6 @@ This script checks:
 - `npl_ratio` values are in the range [0.0, 1.0]
 - `close_price` values are strictly positive
 - No null values remain in any CAMELS ratio column after imputation
-- HPG intraday ticks are within valid HOSE session hours (if data is present; empty in production)
 
 ### 7.2 Model Acceptance Validation
 

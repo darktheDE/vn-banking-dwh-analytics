@@ -54,7 +54,7 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 - **FR2.1**: The system must store data in a centralized Star Schema architecture on Google BigQuery.
 - **FR2.2**: The schema must include exactly 4 Dimension tables: `dim_date`, `dim_stock`, `dim_bank`, and `dim_trading_session`.
-- **FR2.3**: The schema must include exactly 6 Fact tables: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_intraday_matching`, and `fact_bank_performance`.
+- **FR2.3**: The schema must include exactly 5 Fact tables: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, and `fact_bank_performance`.
 
 ### FR3: Machine Learning Analytics
 
@@ -95,7 +95,6 @@ Financial analysts and risk managers currently lack a centralized system to cros
 | --- | --- | --- | --- |
 | **Foreign and Prop Trading BID** | Excel | Date, Net Volume, Value | 22 Trading Sessions |
 | **Price History and Order Stats BID** | Excel | OHLCV, Buy and Sell Orders, Matched Vol | 22 Trading Sessions |
-| **Intraday Ticks (Deprecated)** | Excel | Timestamp, Price, Cumulative Vol | Deprecated/Empty |
 | **Bank Financials for 46 Banks** | Excel | ROA, ROE, NPL, ETA, NIM, CIR | 20 Years from 2002 to 2022 |
 
 ---

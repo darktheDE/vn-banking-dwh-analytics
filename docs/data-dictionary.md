@@ -16,7 +16,6 @@ This document defines all data entities, source fields, and derived variables us
 | `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_proprietary_trading` | Daily (22 sessions) |
 | `F3` | BID — Price History (OHLCV) | `fact_price_history` | Daily (22 sessions) |
 | `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_order_stats` | Daily (22 sessions) |
-| `F5` | Intraday Tick Matching (Deprecated/Removed) | `fact_intraday_matching` | Tick-level (Deprecated/Empty) |
 | `F6–F7` | 46 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
 
 ---
@@ -70,9 +69,6 @@ This document defines all data entities, source fields, and derived variables us
 | Total Sell Volume | `total_sell_volume` | INT64 | Total volume in sell orders |
 | Matched Volume | `matched_volume` | INT64 | Total volume successfully matched |
 
-### 2.5 Intraday Tick Matching (Deprecated/Removed)
-
-This dataset is deprecated/removed as HPG was removed to focus strictly on the banking sector. The table `fact_intraday_matching` remains in the schema but is empty.
 
 
 ---
@@ -146,7 +142,7 @@ The following features are created during the Feature Engineering step and are n
 | Feature Name | Derived From | Purpose |
 |--------------|-------------|---------|
 | `price_change_pct` | `close_price` | Daily percentage change for momentum signal in LSTM |
-| `active_buy_ratio` | `total_buy_orders` / (`total_buy_orders` + `total_sell_orders`) | Market sentiment indicator for intraday HPG analysis |
+| `active_buy_ratio` | `total_buy_orders` / (`total_buy_orders` + `total_sell_orders`) | Market sentiment indicator for order statistics analysis |
 | `risk_label` | `npl_ratio` ≥ 0.03 → 1, else 0 | Binary target variable for Random Forest classification |
 | `foreign_net_lag_1` | `foreign_net_volume` shifted by 1 day | Lagged foreign flow signal as LSTM regressor |
 | `prop_net_lag_1` | `prop_net_volume` shifted by 1 day | Lagged proprietary flow signal as LSTM regressor |
@@ -161,5 +157,4 @@ The following features are created during the Feature Engineering step and are n
 | DQ-02 | `fact_bank_performance` | `npl_ratio` must be in range [0.0, 1.0] | Flag for manual review |
 | DQ-03 | `fact_price_history` | `close_price` must be > 0 | Reject record; log error |
 | DQ-04 | `fact_bank_performance` | Missing values for years 2002–2005 must be imputed using column median | Impute during ETL Transform step |
-| DQ-05 | `fact_intraday_matching` | `timestamp` must fall within valid HOSE session hours (09:00–14:30) | Reject out-of-range ticks |
 | DQ-06 | `fact_foreign_trading` | `foreign_buy_volume` and `foreign_sell_volume` must be ≥ 0 | Reject negative values |

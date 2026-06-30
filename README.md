@@ -77,7 +77,7 @@ The platform is designed as a **5-layer, modular, batch-processing pipeline** fo
 │                       │     │                  │     │                  │
 │  Excel & CSV Files    │────▶│ Extract          │────▶│ Google BigQuery  │
 │  - Stocks (4 symbols) │     │ Transform/Clean  │     │ Star Schema      │
-│    (BID, TCB, VCB, CTG)     │ Load via API     │     │ 4 Dims · 6 Facts │
+│    (BID, TCB, VCB, CTG)     │ Load via API     │     │ 4 Dims · 5 Facts │
 │  - Banks (2 files)    │     │ Python + Pandas  │     │                  │
 └───────────────────────┘     └──────────────────┘     └────────┬─────────┘
                                                            │
@@ -125,10 +125,12 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 |-------|-------------|
 | `dim_date` | Calendar dimension with trading day flag (2002–2026) |
 | `dim_stock` | BID, TCB, VCB, CTG stock descriptors (HPG removed to focus strictly on banking) |
-| `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification |
+| `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification and SCD Type 2 tracking (`valid_from`, `valid_to`, `is_current`) |
 | `dim_trading_session` | ATO, Morning, Afternoon, ATC session definitions |
 
-**6 Fact Tables** (quantitative measurements):
+*Note: All tables dynamically append system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
+
+**5 Fact Tables** (quantitative measurements):
 
 | Table | Granularity | Key Metrics |
 |-------|-------------|-------------|
@@ -136,7 +138,6 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 | `fact_foreign_trading` | Daily per stock | Foreign net volume and value |
 | `fact_proprietary_trading` | Daily per stock | Proprietary desk net volume |
 | `fact_order_stats` | Daily per stock | Buy/sell order counts and matched volume |
-| `fact_intraday_matching` | Tick-level (Deprecated/Empty) | Timestamp, matched price, cumulative volume (Empty as HPG was removed) |
 | `fact_bank_performance` | Annual per bank | Full CAMELS indicators — ROA, ROE, NIM, CIR, NPL, ETA |
 
 **BigQuery Optimizations:**
@@ -209,7 +210,6 @@ For full model specifications, hyperparameter strategies, and MLOps retraining s
 |--------|-------------|--------|------|
 | **Stock Price History (BID, TCB, VCB, CTG)** | Daily historical trading data for banking stocks (BID, TCB, VCB, CTG) | 11,835+ rows | [CafeF](https://cafef.vn/) |
 | **BID Stock Daily Stats** | Daily trading stats for BID — foreign trading, proprietary trading, order statistics | 22 trading sessions | [CafeF — BID](https://cafef.vn/du-lieu/lich-su-giao-dich/hose/bid-1.chn) |
-| **HPG Intraday Ticks (Deprecated)** | Tick-level matched trade data for Hoa Phat Group (deprecated and removed) | 0 ticks (Empty) | HOSE market feed |
 | **VN Bank CAMELS Dataset** | 20-year CAMELS financial performance data for 46 Vietnamese commercial banks (2002–2022) | 667 rows × 47+ columns | [Harvard Dataverse — DOI:10.7910/DVN/RIWA3B](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RIWA3B) |
 
 ### Key Financial Indicators (CAMELS Framework)
@@ -355,12 +355,11 @@ python -m src.etl.populate_dim_stock
 python -m src.etl.populate_dim_bank
 python -m src.etl.populate_dim_trading_session
 
-# Load fact tables (place raw Excel files in data/raw/ first)
+# Load fact tables incrementally via MERGE (place raw Excel/CSV files in data/raw/ first)
 python -m src.etl.load_price_history
 python -m src.etl.load_foreign_trading
 python -m src.etl.load_proprietary_trading
 python -m src.etl.load_order_stats
-python -m src.etl.load_intraday_matching  # Deprecated / Loads empty table
 python -m src.etl.load_bank_performance
 
 # Validate data integrity

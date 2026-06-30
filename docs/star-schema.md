@@ -34,12 +34,15 @@ Stores descriptive information about the traded stock assets.
 
 ### 2.3 `dim_bank`
 
-Stores descriptive and structural information about the 46 commercial banks.
+Stores descriptive and structural information about the 46 commercial banks. Includes Slowly Changing Dimension (SCD Type 2) columns to track historical modifications (e.g. charter capital increases) over time.
 - `bank_key` of type INT64 as Primary Key: Unique surrogate key for the bank.
 - `bank_code` of type STRING: Standardized bank ticker like ‘VCB’ and ‘BID’.
 - `bank_name` of type STRING: Full name of the bank.
 - `bank_type` of type STRING: State-owned SOCB, Joint Stock JSCB, or Foreign FOCB.
 - `charter_capital` of type FLOAT64: Registered charter capital.
+- `valid_from` of type DATE: The start date from which this bank version record is valid.
+- `valid_to` of type DATE: The end date until which this bank version record was valid (defaults to `9999-12-31` for current records).
+- `is_current` of type BOOLEAN: Flag indicating if this record represents the most recent/active version of the bank.
 
 ### 2.4 `dim_trading_session`
 
@@ -98,18 +101,7 @@ Records daily statistics on market order placements representing supply and dema
 - `total_sell_volume` of type INT64
 - `matched_volume` of type INT64
 
-### 3.5 `fact_intraday_matching`
-
-Records highly granular tick-level matched trades during the trading day (currently deprecated/empty as HPG was removed to focus strictly on banking).
-- **Foreign Keys**: `date_key`, `stock_key`, `session_key`
-- **Metrics**:
-- `timestamp` of type TIMESTAMP: Exact time of the match.
-- `matched_price` of type FLOAT64
-- `matched_volume` of type INT64
-- `cumulative_volume` of type INT64
-
-
-### 3.6 `fact_bank_performance`
+### 3.5 `fact_bank_performance`
 
 Records the annual and quarterly financial health indicators of the commercial banks.
 - **Foreign Keys**: `date_key` pointing to the financial reporting date, `bank_key`
@@ -129,12 +121,15 @@ Records the annual and quarterly financial health indicators of the commercial b
 
 - **1-to-Many Relationships**:
     - One record in `dim_date` maps to multiple records across all Fact tables.
-    - One record in `dim_stock` maps to multiple records in `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`, `fact_order_stats`, and `fact_intraday_matching`.
+    - One record in `dim_stock` maps to multiple records in `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`, and `fact_order_stats`.
     - One record in `dim_bank` maps to multiple records in `fact_bank_performance`.
-    - One record in `dim_trading_session` maps to multiple records in `fact_intraday_matching`.
 
 ## 5. Google BigQuery Optimizations
 
 To ensure low latency and cost-efficiency when querying massive datasets:
-- **Partitioning**: Fact tables with high volumes including `fact_intraday_matching` and `fact_price_history` will be strictly partitioned by `date_key` cast to DATE. This restricts the amount of data scanned when querying specific date ranges.
+- **Partitioning**: Fact tables with high volumes such as `fact_price_history` will be strictly partitioned by `date_key` cast to DATE. This restricts the amount of data scanned when querying specific date ranges.
 - **Clustering**: Fact tables will be clustered by `stock_key` or `bank_key`. This optimizes performance when the Looker Studio dashboard applies ticker or bank-specific filters.
+- **DWH Auditing**: To support tracking, lineage, and data processing verification, all tables (both Fact and Dimension) dynamically append the following system columns during the transformation phase:
+    - `_created_at` of type TIMESTAMP: The timestamp indicating when the row was first loaded.
+    - `_updated_at` of type TIMESTAMP: The timestamp indicating when the row was last updated.
+    - `_source_file` of type STRING: The filename of the source file from which this data row was extracted.

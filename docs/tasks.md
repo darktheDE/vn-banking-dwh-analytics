@@ -33,32 +33,38 @@
 - `[x]` **B-01**: Create the BigQuery Dataset using the `BQ_DATASET_ID` from `.env`.
   - *File*: `sql/bigquery_schema.sql`
   - *Verification*: Dataset visible in GCP Console.
+- `[ ]` **B-01b**: Update `sql/bigquery_schema.sql` to include SCD Type 2 columns in `dim_bank` (`valid_from`, `valid_to`, `is_current`) and system auditing columns (`_created_at`, `_updated_at`, `_source_file`) in all tables.
+  - *Verification*: Schema file matches the specification in `docs/star-schema.md`.
 
 - `[x]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
   - *Verification*: All 4 tables exist with correct schemas matching `docs/star-schema.md`.
-- `[x]` **B-03**: Create the 6 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
-  - *Verification*: All 6 tables exist. `fact_intraday_matching` and `fact_price_history` have DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
+- `[x]` **B-03**: Create the 5 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
+  - *Verification*: All 5 tables exist. `fact_price_history` has DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
 
 - `[x]` **B-04**: Populate `dim_date` programmatically for range 2002-01-01 to 2026-12-31.
   - *File*: `src/etl/populate_dim_date.py`
   - *Verification*: Table row count ≈ 9,131 rows. `is_trading_day` column exists.
-- `[x]` **B-05**: Populate `dim_stock` with BID and HPG records (2 rows).
+- `[x]` **B-05**: Populate `dim_stock` with banking stock records (4 rows: BID, TCB, VCB, CTG).
   - *File*: `src/etl/populate_dim_stock.py`
-  - *Verification*: 2 rows in table.
+  - *Verification*: 4 rows in table.
 - `[x]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
   - *File*: `src/etl/populate_dim_bank.py`
   - *Verification*: 46 rows in table. No null `bank_code` values.
+- `[ ]` **B-06b**: Implement SCD Type 2 historical comparison and update-insert flow in `populate_dim_bank.py`.
+  - *Verification*: Changing bank charter capital in local csv creates a new version with updated valid windows, and sets `is_current = FALSE` for the old row.
 - `[x]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
   - *Verification*: 4 rows in table.
+- `[ ]` **B-07b**: Update all ETL scripts under `src/etl/` to populate audit fields (`_created_at`, `_updated_at`, `_source_file`) dynamically during the transform step.
+  - *Verification*: CSV outputs in `data/processed/` contain the populated system auditing columns.
 
 ### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
-- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (22 rows for BID).
+- `[x]` **B-08**: Implement ETL for stock price history → `fact_price_history` (focus stocks: BID, TCB, VCB, CTG).
   - *File*: `src/etl/load_price_history.py`
   - *Rules*: `docs/etl-spec.md` Section 3.1.
-  - *Verification*: 22 rows in table. No null `close_price`. Log confirms row count.
+  - *Verification*: ~11,835 rows in table. No null `close_price`. Log confirms row count.
 - `[x]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
   - *File*: `src/etl/load_foreign_trading.py`
   - *Verification*: 22 rows. Log confirms load.
@@ -68,11 +74,6 @@
 - `[x]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
   - *File*: `src/etl/load_order_stats.py`
   - *Verification*: 22 rows. Log confirms load.
-- `[x]` **B-12**: Implement ETL for File F5 → `fact_intraday_matching` (Deprecated/Empty).
-  - *File*: `src/etl/load_intraday_matching.py`
-  - *Rules*: `docs/etl-spec.md` Section 3.5.
-  - *Verification*: Table exists in BigQuery and is empty (HPG removed).
-
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
@@ -80,6 +81,8 @@
   - *File*: `src/etl/load_bank_performance.py`
   - *Rules*: `docs/etl-spec.md` Section 3.6. Median imputation required for 2002–2005.
   - *Verification*: ~667 rows. No null values in CAMELS ratio columns after imputation. `is_imputed` flag column present. Log confirms row count.
+- `[ ]` **B-13b**: Implement the BigQuery `MERGE` SQL upsert logic in `load_to_bigquery.py` to support incremental loading (rather than full truncation) for all tables.
+  - *Verification*: Subsequent run logs indicate records were updated or ignored instead of creating duplicates.
 
 ### B-5: Integration Validation (Both members)
 
@@ -167,7 +170,7 @@
 
 The project is officially complete when **all** of the following are true:
 
-- `[ ]` ETL pipeline runs without errors and all 10 BigQuery tables are populated.
+- `[ ]` ETL pipeline runs without errors and all 9 BigQuery tables are populated.
 - `[ ]` Data quality validation (B-14, B-15) passes with zero critical errors.
 - `[ ]` LSTM RMSE is lower than the ARIMA baseline.
 - `[ ]` Random Forest achieves AUC-ROC > 0.80 and Recall ≥ 85% for the High Risk class.
