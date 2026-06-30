@@ -34,7 +34,7 @@ LSTM, a specialized Recurrent Neural Network (RNN) architecture, is chosen becau
 
 ## 2. Clustering & Dimensionality Reduction: K-Means + PCA
 
-**Objective**: Segment 46 Vietnamese commercial banks into distinct groups based on 20 years of financial performance data to identify behavioral patterns, risk profiles, and strategic groups.
+**Objective**: Segment 45 Vietnamese commercial banks into distinct groups based on 20 years of financial performance data to identify behavioral patterns, risk profiles, and strategic groups.
 
 ### 2.1 Model Selection Rationale
 
@@ -150,33 +150,36 @@ The following results were obtained from the latest production training run exec
 
 | Bank | Model File | Scaler File | LSTM RMSE | ARIMA RMSE | Acceptance |
 |------|-----------|-------------|-----------|------------|------------|
-| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | 0.8801 | 1.1696 | PASSED |
-| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | 1.3093 | 9.4864 | PASSED |
-| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | 3.0529 | 4.4900 | PASSED |
-| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | 1.4231 | 11.3624 | PASSED |
+| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | 0.9167 | 1.1696 | PASSED |
+| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | 1.3725 | 9.4864 | PASSED |
+| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | 2.9453 | 4.4900 | PASSED |
+| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | 1.5025 | 11.3624 | PASSED |
 
 - **Feature Adaptation**: BID uses 12 features (OHLCV + foreign/proprietary trading signals). TCB, VCB, and CTG use 7 features (OHLCV + derived price/volume change) due to limited raw trading data availability for those banks.
-- **Output**: T+1 to T+5 predictions written to `fact_model_predictions` in BigQuery.
+- **Output**: T+1 to T+5 predictions written to `fact_model_predictions` in BigQuery (exactly 20 rows).
 
 ### 8.2 K-Means Clustering
 
 | Metric | Value |
 |--------|-------|
-| Optimal K | 2 |
-| Silhouette Score | 0.7361 |
-| PCA Components Retained | Explains >= 80% variance |
+| Optimal K | 3 |
+| Silhouette Score | 0.3222 |
+| Davies-Bouldin Index | 0.9746 |
+| PCA Components Retained | 3 components explaining 85.92% variance |
+| Cluster Distribution | Cụm 0 (TMCP Nhỏ): 13 banks, Cụm 1 (Trụ Cột Lớn): 24 banks, Cụm 2 (Ngân Hàng Ngoại): 2 banks |
+| Excluded Outliers | 6 banks (CB, VBSP, DAB, GPB, WEB, MDB) |
 | Model Files | `kmeans_model.pkl`, `pca_model.pkl`, `scaler_bank.pkl` |
-| Output | Cluster assignments written to `bank_cluster_assignments` in BigQuery |
+| Output | Cluster assignments written to `bank_cluster_assignments` in BigQuery (39 rows) |
 
 ### 8.3 Random Forest Credit Risk Classification
 
 | Metric | Value | Threshold | Status |
 |--------|-------|-----------|--------|
-| AUC-ROC | 0.9752 | > 0.80 | PASSED |
-| Recall (High Risk) | 0.9167 (91.67%) | >= 0.85 (85%) | PASSED |
-| Optimal Decision Threshold | 0.2327 | — | Tuned |
-| Model Files | `random_forest_credit_risk.pkl`, `rf_features.pkl`, `rf_threshold.pkl` |
-| Output | Risk labels written to `bank_risk_predictions` in BigQuery |
+| AUC-ROC | 0.9370 | > 0.80 | PASSED |
+| Recall (High Risk) | 0.8571 (85.71%) | >= 0.85 (85%) | PASSED |
+| Optimal Decision Threshold | 0.2822 | — | Tuned |
+| Model Files | `random_forest_credit_risk.pkl`, `rf_features.pkl` |
+| Output | Risk labels and probability written to `bank_risk_predictions` in BigQuery (661 rows) |
 
 ### 8.4 All Model Artifacts Location
 

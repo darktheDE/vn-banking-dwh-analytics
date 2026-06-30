@@ -34,7 +34,7 @@ Stores descriptive information about the traded stock assets.
 
 ### 2.3 `dim_bank`
 
-Stores descriptive and structural information about the 46 commercial banks. Includes Slowly Changing Dimension (SCD Type 2) columns to track historical modifications (e.g. charter capital increases) over time.
+Stores descriptive and structural information about the 45 commercial banks. Includes Slowly Changing Dimension (SCD Type 2) columns to track historical modifications (e.g. charter capital increases) over time.
 - `bank_key` of type INT64 as Primary Key: Unique surrogate key for the bank.
 - `bank_code` of type STRING: Standardized bank ticker like ‘VCB’ and ‘BID’.
 - `bank_name` of type STRING: Full name of the bank.
@@ -175,7 +175,7 @@ Stores credit risk classifications and probabilities for each bank.
 - `model_name` of type STRING
 
 #### 3.6.3 `fact_model_predictions` (LSTM Outputs)
-Stores daily multi-horizon predictions for BID stock close prices.
+Stores daily multi-horizon predictions for banking stock close prices (BID, TCB, VCB, CTG).
 - `base_date_key` of type INT64: The date on which the prediction was generated
 - `stock_key` of type INT64
 - `horizon` of type STRING: Prediction window label (e.g. `'T+1'`, `'T+2'`, ..., `'T+5'`)

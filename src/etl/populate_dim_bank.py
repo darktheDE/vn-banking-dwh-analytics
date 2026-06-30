@@ -63,7 +63,7 @@ def populate_bank_dimension(workbook_path: Path, audit_key: int, now_ts: datetim
     df_dim["bank_code"] = df_dim["bank_code"].astype(str).str.strip().str.upper()
     df_dim["bank_name"] = df_dim["bank_name"].astype(str).str.strip()
     df_dim["bank_type"] = df_dim["bank_type"].astype(str).str.strip().str.upper()
-    df_dim["charter_capital"] = pd.NA
+    df_dim["charter_capital"] = pd.NA  # Raw Excel does not contain charter capital data; initialized as NULL for future extension
     
     # Clean duplicates
     df_dim = df_dim.dropna(subset=["bank_key", "bank_code", "bank_name", "bank_type"])

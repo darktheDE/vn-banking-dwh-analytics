@@ -156,7 +156,12 @@ TABLES_TO_CSV = {
         "file": "fact_bank_performance_clean.csv",
         "keys": ["date_key", "bank_key"],
         "columns": [
-            "date_key", "bank_key", "total_assets", "total_deposits", "total_loans", "npl_ratio", "roa", "roe", "nim", "cir", "is_imputed",
+            "date_key", "bank_key", "total_assets", "total_deposits", "total_loans", "total_equity",
+            "num_employees", "num_branches", "npl_amount", "loan_loss_provision",
+            "interest_income", "interest_expense", "net_interest_income",
+            "non_interest_expense", "personnel_expense", "other_expense",
+            "profit_before_tax", "profit_after_tax", "off_balance_sheet",
+            "npl_ratio", "llp_ratio", "roa", "roe", "nim", "cir", "eta", "etd", "lta", "ltd", "gta", "is_imputed",
             "audit_key", "_created_at", "_updated_at", "_source_file"
         ],
         "types": {

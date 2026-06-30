@@ -6,7 +6,7 @@
 
 **Vấn đề:** Các nhà đầu tư và tổ chức tài chính hiện thiếu một hệ thống phân tích tập trung, có khả năng đánh giá toàn diện từ dữ liệu giao dịch vi mô theo từng giây trên sàn chứng khoán đến dữ liệu vĩ mô về sức khỏe tài chính của các ngân hàng trong nhiều thập kỷ.
 
-**Mục tiêu:** Xây dựng thành công Kho dữ liệu tài chính tập trung trên nền tảng đám mây và triển khai 5 mô hình học máy, kỳ vọng đưa ra dự báo giá cổ phiếu ngắn hạn và phân loại chính xác sức khỏe tài chính của 46 ngân hàng với độ tin cậy trên 85%.
+**Mục tiêu:** Xây dựng thành công Kho dữ liệu tài chính tập trung trên nền tảng đám mây và triển khai 3 mô hình học máy, kỳ vọng đưa ra dự báo giá cổ phiếu ngắn hạn và phân loại chính xác sức khỏe tài chính của 45 ngân hàng với độ tin cậy trên 85%.
 
 **Giải pháp:** Xây dựng Data Warehouse với mô hình Star Schema trên Google BigQuery để lưu trữ và chuẩn hóa dữ liệu. Sau đó, áp dụng các kỹ thuật Phân tích chuỗi thời gian, Phân cụm và Phân loại học máy để khám phá thông tin chi tiết.
 
@@ -36,7 +36,7 @@
 
 - Dữ liệu cổ phiếu BID, TCB, VCB, CTG: Hơn 11,835 dòng dữ liệu giá lịch sử hàng ngày.
 
-- Dữ liệu ngân hàng: 667 dòng và hơn 47 cột, bao phủ 46 ngân hàng trong khoảng thời gian 20 năm từ 2002 đến 2022.
+- Dữ liệu ngân hàng: 667 dòng và hơn 47 cột, bao phủ 45 ngân hàng trong khoảng thời gian 20 năm từ 2002 đến 2022.
 
 **Các biến chính - Data Dictionary sơ lược:**
 
@@ -144,19 +144,19 @@ da_project/
     - Bảng fact_proprietary_trading: prop_buy, prop_sell, prop_net
     - Bảng fact_price_history: open, high, low, close, volume
     - Bảng fact_order_stats: buy_orders, sell_orders, matched
-    - Bảng fact_intraday_matching: timestamp, price, cumulative_vol
     - Bảng fact_bank_performance: deposits, loans, npl, roa, roe
 - **Các vệ tinh xung quanh - Dimension Tables trỏ khóa ngoại vào Fact:**
     - Bảng dim_date: date_key, day, month, year, quarter
     - Bảng dim_stock: stock_key, ticker, company_name, exchange
-    - Bảng dim_bank: bank_key, bank_code, bank_type, charter_capital
+    - Bảng dim_bank: bank_key, bank_code, bank_type, charter_capital, valid_from, valid_to, is_current
     - Bảng dim_trading_session: session_key, session_name, start_time
+    - Bảng dim_audit: audit_key, run_id, run_timestamp, status
 
 **Sơ đồ 2: Luồng xử lý dữ liệu - ETL & ML Pipeline**
 
 - **Khối 1 Nguồn dữ liệu:** File Excel, Tài liệu yêu cầu. Mũi tên hướng sang Khối 2.
 - **Khối 2 ETL Pipeline:** Extract bằng Python Pandas. Transform làm sạch dữ liệu. Load bằng Google Cloud API. Mũi tên hướng sang Khối 3.
-- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 4 bảng Dim và 6 bảng Fact. Mũi tên hướng sang Khối 4.
+- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 5 bảng Dim và 5 bảng Fact. Mũi tên hướng sang Khối 4.
 - **Khối 4 Analytics & Machine Learning:** Trực quan hóa EDA. Chạy mô hình Học máy có giám sát và không giám sát. Xuất báo cáo Dashboard.
 
 **Sơ đồ 3: Cấu trúc Mô hình Học máy**

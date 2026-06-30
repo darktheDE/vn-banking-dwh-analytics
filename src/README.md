@@ -30,7 +30,6 @@ python -m src.etl.load_price_history
 python -m src.etl.load_foreign_trading
 python -m src.etl.load_proprietary_trading
 python -m src.etl.load_order_stats
-python -m src.etl.load_intraday_matching
 python -m src.etl.load_bank_performance
 
 # Validate integrity

@@ -4,14 +4,14 @@
 
 ## Executive Summary
 
-The **Financial Data Analytics Platform** is an end-to-end data solution that centralizes fragmented Vietnamese financial market data — covering stock price history for focus banks (BID, TCB, VCB, CTG) alongside 20 years of CAMELS performance data for 46 commercial banks — into a cloud-based Data Warehouse on Google BigQuery.
+The **Financial Data Analytics Platform** is an end-to-end data solution that centralizes fragmented Vietnamese financial market data — covering stock price history for focus banks (BID, TCB, VCB, CTG) alongside 20 years of CAMELS performance data for 45 commercial banks — into a cloud-based Data Warehouse on Google BigQuery.
 
 The platform applies three Machine Learning models to deliver actionable insights:
 
 | Model | Task | Primary Output |
 |-------|------|----------------|
 | LSTM | Predict stock closing prices (T+1 to T+5) for BID, TCB, VCB, CTG | Short-term trading signals |
-| K-Means + PCA | Segment 46 banks by financial behavior | Strategic bank groupings |
+| K-Means + PCA | Segment 45 banks by financial behavior | Strategic bank groupings |
 | Random Forest | Classify banks with NPL ≥ 3% as High Risk | Early warning for credit risk |
 
 Results are delivered through interactive Looker Studio dashboards connected natively to BigQuery, targeting Risk Managers and Financial Analysts.

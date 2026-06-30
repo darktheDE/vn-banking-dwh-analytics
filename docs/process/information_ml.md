@@ -4,7 +4,7 @@
 
 Phạm Minh Quân chịu trách nhiệm chính về mảng **Machine Learning (Track C)**. Nhiệm vụ cốt lõi là từ dữ liệu đã được làm sạch trên BigQuery, tiến hành trích xuất đặc trưng (Feature Engineering) và xây dựng 3 hệ thống mô hình chính:
 1. **Dự báo chuỗi thời gian (Time Series Forecasting)**: Dự đoán giá cổ phiếu BID (T+1 đến T+5) bằng mạng LSTM.
-2. **Phân cụm (Clustering)**: Phân nhóm 46 ngân hàng dựa trên chỉ số tài chính CAMELS bằng PCA và K-Means.
+2. **Phân cụm (Clustering)**: Phân nhóm 45 ngân hàng dựa trên chỉ số tài chính CAMELS bằng PCA và K-Means.
 3. **Phân loại (Classification)**: Dự đoán rủi ro nợ xấu (NPL $\ge$ 3%) bằng Random Forest.
 
 ---
@@ -81,7 +81,7 @@ python src/models/local/data_loader.py
 ```
 Lệnh này tự động tạo ra thư mục `data/data_ml/input` chứa các file:
 
-*   **`banks_camels_46.csv`**: File gộp bảng hiệu suất của 46 ngân hàng. 
+*   **`banks_camels_46.csv`**: File gộp bảng hiệu suất của 45 ngân hàng. 
     *   *Tại sao phải xử lý?* Thuật toán K-Means hoạt động dựa trên khoảng cách không gian (Euclidean distance). Nếu không được xử lý điền khuyết (median imputation) và chuẩn hóa (StandardScaler), thuật toán sẽ bị sai lệch vì biến quá lớn như `Tổng tài sản` sẽ lấn át tất cả.
 *   **`bid_lstm_data.csv`**: Lịch sử giao dịch mã chứng khoán BID.
     *   *Tại sao phải xử lý?* Mạng LSTM không hiểu được dữ liệu dạng bảng tĩnh. Việc tính toán thêm biến phái sinh (`% thay đổi giá`) và chia thành các "cửa sổ trượt" (sliding windows) 5 ngày là bắt buộc để LSTM ép dữ liệu vào định dạng tensor 3D, giúp học được xu hướng thay vì giá trị tuyệt đối.

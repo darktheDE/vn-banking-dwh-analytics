@@ -12,7 +12,7 @@
 Build an automated, end-to-end **data pipeline and ML analytics platform** for the Vietnamese
 financial market, covering:
 - Daily stock data (price history, foreign/proprietary trading, order statistics) for bank assets: **BID**, **TCB**, **VCB**, and **CTG** (HPG stock data and intraday ticks have been removed to focus strictly on the banking sector).
-- 20-year CAMELS performance data for **46 Vietnamese commercial banks** (2002–2022).
+- 20-year CAMELS performance data for **45 Vietnamese commercial banks** (2002–2022).
 
 The output is a Google BigQuery Star Schema Data Warehouse serving 3 machine learning models
 and 3 Looker Studio dashboards.
@@ -74,7 +74,7 @@ Memorize these facts. They appear in nearly every task.
 
 | Table | Model Area | Primary/Key Fields | Description |
 |-------|------------|--------------------|-------------|
-| `bank_cluster_assignments` | K-Means | `bank_key`, `cluster_id` | Strategic segmentation of 46 commercial banks |
+| `bank_cluster_assignments` | K-Means | `bank_key`, `cluster_id` | Strategic segmentation of 45 commercial banks |
 | `bank_risk_predictions` | Random Forest | `bank_key`, `date_key`, `risk_label` | Credit risk classifications and probability scores |
 | `fact_model_predictions` | LSTM | `base_date_key`, `stock_key`, `horizon` | Rolling price predictions for BID stock close prices |
 
@@ -91,19 +91,19 @@ Memorize these facts. They appear in nearly every task.
 
 | Data | Expected Rows |
 |------|--------------|
-| `fact_price_history` (BID, TCB, VCB, CTG) | ~11,835 rows |
+| `fact_price_history` (BID, TCB, VCB, CTG) | 11,835 rows |
 | `fact_foreign_trading` (BID) | 22 rows |
 | `fact_proprietary_trading` (BID) | 22 rows |
 | `fact_order_stats` (BID) | 22 rows |
-| `fact_bank_performance` (46 banks × ~20 years) | ~667 rows |
-| `dim_date` (2002–2026) | ~9,131 rows |
-| `dim_bank` | 46 rows |
+| `fact_bank_performance` (45 banks × 20 years) | 667 rows |
+| `dim_date` (2002–2026) | 9,131 rows |
+| `dim_bank` | 45 rows (1 bank duplicate resolved) |
 | `dim_stock` | 4 rows |
 | `dim_trading_session` | 4 rows |
 | `dim_audit` | Dynamic execution runs |
-| `bank_cluster_assignments` | 46 rows |
-| `bank_risk_predictions` | 667 rows |
-| `fact_model_predictions` | ~110 rows |
+| `bank_cluster_assignments` | 39 rows (6 outliers CB, VBSP, DAB, GPB, WEB, MDB excluded) |
+| `bank_risk_predictions` | 661 rows (clean performance dataset entries evaluated) |
+| `fact_model_predictions` | 20 rows (4 stocks × 5 horizons T+1 to T+5) |
 
 ---
 
@@ -111,7 +111,7 @@ Memorize these facts. They appear in nearly every task.
 
 These thresholds are non-negotiable acceptance criteria. Never generate a model that relaxes them.
 
-### 4.1 LSTM — BID Stock Price Forecasting
+### 4.1 LSTM — Banking Stock Price Forecasting (BID, TCB, VCB, CTG)
 
 - **Target**: `close_price` in `fact_price_history`
 - **Horizon**: T+1 through T+5 closing price predictions
@@ -123,7 +123,7 @@ These thresholds are non-negotiable acceptance criteria. Never generate a model 
 
 ### 4.2 K-Means + PCA — Bank Clustering
 
-- **Input**: 47+ CAMELS variables from `fact_bank_performance` for all 46 banks
+- **Input**: 47+ CAMELS variables from `fact_bank_performance` for all 45 banks
 - **Mandatory preprocessing**: `StandardScaler` → PCA (retain components explaining ≥ 80% variance)
 - **K selection**: Elbow Method AND Silhouette Analysis — document both
 - **Evaluation**: Log Silhouette Score and Davies-Bouldin Index

@@ -20,7 +20,7 @@ This directory stores all data files used by the Financial Data Analytics Platfo
 | `BID_proprietary_trading.xlsx` | BID daily proprietary desk trading data | `fact_proprietary_trading` |
 | `BID_price_history.xlsx` | BID daily OHLCV price history | `fact_price_history` |
 | `BID_order_stats.xlsx` | BID daily order placement statistics | `fact_order_stats` |
-| `bank_financials_part1.xlsx` | CAMELS financial data for 46 banks (Part 1) | `fact_bank_performance` |
-| `bank_financials_part2.xlsx` | CAMELS financial data for 46 banks (Part 2) | `fact_bank_performance` |
+| `bank_financials_part1.xlsx` | CAMELS financial data for 45 banks (Part 1) | `fact_bank_performance` |
+| `bank_financials_part2.xlsx` | CAMELS financial data for 45 banks (Part 2) | `fact_bank_performance` |
 
 For full column mappings and transformation rules, see [`docs/etl-spec.md`](../docs/etl-spec.md).

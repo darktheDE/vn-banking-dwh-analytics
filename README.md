@@ -19,18 +19,44 @@
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#-project-overview)
-2. [Research Questions and Hypotheses](#-research-questions--hypotheses)
-3. [System Architecture](#-system-architecture)
-4. [Data Pipeline](#-data-pipeline)
-5. [Star Schema Design](#-star-schema-design)
-6. [Machine Learning Models](#-machine-learning-models)
-7. [Dataset](#-dataset)
-8. [Directory Structure](#-directory-structure)
-9. [Team and Roles](#-team-and-roles)
-10. [Quick Start](#-quick-start)
-11. [Documentation Index](#-documentation-index)
-12. [References](#-references)
+1. [Key Production Results](#-key-production-results)
+2. [Project Overview](#-project-overview)
+3. [Research Questions and Hypotheses](#-research-questions--hypotheses)
+4. [System Architecture](#-system-architecture)
+5. [Data Pipeline](#-data-pipeline)
+6. [Star Schema Design](#-star-schema-design)
+7. [Machine Learning Models](#-machine-learning-models)
+8. [Dataset](#-dataset)
+9. [Directory Structure](#-directory-structure)
+10. [Team and Roles](#-team-and-roles)
+11. [Quick Start](#-quick-start)
+12. [Documentation Index](#-documentation-index)
+13. [References](#-references)
+
+---
+
+## 🏆 Key Production Results
+
+Here is a summary of the key quantitative results achieved by the deployed models on live DWH data:
+
+### 1. LSTM Time Series Forecasting (Stock Price Forecasting)
+*   **BID**: LSTM RMSE: **0.9167** vs ARIMA Baseline: **1.1696** (Passed)
+*   **TCB**: LSTM RMSE: **1.3725** vs ARIMA Baseline: **9.4864** (Passed)
+*   **VCB**: LSTM RMSE: **2.9453** vs ARIMA Baseline: **4.4900** (Passed)
+*   **CTG**: LSTM RMSE: **1.5025** vs ARIMA Baseline: **11.3624** (Passed)
+
+### 2. K-Means Clustering (Bank Profiling)
+*   **Optimal Clusters (k)**: 3
+*   **Silhouette Score**: **0.3222**
+*   **Davies-Bouldin Index**: **0.9746**
+*   **PCA Variance Explained**: **85.92%** (with 3 main components retained)
+*   **Distribution**: Cluster 0 (Small-to-medium retail banks): 13 banks, Cluster 1 (Large system pillars): 24 banks, Cluster 2 (Foreign-owned banks): 2 banks (6 outliers excluded: CB, VBSP, DAB, GPB, WEB, MDB).
+
+### 3. Random Forest Classifier (Credit Risk Warning NPL ≥ 3%)
+*   **AUC-ROC**: **0.9370** (Threshold: > 0.80)
+*   **Recall (High-Risk Class)**: **85.71%** (Threshold: ≥ 85%)
+*   **Optimal decision threshold**: **0.2822**
+*   **Top Feature Importance**: `llp_ratio` (Loan Loss Provision ratio - **21.05%**), `roe` (**11.49%**), `cir` (**11.03%**), `roa` (**9.85%**).
 
 ---
 
@@ -43,8 +69,8 @@ The Vietnamese stock market and banking system are experiencing significant fluc
 | Capability | Technology | Output |
 |------------|------------|--------|
 | **Centralized Data Warehouse** | Google BigQuery + Star Schema | Single source of truth for all financial data |
-| **Stock Price Forecasting** | LSTM Deep Learning (T+1 → T+5) | Short-term BID price signals |
-| **Bank Clustering** | K-Means + PCA | Strategic segmentation of 46 banks |
+| **Stock Price Forecasting** | LSTM Deep Learning (T+1 → T+5) | Short-term banking stock price signals (BID, TCB, VCB, CTG) |
+| **Bank Clustering** | K-Means + PCA | Strategic segmentation of 45 banks (39 in active clustering) |
 | **Credit Risk Classification** | Random Forest | Early warning for NPL ≥ 3% threshold |
 | **Interactive Dashboard** | Looker Studio | Live BigQuery-connected reporting |
 
@@ -101,7 +127,7 @@ The full end-to-end data flow from raw Excel sources to Looker Studio dashboards
 
 **Pipeline Stages:**
 
-1. **Extract** — Read 7 structured Excel files using `pandas` + `openpyxl`
+1. **Extract** — Read 6 structured Excel files using `pandas` + `openpyxl`
 2. **Transform** — Clean missing values, standardize date formats, normalize features, generate surrogate keys
 3. **Load** — Push structured DataFrames to BigQuery via `pandas-gbq` with partitioning and clustering
 4. **Analyze** — ML models consume data directly from BigQuery Fact tables
@@ -125,7 +151,7 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 |-------|-------------|
 | `dim_date` | Calendar dimension with trading day flag (2002–2026) |
 | `dim_stock` | BID, TCB, VCB, CTG stock descriptors (HPG removed to focus strictly on banking) |
-| `dim_bank` | 46 commercial banks with SOCB / JSCB / FOCB classification and SCD Type 2 tracking (`valid_from`, `valid_to`, `is_current`) |
+| `dim_bank` | 45 commercial banks with SOCB / JSCB / FOCB classification and SCD Type 2 tracking (`valid_from`, `valid_to`, `is_current`) |
 | `dim_trading_session` | ATO, Morning, Afternoon, ATC session definitions |
 | `dim_audit` | ETL execution run log registry table |
 
@@ -147,7 +173,7 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 |-------|-------------|-------------|
 | `bank_cluster_assignments` | Per bank | Strategic bank cluster labels (`cluster_id`) |
 | `bank_risk_predictions` | Annual per bank | Credit risk classifications (`risk_label`) and probability scores |
-| `fact_model_predictions` | Daily per stock/horizon | Rolling multi-horizon BID closing price forecasting |
+| `fact_model_predictions` | Daily per stock/horizon | Rolling multi-horizon price forecasting (BID, TCB, VCB, CTG) |
 
 **BigQuery Optimizations:**
 - **Partitioning**: All high-volume fact tables partitioned by `date_key` as DATE
@@ -166,8 +192,8 @@ Three production ML models are deployed, each solving a distinct financial analy
 ### Model 1 — LSTM: Stock Price Forecasting
 
 ```
-Input  : BID OHLCV + Foreign Net Volume + Proprietary Net Volume (rolling window)
-Output : Predicted BID closing price for T+1, T+2, T+3, T+4, T+5
+Input  : Stock OHLCV + Foreign Net Volume + Proprietary Net Volume (rolling window)
+Output : Predicted closing price for T+1, T+2, T+3, T+4, T+5 (BID, TCB, VCB, CTG)
 Scaler : MinMaxScaler on sequence windows
 Baseline: ARIMA (comparison only — not deployed in production)
 ```
@@ -181,7 +207,7 @@ Baseline: ARIMA (comparison only — not deployed in production)
 ### Model 2 — K-Means + PCA: Bank Clustering
 
 ```
-Input  : 47+ CAMELS financial variables for 46 banks (2002–2022)
+Input  : 47+ CAMELS financial variables for 45 banks (2002–2022)
 Process: StandardScaler → PCA (≥80% variance) → K-Means (Elbow + Silhouette)
 Output : Cluster assignments written to BigQuery
 ```
@@ -219,7 +245,7 @@ For full model specifications, hyperparameter strategies, and MLOps retraining s
 |--------|-------------|--------|------|
 | **Stock Price History (BID, TCB, VCB, CTG)** | Daily historical trading data for banking stocks (BID, TCB, VCB, CTG) | 11,835+ rows | [CafeF](https://cafef.vn/) |
 | **BID Stock Daily Stats** | Daily trading stats for BID — foreign trading, proprietary trading, order statistics | 22 trading sessions | [CafeF — BID](https://cafef.vn/du-lieu/lich-su-giao-dich/hose/bid-1.chn) |
-| **VN Bank CAMELS Dataset** | 20-year CAMELS financial performance data for 46 Vietnamese commercial banks (2002–2022) | 667 rows × 47+ columns | [Harvard Dataverse — DOI:10.7910/DVN/RIWA3B](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RIWA3B) |
+| **VN Bank CAMELS Dataset** | 20-year CAMELS financial performance data for 45 Vietnamese commercial banks (2002–2022) | 667 rows × 47+ columns | [Harvard Dataverse — DOI:10.7910/DVN/RIWA3B](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RIWA3B) |
 
 ### Key Financial Indicators (CAMELS Framework)
 
@@ -249,7 +275,7 @@ vn-banking-dwh-analytics/
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/                     # Original source Excel files (7 files, git-ignored)
+│   ├── raw/                     # Original source Excel files (6 files, git-ignored)
 │   ├── processed/               # Cleaned intermediate DataFrames (git-ignored)
 │   └── external/                # Reference data (holiday calendars, etc.)
 │
@@ -281,7 +307,7 @@ vn-banking-dwh-analytics/
 ├── src/
 │   ├── etl/                     # Production ETL batch scripts
 │   │   ├── populate_dim_*.py    # Dimension table loaders (4 scripts)
-│   │   ├── load_*.py            # Fact table ETL (6 scripts)
+│   │   ├── load_*.py            # Fact table ETL (5 scripts)
 │   │   └── validate_integrity.py
 │   ├── models/                  # Production ML training and inference scripts
 │   │   ├── feature_engineering_*.py
@@ -382,7 +408,7 @@ python -m src.models.feature_engineering_stock
 python -m src.models.feature_engineering_bank
 python -m src.models.baseline_arima        # Establish ARIMA benchmark
 python -m src.models.train_lstm            # Train LSTM; predictions → BigQuery
-python -m src.models.train_kmeans          # Cluster 46 banks; assignments → BigQuery
+python -m src.models.train_kmeans          # Cluster 45 banks; assignments → BigQuery
 python -m src.models.baseline_logistic     # Establish Logistic Regression benchmark
 python -m src.models.train_random_forest   # Train RF; risk labels → BigQuery
 ```
