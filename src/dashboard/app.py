@@ -573,19 +573,33 @@ def show_bank_clustering_section():
     df_clean["PC1"] = pca_data[:, 0]
     df_clean["PC2"] = pca_data[:, 1]
     
+    # Define cluster names and color map
+    cluster_names = {
+        0: "Cụm 0 (TMCP Nhỏ)",
+        1: "Cụm 1 (Trụ Cột Lớn)",
+        2: "Cụm 2 (Ngân Hàng Ngoại)"
+    }
+    df_clean["Phân Nhóm (Cluster)"] = df_clean["cluster_id"].map(cluster_names)
+    
+    color_map = {
+        "Cụm 0 (TMCP Nhỏ)": "#3b82f6",      # blue
+        "Cụm 1 (Trụ Cột Lớn)": "#ec4899",    # pink/rose
+        "Cụm 2 (Ngân Hàng Ngoại)": "#10b981" # green
+    }
+    
     # Scatter plot
     fig = px.scatter(
         df_clean,
         x="PC1",
         y="PC2",
-        color="cluster_id",
+        color="Phân Nhóm (Cluster)",
         text="bank_code",
         hover_data=["bank_name", "bank_type"],
         title="Biểu Đồ Phân Tán Các Ngân Hàng Trên Hệ Tọa Độ PCA",
-        color_continuous_scale=px.colors.sequential.Viridis
+        color_discrete_map=color_map
     )
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
-    fig.update_layout(coloraxis_showscale=False)
+    fig.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
     st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân cụm rõ rệt thành 3 nhóm chiến lược: Cụm 0 (13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản), Cụm 1 (24 ngân hàng thương mại lớn và trung bình đóng vai trò trụ cột hệ thống), và Cụm 2 (2 chi nhánh ngân hàng nước ngoài có an toàn vốn vượt trội).")
     
@@ -611,15 +625,16 @@ def show_bank_clustering_section():
         "gta": "Cho vay gộp/Tổng tài sản (GTA)"
     }
     melted_profiles["Chỉ Số Tài Chính"] = melted_profiles["Chỉ Số Tài Chính"].map(ratio_vn_map)
+    melted_profiles["Phân Nhóm (Cluster)"] = melted_profiles["cluster_id"].map(cluster_names)
     
     fig_bar = px.bar(
         melted_profiles,
         x="Chỉ Số Tài Chính",
         y="Giá Trị Trung Bình",
-        color="cluster_id",
+        color="Phân Nhóm (Cluster)",
         barmode="group",
         title="Giá Trị Trung Bình Các Chỉ Số Camels Phân Theo Nhóm Ngân Hàng",
-        labels={"cluster_id": "Mã Nhóm (Cluster ID)"}
+        color_discrete_map=color_map
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
     st.caption("Tình hình: So sánh đặc trưng CAMELS chỉ ra sự phân hóa: Cụm 2 (Ngân hàng ngoại) có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 (Trụ cột lớn) giữ tỷ suất sinh lời ROE/ROA lành mạnh và tỷ lệ cho vay ở mức cao nhất; Cụm 0 (TMCP nhỏ) có biên NIM và hiệu quả kinh doanh khiêm tốn hơn.")
