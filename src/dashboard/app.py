@@ -316,7 +316,7 @@ def show_eda_section():
             x=selected_col,
             marginal="box",
             title=f"Phân phối và Biểu đồ hộp của {ratio_vn_map[selected_col]} (%)",
-            labels={selected_col: f"{ratio_vn_map[selected_col]} (%)"},
+            labels={selected_col: f"{ratio_vn_map[selected_col]} (%)", "count": "Số lượng bản ghi"},
             color_discrete_sequence=["#3b82f6"]
         )
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
@@ -338,6 +338,7 @@ def show_eda_section():
         
         stats = col_data.describe().to_frame().T
         stats.columns = ["Số mẫu", "Trung bình (%)", "Độ lệch chuẩn (%)", "Tối thiểu (%)", "25% (%)", "Trung vị (50%) (%)", "75% (%)", "Tối đa (%)"]
+        stats.index = [f"Chỉ số: {ratio_vn_map[selected_col]}"]
         st.dataframe(stats, use_container_width=True)
 
     with tab2:
@@ -730,20 +731,24 @@ def show_bank_clustering_section():
     display_cols = ["bank_code", "bank_name", "bank_type"] + feature_cols
     cluster_banks = df_clean[df_clean["cluster_id"] == cluster_select][display_cols].copy()
     
+    # Scale to percentage for consistency with other tabs
+    for col in feature_cols:
+        cluster_banks[col] = cluster_banks[col] * 100
+        
     column_renames = {
         "bank_code": "Mã Ngân Hàng",
         "bank_name": "Tên Ngân Hàng",
-        "bank_type": "Loại Hình",
-        "npl_ratio": "NPL Ratio",
-        "roa": "ROA",
-        "roe": "ROE",
-        "nim": "NIM",
-        "cir": "CIR",
-        "eta": "ETA",
-        "etd": "ETD",
-        "lta": "LTA",
-        "ltd": "LTD",
-        "gta": "GTA"
+        "bank_type": "Loại Hình Ngân Hàng",
+        "npl_ratio": "Tỷ lệ nợ xấu (NPL) (%)",
+        "roa": "Tỷ suất sinh lời/Tài sản (ROA) (%)",
+        "roe": "Tỷ suất sinh lời/Vốn CSH (ROE) (%)",
+        "nim": "Biên lãi thuần (NIM) (%)",
+        "cir": "Tỷ lệ chi phí/Thu nhập (CIR) (%)",
+        "eta": "Vốn CSH/Tổng tài sản (ETA) (%)",
+        "etd": "Vốn CSH/Tiền gửi (ETD) (%)",
+        "lta": "Dư nợ cho vay/Tổng tài sản (LTA) (%)",
+        "ltd": "Dư nợ cho vay/Tiền gửi (LTD) (%)",
+        "gta": "Cho vay gộp/Tổng tài sản (GTA) (%)"
     }
     cluster_banks = cluster_banks.rename(columns=column_renames)
     st.dataframe(cluster_banks, use_container_width=True)
