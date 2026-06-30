@@ -11,7 +11,7 @@ Dữ liệu được tổ chức phân cấp rõ rệt để tách biệt giữa
 ```text
 data/
 ├── raw/
-│   └── VN banks dataset (updated August 2023).xlsx  # Dữ liệu Excel gốc 46 ngân hàng thương mại (2002-2022)
+│   └── VN banks dataset (updated August 2023).xlsx  # Dữ liệu Excel gốc 45 ngân hàng thương mại (2002-2022)
 └── processed/
     ├── financial_items_mapping.csv                 # Từ điển chỉ tiêu tài chính Việt - Anh dùng chung (219 dòng)
     ├── bid/                                         # Thư mục dữ liệu processed của BIDV (BID)

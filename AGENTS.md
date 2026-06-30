@@ -12,7 +12,7 @@
 Build an automated, end-to-end **data pipeline and ML analytics platform** for the Vietnamese
 financial market, covering:
 - Daily stock data (price history, foreign/proprietary trading, order statistics) for bank assets: **BID**, **TCB**, **VCB**, and **CTG** (HPG stock data and intraday ticks have been removed to focus strictly on the banking sector).
-- 20-year CAMELS performance data for **46 Vietnamese commercial banks** (2002–2022).
+- 20-year CAMELS performance data for **45 Vietnamese commercial banks** (2002–2022).
 
 The output is a Google BigQuery Star Schema Data Warehouse serving 3 machine learning models
 and 3 Looker Studio dashboards.
@@ -74,7 +74,7 @@ Memorize these facts. They appear in nearly every task.
 
 | Table | Model Area | Primary/Key Fields | Description |
 |-------|------------|--------------------|-------------|
-| `bank_cluster_assignments` | K-Means | `bank_key`, `cluster_id` | Strategic segmentation of 46 commercial banks |
+| `bank_cluster_assignments` | K-Means | `bank_key`, `cluster_id` | Strategic segmentation of 45 commercial banks |
 | `bank_risk_predictions` | Random Forest | `bank_key`, `date_key`, `risk_label` | Credit risk classifications and probability scores |
 | `fact_model_predictions` | LSTM | `base_date_key`, `stock_key`, `horizon` | Rolling price predictions for BID stock close prices |
 

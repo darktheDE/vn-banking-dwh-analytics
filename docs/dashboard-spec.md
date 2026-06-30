@@ -43,7 +43,7 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 
 ## 3. Page 2 — Bank Profiling (K-Means Clustering)
 
-**Purpose**: Allow both Persona A and Persona B to understand the behavioral segmentation of the 46 Vietnamese commercial banks based on 20 years of financial performance data.
+**Purpose**: Allow both Persona A and Persona B to understand the behavioral segmentation of the 45 Vietnamese commercial banks based on 20 years of financial performance data.
 
 ### 3.1 Required Charts and Components
 
@@ -82,7 +82,7 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 | RM-01 | Data Table | Classification output + `dim_bank` | Bank Name, Bank Type, Year, `npl_ratio` (actual), Predicted Risk Label (Healthy / High Risk), Prediction Probability | Rows color-coded: red = High Risk, green = Healthy |
 | RM-02 | Line Chart | `fact_bank_performance` filtered by High Risk banks | X-axis: Year. Y-axis: `npl_ratio`. Series: One per High-Risk bank | Shows NPL trend for flagged banks over time |
 | RM-03 | Bar Chart | Feature importance output | X-axis: Feature Name. Y-axis: Importance Score | Static chart from the Random Forest model output |
-| RM-04 | Scorecard (x3) | Classification output table | Total Banks Analyzed: 46. High Risk Banks (Predicted): count. Recall Achieved: value | Top of page KPIs |
+| RM-04 | Scorecard (x3) | Classification output table | Total Banks Analyzed: 45 (39 in active clustering). High Risk Banks (Predicted): count. Recall Achieved: value | Top of page KPIs |
 
 ### 4.2 Filters
 

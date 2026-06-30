@@ -19,18 +19,44 @@
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#-project-overview)
-2. [Research Questions and Hypotheses](#-research-questions--hypotheses)
-3. [System Architecture](#-system-architecture)
-4. [Data Pipeline](#-data-pipeline)
-5. [Star Schema Design](#-star-schema-design)
-6. [Machine Learning Models](#-machine-learning-models)
-7. [Dataset](#-dataset)
-8. [Directory Structure](#-directory-structure)
-9. [Team and Roles](#-team-and-roles)
-10. [Quick Start](#-quick-start)
-11. [Documentation Index](#-documentation-index)
-12. [References](#-references)
+1. [Key Production Results](#-key-production-results)
+2. [Project Overview](#-project-overview)
+3. [Research Questions and Hypotheses](#-research-questions--hypotheses)
+4. [System Architecture](#-system-architecture)
+5. [Data Pipeline](#-data-pipeline)
+6. [Star Schema Design](#-star-schema-design)
+7. [Machine Learning Models](#-machine-learning-models)
+8. [Dataset](#-dataset)
+9. [Directory Structure](#-directory-structure)
+10. [Team and Roles](#-team-and-roles)
+11. [Quick Start](#-quick-start)
+12. [Documentation Index](#-documentation-index)
+13. [References](#-references)
+
+---
+
+## 🏆 Key Production Results
+
+Here is a summary of the key quantitative results achieved by the deployed models on live DWH data:
+
+### 1. LSTM Time Series Forecasting (Stock Price Forecasting)
+*   **BID**: LSTM RMSE: **0.9167** vs ARIMA Baseline: **1.1696** (Passed)
+*   **TCB**: LSTM RMSE: **1.3725** vs ARIMA Baseline: **9.4864** (Passed)
+*   **VCB**: LSTM RMSE: **2.9453** vs ARIMA Baseline: **4.4900** (Passed)
+*   **CTG**: LSTM RMSE: **1.5025** vs ARIMA Baseline: **11.3624** (Passed)
+
+### 2. K-Means Clustering (Bank Profiling)
+*   **Optimal Clusters (k)**: 3
+*   **Silhouette Score**: **0.3222**
+*   **Davies-Bouldin Index**: **0.9746**
+*   **PCA Variance Explained**: **85.92%** (with 3 main components retained)
+*   **Distribution**: Cluster 0 (Small-to-medium retail banks): 13 banks, Cluster 1 (Large system pillars): 24 banks, Cluster 2 (Foreign-owned banks): 2 banks (6 outliers excluded: CB, VBSP, DAB, GPB, WEB, MDB).
+
+### 3. Random Forest Classifier (Credit Risk Warning NPL ≥ 3%)
+*   **AUC-ROC**: **0.9370** (Threshold: > 0.80)
+*   **Recall (High-Risk Class)**: **85.71%** (Threshold: ≥ 85%)
+*   **Optimal decision threshold**: **0.2822**
+*   **Top Feature Importance**: `llp_ratio` (Loan Loss Provision ratio - **21.05%**), `roe` (**11.49%**), `cir` (**11.03%**), `roa` (**9.85%**).
 
 ---
 
@@ -101,7 +127,7 @@ The full end-to-end data flow from raw Excel sources to Looker Studio dashboards
 
 **Pipeline Stages:**
 
-1. **Extract** — Read 7 structured Excel files using `pandas` + `openpyxl`
+1. **Extract** — Read 6 structured Excel files using `pandas` + `openpyxl`
 2. **Transform** — Clean missing values, standardize date formats, normalize features, generate surrogate keys
 3. **Load** — Push structured DataFrames to BigQuery via `pandas-gbq` with partitioning and clustering
 4. **Analyze** — ML models consume data directly from BigQuery Fact tables
@@ -249,7 +275,7 @@ vn-banking-dwh-analytics/
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/                     # Original source Excel files (7 files, git-ignored)
+│   ├── raw/                     # Original source Excel files (6 files, git-ignored)
 │   ├── processed/               # Cleaned intermediate DataFrames (git-ignored)
 │   └── external/                # Reference data (holiday calendars, etc.)
 │
@@ -281,7 +307,7 @@ vn-banking-dwh-analytics/
 ├── src/
 │   ├── etl/                     # Production ETL batch scripts
 │   │   ├── populate_dim_*.py    # Dimension table loaders (4 scripts)
-│   │   ├── load_*.py            # Fact table ETL (6 scripts)
+│   │   ├── load_*.py            # Fact table ETL (5 scripts)
 │   │   └── validate_integrity.py
 │   ├── models/                  # Production ML training and inference scripts
 │   │   ├── feature_engineering_*.py

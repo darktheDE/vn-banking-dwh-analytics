@@ -47,7 +47,7 @@ We will build and finalize 7 Python scripts in the `src/models/` directory.
 ### 3. Bank Clustering (K-Means & PCA)
 
 #### [MODIFY] `train_kmeans.py`
-- **Goal**: Cluster the 46 banks.
+- **Goal**: Cluster the 45 banks.
 - **Key Features**:
   - Accept `StandardScaler` processed input.
   - Run PCA to retain components explaining >= 80% variance.

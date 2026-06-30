@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-The **Financial Data Analytics Platform** aims to process, store, and analyze 20 years of banking performance data and granular stock market trading ticks. The system provides actionable insights through interactive Looker Studio dashboards and predictive Machine Learning models.
+The **Financial Data Analytics Platform** aims to process, store, and analyze 20 years of banking performance data and stock market price history. The system provides actionable insights through interactive Looker Studio dashboards and predictive Machine Learning models.
 
 ## 2. Team Structure and Roles
 
@@ -13,21 +13,21 @@ To maximize efficiency, the project executes under a concurrent, role-based stra
 **Focus**: Data Collection, Processing, and Cleaning.
 - Set up the Python environment using Pandas and Openpyxl.
 - Extract raw data from the 7 provided Excel sources.
-- Handle missing values using Forward-fill for intraday ticks and Statistical Imputation for missing 2002-2005 bank data.
+- Handle missing values using Forward-fill for stock data and Statistical Imputation for missing 2002-2005 bank data.
 - Standardize data formats and normalize numerical features using StandardScaler and MinMaxScaler.
 
 ### Role 2: Data Warehousing
 
 **Focus**: Google BigQuery Architecture and Maintenance.
-- Design and deploy the Star Schema comprising 4 Dimension Tables and 6 Fact Tables.
+- Design and deploy the Star Schema comprising 5 Dimension Tables and 5 Fact Tables.
 - Configure Partitioning by date and Clustering by stock and bank keys to optimize query performance and reduce scanning costs.
 - Securely manage Service Account JSON Keys and IAM permissions.
 
 ### Role 3: Machine Learning Engineering
 
 **Focus**: Predictive Modeling and Optimization.
-- **Time Series**: Train and optimize the LSTM deep learning network for short-term BID stock price forecasting.
-- **Clustering**: Apply PCA and K-Means to segment 46 banks based on CAMELS indicators.
+- **Time Series**: Train and optimize the LSTM deep learning network for short-term stock price forecasting (BID, TCB, VCB, CTG).
+- **Clustering**: Apply PCA and K-Means to segment 45 banks based on CAMELS indicators.
 - **Classification**: Train the Random Forest algorithm to classify banks into ‘High Risk’ versus ‘Healthy’ categories.
 - Ensure the models meet the defined Acceptance Criteria, specifically achieving a Recall greater than or equal to 85% for risk classification.
 

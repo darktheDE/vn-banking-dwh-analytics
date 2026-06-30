@@ -6,7 +6,7 @@ This directory contains SQL scripts for provisioning and managing the Google Big
 
 | File | Description |
 |------|-------------|
-| `bigquery_schema.sql` | DDL statements to create all 4 Dimension Tables and 6 Fact Tables with correct partitioning and clustering. |
+| `bigquery_schema.sql` | DDL statements to create all 5 Dimension Tables and 5 Fact Tables with correct partitioning and clustering. |
 
 ## Usage
 

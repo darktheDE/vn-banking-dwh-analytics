@@ -51,9 +51,9 @@
 - `[x]` **B-05**: Populate `dim_stock` with focus banks (BID, TCB, VCB, CTG) records (4 rows).
   - *File*: `src/etl/populate_dim_stock.py`
   - *Verification*: 4 rows in table.
-- `[x]` **B-06**: Populate `dim_bank` with 46 bank records from the raw CAMELS file.
+- `[x]` **B-06**: Populate `dim_bank` with 45 bank records from the raw CAMELS file.
   - *File*: `src/etl/populate_dim_bank.py`
-  - *Verification*: 46 rows in table. No null `bank_code` values.
+  - *Verification*: 45 rows in table. No null `bank_code` values.
 - `[x]` **B-06b**: Implement SCD Type 2 historical comparison and update-insert flow in `populate_dim_bank.py`.
   - *Verification*: Changing bank charter capital in local csv creates a new version with updated valid windows, and sets `is_current = FALSE` for the old row.
 - `[x]` **B-07**: Populate `dim_trading_session` with 4 session records per `docs/etl-spec.md` Section 4.4.
@@ -79,7 +79,7 @@
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
-- `[x]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance`.
+- `[x]` **B-13**: Implement ETL for Files F6–F7 → `fact_bank_performance` (covering 45 banks from 2002 to 2022).
   - *File*: `src/etl/load_bank_performance.py`
   - *Rules*: `docs/etl-spec.md` Section 3.6. Median imputation required for 2002–2005.
   - *Verification*: ~667 rows. No null values in CAMELS ratio columns after imputation. `is_imputed` flag column present. Log confirms row count.
@@ -151,21 +151,21 @@
 - `[x]` **D-00**: Prototype and validate all three dashboard pages (Market Movement, Bank Profiling, Risk Monitoring) locally using processed CSV files.
   - *File*: `src/models/local/generate_dashboard_plots.py`
   - *Verification*: Plots generated successfully in `reports/figures/dashboard/` and business interpretation report saved to `docs/process/bao_cao_dashboard_ml_local.md`.
-- `[ ]` **D-01**: Connect Looker Studio to the BigQuery Dataset using the Native Connector.
+- `[x]` **D-01**: Connect Looker Studio to the BigQuery Dataset using the Native Connector.
   - *Verification*: Connection established without errors. All Fact and Dimension tables visible.
-- `[ ]` **D-02**: Build the **Market Movement** dashboard page.
+- `[x]` **D-02**: Build the **Market Movement** dashboard page.
   - *Charts*: Line chart of actual vs LSTM-predicted `close_price`. Bar chart of `foreign_net_volume` and `prop_net_volume` by date.
   - *Filters*: Date range, Stock Ticker.
   - *Acceptance*: Per `docs/dashboard-spec.md` Section 2.
-- `[ ]` **D-03**: Build the **Bank Profiling** dashboard page.
+- `[x]` **D-03**: Build the **Bank Profiling** dashboard page.
   - *Charts*: Scatter plot of PCA components colored by cluster. Radar chart of CAMELS ratios per cluster.
   - *Filters*: Bank Name, Bank Type (SOCB / JSCB / FOCB), Cluster ID.
   - *Acceptance*: Per `docs/dashboard-spec.md` Section 3.
-- `[ ]` **D-04**: Build the **Risk Monitoring** dashboard page.
+- `[x]` **D-04**: Build the **Risk Monitoring** dashboard page.
   - *Charts*: Risk classification table with color-coded risk labels. NPL ratio trend line per bank.
   - *Filters*: Bank Name, Year, Risk Category.
   - *Acceptance*: Per `docs/dashboard-spec.md` Section 4.
-- `[ ]` **D-05**: End-to-end integration test — confirm all dashboard charts render correctly from live BigQuery data without manual CSV uploads.
+- `[x]` **D-05**: End-to-end integration test — confirm all dashboard charts render correctly from live BigQuery data without manual CSV uploads.
   - *Verification*: All 3 dashboard pages load without errors. Non-technical team members can operate filters without SQL.
 
 ---
@@ -179,5 +179,5 @@ The project is officially complete when **all** of the following are true:
 - `[x]` LSTM RMSE is lower than the ARIMA baseline.
 - `[x]` Random Forest achieves AUC-ROC > 0.80 and Recall ≥ 85% for the High Risk class.
 - `[x]` K-Means Silhouette Score is logged and clusters are interpretable.
-- `[ ]` All 3 Looker Studio dashboard pages render from live BigQuery data.
+- `[x]` All 3 Looker Studio dashboard pages render from live BigQuery data.
 - `[x]` All ML model metrics are logged to the Python `logging` system (no bare `print()` statements).

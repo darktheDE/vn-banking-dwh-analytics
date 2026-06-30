@@ -25,7 +25,7 @@ graph TD
 1.  **Bài toán 1: Dự báo xu hướng giá và tối ưu hóa thời điểm giao dịch (BID Stock Forecasting)**
     *   *Mục tiêu*: Sử dụng mạng LSTM kết hợp dòng tiền ròng của Khối ngoại và Tự doanh để dự báo giá đóng cửa BIDV trong 5 ngày tới ($T+1$ đến $T+5$).
 2.  **Bài toán 2: Phân nhóm định hình cấu trúc cạnh tranh (Bank CAMELS Clustering)**
-    *   *Mục tiêu*: Áp dụng thuật toán K-Means kết hợp giảm chiều dữ liệu PCA để phân hóa 46 ngân hàng Việt Nam thành các nhóm có cùng "chân dung tài chính" nhằm đánh giá đối thủ cùng phân khúc.
+    *   *Mục tiêu*: Áp dụng thuật toán K-Means kết hợp giảm chiều dữ liệu PCA để phân hóa 45 ngân hàng Việt Nam thành các nhóm có cùng "chân dung tài chính" nhằm đánh giá đối thủ cùng phân khúc.
 3.  **Bài toán 3: Radar cảnh báo sớm nguy cơ nợ xấu (Early Risk Warning)**
     *   *Mục tiêu*: Xây dựng mô hình Random Forest phân loại các ngân hàng có rủi ro nợ xấu vượt ngưỡng an toàn quy định (NPL $\ge$ 3%) để kích hoạt các biện pháp phòng ngừa rủi ro.
 4.  **Bài toán 4: Giải thích các động cơ cốt lõi gây suy yếu hệ thống (Explainable Risk Drivers)**

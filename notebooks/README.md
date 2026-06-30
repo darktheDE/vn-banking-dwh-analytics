@@ -11,7 +11,7 @@ This directory contains Jupyter Notebooks for research, experimentation, and exp
 | `01_EDA.ipynb` | Understand | Exploratory Data Analysis — distributions, correlations, missing values across all 7 source files | Trần Minh Khánh & Phạm Minh Quân |
 | `02_ETL_BigQuery.ipynb` | Prepare | Prototype and validate the ETL pipeline before promoting to `src/etl/` production scripts | Trần Minh Khánh, Nguyễn Đặng Quốc Anh & Đỗ Kiến Hưng |
 | `03_ML_TimeSeries.ipynb` | Model | LSTM and ARIMA baseline experiments for BID stock price forecasting (T+1 to T+5) | Phạm Minh Quân & Nguyễn Đặng Quốc Anh |
-| `04_ML_Clustering.ipynb` | Model | PCA dimensionality reduction and K-Means clustering experiments for 46 banks | Phạm Minh Quân & Nguyễn Đặng Quốc Anh |
+| `04_ML_Clustering.ipynb` | Model | PCA dimensionality reduction and K-Means clustering experiments for 45 banks | Phạm Minh Quân & Nguyễn Đặng Quốc Anh |
 | `05_ML_Classification.ipynb` | Model | Random Forest and Logistic Regression baseline for NPL ≥ 3% risk classification | Phạm Minh Quân & Nguyễn Đặng Quốc Anh |
 | `06_PCA_Visualization.ipynb` | Evaluate | Visualization of PCA components, cluster scatter plots, and feature importance charts | Đỗ Kiến Hưng & Phạm Minh Quân |
 

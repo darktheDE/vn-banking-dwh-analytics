@@ -93,7 +93,7 @@ Dữ liệu đầu vào từ `data/processed/`, sau khi xử lý được xuất
 | 0 | 44 | Nhóm chính: BID, CTG, VCB, TCB, ACB, MB, VPB... (các ngân hàng hoạt động bình thường) |
 | 1 | 1 | DAB — ngân hàng có chỉ số tài chính ngoại lai (outlier) |
 
-**Nhận xét**: Silhouette Score 0.71 là rất tốt, cho thấy cụm được phân tách rõ ràng. Tuy nhiên k=2 với chỉ 1 ngân hàng ở cluster 1 cho thấy DAB là một outlier rõ rệt. Khi chạy với 46 ngân hàng đầy đủ trên BigQuery, kỳ vọng sẽ có 3-4 cụm phân biệt (quốc doanh, cổ phần, ngoại) theo giả thuyết Q4.
+**Nhận xét**: Silhouette Score 0.71 là rất tốt, cho thấy cụm được phân tách rõ ràng. Tuy nhiên k=2 với chỉ 1 ngân hàng ở cluster 1 cho thấy DAB là một outlier rõ rệt. Khi chạy với 45 ngân hàng đầy đủ trên BigQuery, kỳ vọng sẽ có 3-4 cụm phân biệt (quốc doanh, cổ phần, ngoại) theo giả thuyết Q4.
 
 ---
 
@@ -122,7 +122,7 @@ Dữ liệu đầu vào từ `data/processed/`, sau khi xử lý được xuất
 
 **Nhận xét**:
 - **AUC-ROC 0.9568** vượt xa ngưỡng 0.80 → mô hình phân biệt rất tốt giữa 2 nhóm rủi ro.
-- **Recall 0.2143 chưa đạt ngưỡng 0.85**: Nguyên nhân là dữ liệu mất cân bằng nặng (chỉ 14 mẫu High Risk trong tập test). Khi tích hợp BigQuery với đầy đủ 46 ngân hàng x 20 năm, có thể cải thiện bằng cách:
+- **Recall 0.2143 chưa đạt ngưỡng 0.85**: Nguyên nhân là dữ liệu mất cân bằng nặng (chỉ 14 mẫu High Risk trong tập test). Khi tích hợp BigQuery với đầy đủ 45 ngân hàng x 20 năm, có thể cải thiện bằng cách:
   - Tăng cường dữ liệu (SMOTE oversampling)
   - Điều chỉnh ngưỡng quyết định (threshold tuning) thay vì mặc định 0.5
   - Thêm hyperparameter tuning (GridSearchCV)
