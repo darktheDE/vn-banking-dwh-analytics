@@ -30,3 +30,7 @@ seaborn>=0.12.0
 # External APIs
 vnstock
 
+# Interactive Dashboard App
+streamlit>=1.25.0
+plotly>=5.15.0
+

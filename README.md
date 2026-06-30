@@ -395,6 +395,14 @@ python -m src.models.train_random_forest   # Train RF; risk labels → BigQuery
 4. Select your `GCP_PROJECT_ID` and `BQ_DATASET_ID`
 5. Build dashboards per the specifications in [`docs/dashboard-spec.md`](docs/dashboard-spec.md)
 
+### Step 6 — Run the Streamlit Dashboard App
+
+To view the predictions, classifications, and clustering results on a local interactive web interface, execute:
+```bash
+streamlit run src/dashboard/app.py
+```
+Open `http://localhost:8501` in your browser.
+
 ---
 
 ## 📚 Documentation Index

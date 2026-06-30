@@ -90,6 +90,15 @@ client = get_bigquery_client()
 print(client.project)  # Should print your GCP_PROJECT_ID
 ```
 
+### 2.5 Run the Streamlit Dashboard App
+
+To run the interactive analytics dashboard locally, execute the following command from the project root:
+```bash
+# Start Streamlit application
+streamlit run src/dashboard/app.py
+```
+This command spins up a local web server and automatically opens the dashboard interface in your web browser (defaulting to `http://localhost:8501`).
+
 ---
 
 ## 3. Project Architecture Overview
@@ -99,11 +108,12 @@ vn-banking-dwh-analytics/
 │
 ├── src/etl/         ← Batch ETL scripts (Extract → Transform → Load)
 ├── src/models/      ← ML training, inference, and BigQuery write-back
+├── src/dashboard/   ← Streamlit interactive dashboard application
 ├── src/utils/       ← Shared: logger, BigQuery client, config loader
 ├── notebooks/       ← Jupyter notebooks (prototyping and EDA only)
 ├── data/raw/        ← Source Excel files (NOT committed to git)
 ├── sql/             ← BigQuery DDL for schema provisioning
-└── docs/            ← All project specifications and documentation
+├── docs/            ← All project specifications and documentation
 ```
 
 ### Data Flow
@@ -111,14 +121,13 @@ vn-banking-dwh-analytics/
 ```
 data/raw/*.xlsx
     │
-    ▼  (src/etl/ using BigQuery MERGE for Incremental Upsert and SCD Type 2)
-Google BigQuery (Star Schema: 4 Dims + 5 Facts + Audit Metadata)
+    ▼  (src/etl/ using BigQuery MERGE/load with SCD Type 2)
+Google BigQuery (Star Schema: 5 Dims + 5 Facts + 3 ML Tables + Audit Metadata)
     │
-    ▼  (src/models/)
-ML Predictions → BigQuery (fact_model_predictions, cluster assignments, risk labels)
+    ├─▶ (src/models/) ──▶ ML Predictions (written back to BQ)
     │
-    ▼  (Looker Studio)
-Interactive Dashboards
+    ├─▶ (Looker Studio) ──▶ BI Dashboards
+    └─▶ (src/dashboard/) ──▶ Interactive Streamlit Web Application
 ```
 
 ---
