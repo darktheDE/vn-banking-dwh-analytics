@@ -140,6 +140,9 @@
 ## Track D — Business Intelligence (Đỗ Kiến Hưng & Phạm Minh Quân)
 *Depends on C-05, C-08, and C-12 being complete.*
 
+- `[x]` **D-00**: Prototype and validate all three dashboard pages (Market Movement, Bank Profiling, Risk Monitoring) locally using processed CSV files.
+  - *File*: `src/models/local/generate_dashboard_plots.py`
+  - *Verification*: Plots generated successfully in `reports/figures/dashboard/` and business interpretation report saved to `docs/process/bao_cao_dashboard_ml_local.md`.
 - `[ ]` **D-01**: Connect Looker Studio to the BigQuery Dataset using the Native Connector.
   - *Verification*: Connection established without errors. All Fact and Dimension tables visible.
 - `[ ]` **D-02**: Build the **Market Movement** dashboard page.
