@@ -49,6 +49,7 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
    * Điều kiện khớp (Join Condition): `fact_price_history.date_key = fact_model_predictions.base_date_key` VÀ `fact_price_history.stock_key = fact_model_predictions.stock_key`.
 5. Nhấp vào **Kết hợp với bảng khác (Join another table)** để thêm **Bảng 3 (Table 3)**: Chọn `dim_date`.
    * **Chiều kích (Dimensions)**: Kéo trường `date_key` và `full_date` vào mục này.
+   * **Phạm vi ngày (Date Range)** (ở dưới cùng của cột Bảng 3): Kéo trường `full_date` thả vào ô này để kích hoạt bộ lọc ngày.
 6. Thiết lập **Cấu hình kết nối (Join Configuration)** giữa Bảng 1 và Bảng 3:
    * Chọn kiểu khớp: **Khớp ngoài bên trái (Left Outer Join)**.
    * Điều kiện khớp (Join Condition): `fact_price_history.date_key = dim_date.date_key`.
@@ -63,7 +64,9 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
 1. Trong màn hình **Quản lý dữ liệu đã kết hợp (Manage blended data)** -> Nhấp vào **Thêm thực thể kết hợp (Add a blend)**.
 2. **Bảng 1 (Table 1)**: Chọn bảng `fact_bank_performance`.
    * **Chiều kích (Dimensions)**: Kéo trường `date_key` và `bank_key` vào mục này.
-   * **Chỉ số (Metrics)**: Kéo trường `total_assets`, `total_deposits`, `total_loans`, `npl_ratio`, `roa`, `roe`, `nim`, `cir`, `eta`, `ltd` vào mục này.
+   * **Chỉ số (Metrics)**: Kéo các chỉ số tài chính vào mục này và thiết lập kiểu tổng hợp như sau:
+     * `total_assets`, `total_deposits`, `total_loans`: Giữ nguyên mặc định là `Tổng số (SUM)`.
+     * `npl_ratio`, `roa`, `roe`, `nim`, `cir`, `eta`, `ltd`: Bắt buộc bấm vào biểu tượng bút chì bên cạnh chỉ số và đổi thành `Trung bình (AVG)`.
 3. Nhấp vào **Kết hợp với bảng khác (Join another table)** để thêm **Bảng 2 (Table 2)**: Chọn `bank_cluster_assignments`.
    * **Chiều kích (Dimensions)**: Kéo trường `bank_key`, `cluster_id` và `model_name` vào mục này.
 4. Thiết lập **Cấu hình kết nối (Join Configuration)** giữa Bảng 1 và Bảng 2:
@@ -76,7 +79,8 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
    * Điều kiện khớp (Join Condition): `fact_bank_performance.bank_key = dim_bank.bank_key`.
 7. Nhấp vào **Kết hợp với bảng khác (Join another table)** để thêm **Bảng 4 (Table 4)**: Chọn `dim_date`.
    * **Chiều kích (Dimensions)**: Kéo trường `date_key` và `year` vào mục này.
-8. Thiết lập **Cấu hình kết nối (Join Configuration)** giữa Bảng 1 và Bảng 4:
+   * **Phạm vi ngày (Date Range)** (ở dưới cùng của cột Bảng 4): Kéo trường `date_key` thả vào ô này.
+8. Thiết lập **Cấu hình kết nối (Join Configuration)** giữa Bảng 1 VÀ Bảng 4:
    * Chọn kiểu khớp: **Khớp ngoài bên trái (Left Outer Join)**.
    * Điều kiện khớp (Join Condition): `fact_bank_performance.date_key = dim_date.date_key`.
 9. Đặt tên nguồn dữ liệu đã kết hợp ở góc trên bên phải là `blend_bank_performance_clusters`. Nhấp **Lưu (Save)** -> **Đóng (Close)**.
@@ -85,9 +89,10 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
 1. Trong màn hình **Quản lý dữ liệu đã kết hợp (Manage blended data)** -> Nhấp vào **Thêm thực thể kết hợp (Add a blend)**.
 2. **Bảng 1 (Table 1)**: Chọn bảng `bank_risk_predictions`.
    * **Chiều kích (Dimensions)**: Kéo trường `bank_key`, `date_key`, `risk_label` vào mục này.
-   * **Chỉ số (Metrics)**: Kéo trường `risk_probability` và `actual_npl_ratio` vào mục này.
+   * **Chỉ số (Metrics)**: Kéo trường `risk_probability` và `actual_npl_ratio` vào mục này. Bấm vào biểu tượng bút chì bên cạnh từng chỉ số để đổi kiểu tổng hợp thành `Trung bình (AVG)`.
+   * **Phạm vi ngày (Date Range)** (ở dưới cùng của cột Bảng 1): Kéo trường `date_key` thả vào ô này.
 3. Nhấp vào **Kết hợp với bảng khác (Join another table)** để thêm **Bảng 2 (Table 2)**: Chọn `dim_bank`.
-   * **Chiều kích (Dimensions)**: Kéo trường `bank_key`, `bank_code`, `bank_name` và `bank_type` vào mục này.
+   * **Chiều kích (Dimensions)**: Kéo trường `bank_key`, `bank_code`, `bank_name` VÀ `bank_type` vào mục này.
 4. Thiết lập **Cấu hình kết nối (Join Configuration)** giữa Bảng 1 và Bảng 2:
    * Chọn kiểu khớp: **Khớp ngoài bên trái (Left Outer Join)**.
    * Điều kiện khớp (Join Condition): `bank_risk_predictions.bank_key = dim_bank.bank_key`.
@@ -107,7 +112,7 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
    * Vị trí: Đặt ở góc trên cùng bên phải.
    * Thiết lập mặc định: Chọn tự động là `28 ngày qua` hoặc chọn phạm vi tùy chỉnh.
 2. Chọn **Thêm bộ kiểm soát (Add a control)** -> Chọn **Danh sách thả xuống (Drop-down list)**.
-   * Nguồn dữ liệu: Chọn `dim_stock`.
+   * Nguồn dữ liệu: Chọn nguồn hợp nhất `blend_market_movement`.
    * Chiều kích kiểm soát (Control Field): Chọn trường `ticker`.
    * Mục chọn mặc định (Default Selection): Điền giá trị `BID` (Đảm bảo bộ lọc luôn mặc định hiển thị mã BID).
 
@@ -115,10 +120,10 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
 Vì thẻ chỉ số chuẩn của Looker Studio tính toán tổng hợp (SUM/AVG) toàn bộ khoảng thời gian, ta cần dùng mẹo tạo biểu đồ Bảng hiển thị 1 dòng để thể hiện giá trị đóng cửa mới nhất của cổ phiếu.
 1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Bảng (Table)**.
 2. Trong tab **Thiết lập (Setup)** ở bên phải:
-   * Nguồn dữ liệu (Data Source): Chọn `fact_price_history`.
+   * Nguồn dữ liệu (Data Source): Chọn nguồn hợp nhất `blend_market_movement`.
    * Chiều kích (Dimension): Kéo trường `close_price`. Nhấp vào biểu tượng bút chì cạnh tên trường để đổi tên nhãn hiển thị thành `Giá đóng cửa thực tế (VND)`.
    * Số lượng hàng trên mỗi trang (Rows per page): Thiết lập giá trị bằng `1`.
-   * Sắp xếp (Sort): Chọn trường `date_key` (hoặc `full_date` qua bảng Dim), cài đặt sắp xếp là **Giảm dần (Descending)**.
+   * Sắp xếp (Sort): Chọn trường `full_date` (hoặc `date_key`), cài đặt sắp xếp là **Giảm dần (Descending)**.
 3. Trong tab **Kiểu (Style)** ở bên phải:
    * Bỏ chọn **Hiển thị số dòng (Show row numbers)**.
    * Bỏ chọn **Hiển thị tiêu đề (Show header)**.
@@ -129,11 +134,11 @@ Vì thẻ chỉ số chuẩn của Looker Studio tính toán tổng hợp (SUM/A
 ### Bước 3.3: Thẻ chỉ số Giá đóng cửa dự báo LSTM phiên kế tiếp (T+1)
 1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Bảng (Table)**.
 2. Trong tab **Thiết lập (Setup)**:
-   * Nguồn dữ liệu (Data Source): Chọn `fact_model_predictions`.
+   * Nguồn dữ liệu (Data Source): Chọn nguồn hợp nhất `blend_market_movement`.
    * Chiều kích (Dimension): Kéo trường `predicted_close_price`. Đổi tên nhãn hiển thị thành `Giá dự báo phiên kế tiếp T+1 (VND)`.
    * Bộ lọc biểu đồ (Filter): Nhấp vào **Thêm bộ lọc (Add a filter)** -> Điền tên bộ lọc là `Filter_T1_LSTM` -> Thiết lập điều kiện: `Bao gồm (Include) -> horizon = 'T+1'`.
    * Số lượng hàng trên mỗi trang (Rows per page): Thiết lập bằng `1`.
-   * Sắp xếp (Sort): Chọn trường `base_date_key` theo chiều **Giảm dần (Descending)**.
+   * Sắp xếp (Sort): Chọn trường `full_date` (hoặc `date_key`) theo chiều **Giảm dần (Descending)**.
 3. Trong tab **Kiểu (Style)**: Thiết lập ẩn tiêu đề, ẩn số dòng, ẩn phân trang và định dạng cỡ chữ `28px` in đậm, màu văn bản cam đậm `#ea580c`.
 
 ### Bước 3.4: Biểu đồ đường Giá thực tế vs Dự báo LSTM (MM-01)
