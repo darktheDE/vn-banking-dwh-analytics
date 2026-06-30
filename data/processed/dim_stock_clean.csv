@@ -1,3 +1,6 @@
 stock_key,ticker,company_name,exchange,industry
 1,BID,Joint Stock Commercial Bank for Investment and Development of Vietnam,HOSE,Banking
 2,HPG,Hoa Phat Group,HOSE,Steel / Manufacturing
+3,TCB,Vietnam Technological and Commercial Joint Stock Bank,HOSE,Banking
+4,VCB,Joint Stock Commercial Bank for Foreign Trade of Vietnam,HOSE,Banking
+5,CTG,Vietnam Joint Stock Commercial Bank for Industry and Trade,HOSE,Banking
