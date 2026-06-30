@@ -193,50 +193,73 @@ def show_intro_section():
     
     with col1:
         st.markdown("""
-        ### 📋 Phạm Vi Nghiệp Vụ
-        *   **Dữ liệu Giao Dịch Chứng Khoán**: Lịch sử giá ngày (OHLCV) và các chỉ số giao dịch khớp lệnh của 4 ngân hàng thương mại trọng điểm: **BID**, **TCB**, **VCB**, và **CTG**.
-        *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: Chuỗi dữ liệu 20 năm (2002–2022) của **46 ngân hàng thương mại Việt Nam** với đầy đủ các thước đo về quy mô, chất lượng tài sản, hiệu quả hoạt động, thanh khoản và độ nhạy cảm thị trường.
+        ### 📋 Phạm Vi & Kích Thước Dữ Liệu
+        *   **Dữ liệu Cổ Phiếu Trọng Điểm**: **11,835+ dòng** dữ liệu giá lịch sử hàng ngày (OHLCV) của 4 ngân hàng thương mại: **BID**, **TCB**, **VCB**, và **CTG**.
+        *   **Dữ liệu Giao Dịch Bổ Trợ**: **22 phiên giao dịch** chứa thông tin khớp lệnh mua/bán, khối lượng giao dịch khối ngoại và tự doanh bổ sung riêng cho cổ phiếu **BID**.
+        *   **Dữ liệu Báo Cáo Tài Chính (CAMELS)**: **667 dòng** và **47+ cột** chỉ số tài chính, bao phủ **46 ngân hàng thương mại Việt Nam** trong suốt **20 năm** (2002–2022).
         
-        ### 🏗️ Thiết Kế Kho Dữ Liệu Star Schema (BigQuery)
-        Dữ liệu được tổ chức tối ưu cho truy vấn OLAP dưới dạng Star Schema gồm **9 bảng**:
-        *   **Bảng Dimension (4 bảng)**:
-            *   `dim_date`: Lịch ngày giao dịch, kiểm soát ngày nghỉ/cuối tuần.
-            *   `dim_stock`: Thông tin chi tiết về mã cổ phiếu, sàn giao dịch (HOSE).
-            *   `dim_bank`: Danh mục 46 ngân hàng thương mại, hỗ trợ so sánh phân loại (SCD Type 2).
-            *   `dim_trading_session`: Phân định các phiên giao dịch khớp lệnh trong ngày (ATO, Liên tục, ATC).
-        *   **Bảng Fact (5 bảng)**:
-            *   `fact_price_history`: Lịch sử giá cổ phiếu ngày.
-            *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại và tự doanh.
-            *   `fact_order_stats`: Thống kê lệnh mua/bán và khối lượng khớp.
-            *   `fact_bank_performance`: Các chỉ tiêu tài chính và tỷ số CAMELS hàng năm.
+        ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
+        Dữ liệu được tổ chức dưới dạng Star Schema gồm **9 bảng** tối ưu cho OLAP:
+        *   **Bảng Chiều (4 Dimension tables)**:
+            *   `dim_date`: Quản lý thời gian, kiểm soát ngày giao dịch.
+            *   `dim_stock`: Thông tin mã cổ phiếu, sàn giao dịch (HOSE).
+            *   `dim_bank`: SCD Type 2 quản lý lịch sử thông tin 46 ngân hàng.
+            *   `dim_trading_session`: Phiên giao dịch trong ngày (ATO, ATC, Liên tục).
+        *   **Bảng Thực Thể (5 Fact tables)**:
+            *   `fact_price_history`: Lịch sử giá đóng/mở cửa, khối lượng giao dịch ngày.
+            *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại & tự doanh.
+            *   `fact_order_stats`: Thống kê khối lượng đặt mua/bán.
+            *   `fact_bank_performance`: 20 năm chỉ số tài chính CAMELS.
         """)
         
     with col2:
         st.markdown("""
-        ### 🤖 Các Mô Hồi Học Máy Tích Hợp
-        1.  **Dự Báo Chuỗi Thời Gian (LSTM)**:
-            *   **Mục tiêu**: Dự báo giá đóng cửa từ T+1 đến T+5 cho các cổ phiếu BID, TCB, VCB, CTG.
-            *   **Kiến trúc**: Mô hình học sâu Stacked LSTM thích ứng với khối lượng dữ liệu thực tế của từng ngân hàng.
-        2.  **Phân Nhóm Ngân Hàng (K-Means + PCA)**:
-            *   **Mục tiêu**: Phân đoạn 46 ngân hàng thương mại Việt Nam thành các nhóm có hành vi tài chính tương đồng dựa trên 10 chỉ số CAMELS cốt lõi sau khi đã giảm chiều bằng PCA.
-        3.  **Phân Loại Rủi Ro Tín Dụng (Random Forest)**:
-            *   **Mục tiêu**: Nhận diện sớm nguy cơ nợ xấu của các ngân hàng thương mại (khi tỷ lệ nợ xấu NPL ≥ 3%).
+        ### 🧠 Cấu Trúc Các Mô Hình Học Máy (ML)
+        Tầng Học Máy được thiết kế module hóa trong thư mục **`src/models/`**:
+        
+        *   **Các Mô Hình Huấn Luyện Chính (`src/models/`)**:
+            1.  **Dự Báo Chuỗi Thời Gian (LSTM)**:
+                *   *Tập tin*: `train_lstm.py` (Huấn luyện Stacked LSTM cho 4 mã BID, TCB, VCB, CTG dự đoán giá T+1 đến T+5).
+                *   *Tiền xử lý*: `feature_engineering_stock.py`.
+            2.  **Phân Nhóm Ngân Hàng (K-Means)**:
+                *   *Tập tin*: `train_kmeans.py` (Áp dụng PCA giảm chiều và K-Means gom cụm 46 ngân hàng).
+                *   *Tiền xử lý*: `feature_engineering_bank.py`.
+            3.  **Phân Loại Rủi Ro Tín Dụng (Random Forest)**:
+                *   *Tập tin*: `train_random_forest.py` (Phân loại rủi ro nợ xấu NPL ≥ 3%).
+        
+        *   **Các Mô Hình Nền Tảng So Sánh (Baseline)**:
+            *   *ARIMA Baseline*: `baseline_arima.py` (Đánh giá so sánh RMSE với LSTM).
+            *   *Logistic Regression*: `baseline_logistic.py` (Đánh giá so sánh AUC-ROC với Random Forest).
+            
+        *   **Thư Mục Lưu Trữ Kết Quả & Artifacts**:
+            *   *Tệp mô hình đã huấn luyện* (`.keras`, `.pkl`): **`reports/models/`**
+            *   *Biểu đồ & Sơ đồ đánh giá* (`.png`): **`reports/figures/`**
         """)
         
     st.markdown("---")
-    st.subheader("🔗 Luồng Dữ Liệu Hệ Thống (Data Flow)")
-    st.markdown("""
-    ```mermaid
-    graph TD
-        A[Dữ liệu thô: Files Excel/CSV] -->|Trích xuất - Extract| B(Python ETL Pipeline - Pandas)
-        B -->|Làm sạch & Gán Khóa Ngoại| C{Kho dữ liệu Google BigQuery}
-        C -->|Star Schema| D[(Dimension & Fact Tables)]
-        D -->|Feature Engineering| E[Machine Learning Layer]
-        E -->|Huấn Luyện & Dự Báo| E1(Model LSTM / K-Means / Random Forest)
-        E1 -->|Ghi nhận dự báo| D
-        D -->|BigQuery Python SDK| F[Streamlit Dashboard]
-    ```
-    """)
+    st.subheader("🔗 Sơ Đồ Luồng Dữ Liệu Hệ Thống (Data Flow)")
+    
+    # Render native vector SVG Graphviz diagram instead of raw mermaid code blocks
+    dot_code = """
+    digraph G {
+        graph [bgcolor="transparent", rankdir=TB, pad=0.3]
+        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=2.6, height=0.5]
+        edge [color="#60a5fa", arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#4b5563"]
+
+        raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
+        etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
+        bq [label="Kho Dữ Liệu DWH\\n(Google BigQuery)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+        ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
+        app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
+
+        raw -> etl [label="Trích xuất"]
+        etl -> bq [label="Làm sạch & Nạp"]
+        bq -> ml [label="Truy vấn thuộc tính"]
+        ml -> bq [label="Lưu dự báo DWH"]
+        bq -> app [label="Kết nối trực tiếp"]
+    }
+    """
+    st.graphviz_chart(dot_code)
 
 
 # ─────────────────────────────────────────────────────────────
