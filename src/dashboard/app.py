@@ -543,6 +543,24 @@ def show_price_forecasting_section():
             
             pred_df["full_date"] = future_dates
             
+            # Fit ARIMA baseline on the fly for comparison plotting
+            from statsmodels.tsa.arima.model import ARIMA
+            import warnings
+            
+            arima_forecast = []
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    # Fit on historical close prices (which are already sorted in ascending order)
+                    arima_model = ARIMA(hist_df["close_price"], order=(5, 1, 0))
+                    arima_fitted = arima_model.fit()
+                    arima_forecast = arima_fitted.forecast(steps=len(pred_df)).values
+            except Exception:
+                # Fallback to last close value if fitting fails
+                arima_forecast = np.array([hist_df["close_price"].iloc[-1]] * len(pred_df))
+            
+            pred_df["predicted_arima_price"] = arima_forecast
+            
             # Combine actuals and predictions for plotting
             actual_trace = go.Scatter(
                 x=hist_df["full_date"],
@@ -559,7 +577,15 @@ def show_price_forecasting_section():
                 marker=dict(size=8, symbol="circle")
             )
             
-            fig = go.Figure(data=[actual_trace, pred_trace])
+            arima_trace = go.Scatter(
+                x=pred_df["full_date"],
+                y=pred_df["predicted_arima_price"] * 1000,
+                name="Giá dự báo đối chứng ARIMA",
+                line=dict(color="#10b981", width=2.5, dash="dot"),
+                marker=dict(size=8, symbol="diamond")
+            )
+            
+            fig = go.Figure(data=[actual_trace, pred_trace, arima_trace])
             fig.update_layout(
                 title=f"Lịch Sử Giá & Dự Báo Giá 5 Ngày Cổ Phiếu {selected_ticker} (VND)",
                 xaxis_title="Thời Gian",
@@ -594,14 +620,15 @@ def show_price_forecasting_section():
             forecast_table = []
             for idx, row in pred_df.iterrows():
                 pred_val = row["predicted_close_price"] * 1000
+                arima_val = row["predicted_arima_price"] * 1000
                 diff = pred_val - last_close
                 diff_pct = (diff / last_close) * 100
                 
                 forecast_table.append({
-                    "Thời Gian": row["horizon"],
-                    "Ngày Dự Báo": row["full_date"].strftime("%Y-%m-%d"),
-                    "Giá Dự Báo (VND)": f"{pred_val:,.0f}",
-                    "Biến Động (%)": f"{diff_pct:+.2f}%"
+                    "Thời Gian": f"T+{row['horizon']}",
+                    "LSTM (VND)": f"{pred_val:,.0f}",
+                    "ARIMA (VND)": f"{arima_val:,.0f}",
+                    "Biến Động LSTM": f"{diff_pct:+.2f}%"
                 })
             
             st.table(pd.DataFrame(forecast_table))
