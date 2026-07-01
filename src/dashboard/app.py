@@ -311,6 +311,7 @@ def show_eda_section():
     
     with tab1:
         st.subheader("Phân Phối & Giới Hạn Của Các Chỉ Số Tài Chính")
+        st.write("Biểu đồ phân phối thống kê toàn bộ **661 bản ghi báo cáo tài chính hàng năm** của 46 ngân hàng Việt Nam giai đoạn 2002–2022 (mỗi ngân hàng đóng góp tối đa 20 năm dữ liệu lịch sử trong hệ thống DWH, nên tổng số lượng bản ghi `count` lớn hơn số lượng 46 ngân hàng).")
         selected_col = st.selectbox(
             "Chọn chỉ số tài chính cần quan sát",
             list(ratio_vn_map.keys()),
