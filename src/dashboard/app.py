@@ -189,6 +189,17 @@ def show_intro_section():
     Hệ thống này tích hợp kho dữ liệu đám mây Google BigQuery và các mô hình Học Máy tiên tiến nhằm cung cấp các góc nhìn phân tích sâu rộng cho các nhà quản lý rủi ro và các nhà đầu tư tài chính.
     """)
     
+    st.markdown("""
+    ### ❓ 4 Câu Hỏi Nghiên Cứu Cốt Lõi (Core Research Questions)
+    Hệ thống phân tích này được xây dựng nhằm giải quyết triệt để **4 bài toán thực tiễn quan trọng** của ngành ngân hàng Việt Nam:
+    *   **Q1 (Dự báo ngắn hạn)**: *Dòng tiền khối ngoại và tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng (ví dụ: BID) không?*
+    *   **Q2 (Đồng pha & Phân hóa)**: *Đà biến động giá của nhóm ngân hàng quốc doanh (BID, VCB, CTG) có đồng pha với nhau và phân hóa thế nào với ngân hàng tư nhân (TCB)?*
+    *   **Q3 (Cảnh báo rủi ro)**: *Chỉ số tài chính nào (theo khung CAMELS) quyết định việc một ngân hàng bị rơi vào nhóm rủi ro nợ xấu vượt mức 3%?*
+    *   **Q4 (Phân cụm chiến lược)**: *Dữ liệu có thể giúp chúng ta phân cụm chính xác các ngân hàng Việt Nam thành các nhóm chiến lược hoạt động khác nhau hay không?*
+    """)
+    
+    st.markdown("---")
+    
     col1, col2 = st.columns([1, 1])
     
     with col1:
