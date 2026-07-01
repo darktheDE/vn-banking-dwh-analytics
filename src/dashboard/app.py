@@ -1028,6 +1028,76 @@ def show_conclusion_section():
         ]
     }))
 
+    st.markdown("---")
+    st.subheader("💡 PHẦN 4: HỎI & ĐÁP (Q&A) CHẤT VẤN PHẢN BIỆN CỐT LÕI")
+    st.write("Giải quyết 4 câu hỏi nghiên cứu cốt lõi (Q1 - Q4) và các câu hỏi kỹ thuật thường gặp của Hội đồng chấm.")
+    
+    with st.expander("❓ Câu hỏi 1 (Tương ứng Q1): Dòng tiền khối ngoại và tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng không? Làm sao nhóm chứng minh được điều này?"):
+        st.markdown("""
+        **Trả lời**:
+        *   **Kết quả thực nghiệm chứng minh**: **CÓ**. Nhóm đã tích hợp biến dòng tiền mua/bán ròng của khối ngoại và tự doanh làm các đặc trưng trễ (lagged features) vào mô hình LSTM.
+        *   **Minh chứng định lượng**: RMSE của mô hình LSTM trên tập kiểm thử cho cổ phiếu BID chỉ là `0.8801` (giảm tới **24.7%** sai số so với ARIMA không sử dụng dòng tiền làm đầu vào). 
+        *   **Cơ chế hoạt động**: Khi dòng tiền tự doanh hoặc khối ngoại xuất hiện mức mua ròng đột biến vượt biên 1.5 lần độ lệch chuẩn, đà tăng giá cổ phiếu ngân hàng sẽ xuất hiện độ trễ phản ứng từ 1 đến 2 ngày giao dịch (phù hợp với chu kỳ khớp lệnh T+1 và T+2), xác nhận dòng tiền lớn đóng vai trò là chỉ báo dẫn đường (leading indicator) vô cùng đáng tin cậy.
+        """)
+
+    with st.expander("❓ Câu hỏi 2 (Tương ứng Q2): Đà biến động giá của nhóm ngân hàng quốc doanh (BID, VCB, CTG) có đồng pha với nhau và phân hóa thế nào với ngân hàng tư nhân (TCB)?"):
+        st.markdown("""
+        **Trả lời**:
+        *   **Nhóm quốc doanh (BID, VCB, CTG) đồng pha rất cao**: Hệ số tương quan Pearson giữa 3 mã này đều vượt `0.82`. Do họ cùng chịu sự điều tiết tín dụng trực tiếp của Ngân hàng Nhà nước, có cấu trúc tài sản tương đồng và khách hàng trọng tâm là các doanh nghiệp nhà nước lớn.
+        *   **TCB (Tư nhân) thể hiện sự phân hóa rõ nét**: Hệ số tương quan của TCB với VCB thấp hơn hẳn (chỉ quanh `0.58`). TCB biến động độc lập hơn theo chu kỳ bất động sản, thị trường trái phiếu doanh nghiệp và mảng ngân hàng bán lẻ tư nhân. Điều này cũng lý giải tại sao sai số dự báo của LSTM cho TCB (RMSE `1.3093`) và biên dao động giá lịch sử lớn hơn nhiều so với nhóm quốc doanh.
+        """)
+
+    with st.expander("❓ Câu hỏi 3 (Tương ứng Q3): Chỉ số tài chính nào theo khung CAMELS quyết định việc một ngân hàng bị rơi vào nhóm rủi ro nợ xấu vượt mức 3%?"):
+        st.markdown("""
+        **Trả lời**:
+        Mô hình Random Forest phân tích trên 11 chỉ số CAMELS đã chỉ ra Top 3 chỉ số quyết định nhất:
+        1.  **Tỷ lệ trích lập dự phòng (`llp_ratio`)**: Chiếm **`20.45%`** trọng số quyết định. Các ngân hàng cố tình trích lập dự phòng mỏng để làm đẹp lợi nhuận trước mắt chính là nhóm dễ bùng phát nợ xấu nhất khi thị trường đi xuống.
+        2.  **Tỷ suất sinh lời vốn chủ sở hữu (`roe`)**: Chiếm **`11.56%`**. ROE tăng nóng đi kèm đòn bẩy quá lớn là tín hiệu cảnh báo sớm nguy cơ.
+        3.  **Tỷ lệ chi phí trên thu nhập (`cir`)**: Chiếm **`10.54%`**. Thể hiện hiệu quả quản lý chi phí vận hành kém trực tiếp làm suy yếu năng lực phòng thủ nợ xấu.
+        """)
+
+    with st.expander("❓ Câu hỏi 4 (Tương ứng Q4): Dữ liệu có thể giúp chúng ta phân cụm chính xác các ngân hàng Việt Nam thành các nhóm chiến lược hoạt động khác nhau hay không?"):
+        st.markdown("""
+        **Trả lời**:
+        **Hoàn toàn có thể**. Sử dụng thuật toán K-Means kết hợp PCA giải thích 85.92% biến động gốc, mô hình đã phân cụm thành công 3 nhóm chiến lược rất rõ nét:
+        1.  **Cụm 1 (Trụ Cột Lớn)**: Quy mô tài sản vượt trội, hoạt động tín dụng lành mạnh và hiệu quả ROE cao (gồm nhóm quốc doanh lớn như VCB, BID, CTG và các TMCP lớn như TCB, ACB, MB).
+        2.  **Cụm 0 (TMCP Nhỏ)**: Quy mô nhỏ đang tích lũy tài sản, biên NIM hẹp và đối mặt với bài toán tối ưu chi phí vận hành.
+        3.  **Cụm 2 (Ngân Hàng Ngoại)**: Đệm an toàn ETA cực cao, tỷ lệ cho vay trên tiền gửi LTD thấp và chất lượng nợ xấu (NPL) được kiểm soát tối đa gần như bằng không.
+        """)
+
+    with st.expander("❓ Câu hỏi 5: Tại sao nhóm chọn mốc 3% làm ngưỡng phân loại rủi ro nợ xấu cho các ngân hàng?"):
+        st.markdown("""
+        **Trả lời**:
+        Mốc 3% là **ngưỡng an toàn pháp lý tối đa do Ngân hàng Nhà nước Việt Nam (SBV) quy định**. Theo các thông tư và chỉ thị giám sát của SBV, các ngân hàng thương mại bắt buộc phải duy trì tỷ lệ nợ xấu dưới 3%. Nếu vượt mốc này, ngân hàng sẽ bị hạn chế room tăng trưởng tín dụng, không được chia cổ tức bằng tiền mặt, và phải chịu sự giám sát đặc biệt. Do đó, đây là ranh giới quản trị rủi ro sống còn trong hệ thống tài chính Việt Nam.
+        """)
+
+    with st.expander("❓ Câu hỏi 6: Tại sao nhóm lại loại bỏ 6 ngân hàng (DAB, VBSP, CB, GPB, WEB, MDB) khỏi mô hình phân cụm? Điều này có ảnh hưởng đến tính tổng quát của báo cáo không?"):
+        st.markdown("""
+        **Trả lời**:
+        Việc loại bỏ này là **hoàn toàn bắt buộc để bảo vệ chất lượng mô hình phân cụm** dưới góc nhìn nghiệp vụ:
+        1.  **DAB, CB, GPB, WEB**: Đây là các ngân hàng đang bị kiểm soát đặc biệt hoặc mua lại 0 đồng do thua lỗ lũy kế và bê bối tài chính. Số liệu của họ cực kỳ dị biệt (ví dụ: DAB bị âm vốn chủ sở hữu lớn và nợ xấu vượt ngưỡng cực hạn). Nếu giữ lại, khoảng cách hình học quá lớn sẽ kéo lệch toàn bộ thuật toán K-Means, khiến 44 ngân hàng hoạt động bình thường bị dồn hết vào duy nhất một cụm.
+        2.  **VBSP (Chính sách)**: Hoạt động phi lợi nhuận theo cơ chế phân bổ vốn nhà nước, không có biên NIM hay lợi nhuận thương mại ROA/ROE thông thường.
+        *   Việc loại bỏ 6 thực thể này giúp chúng em phác họa chính xác bản đồ cạnh tranh và định hướng chiến lược của **39 ngân hàng thương mại hoạt động bình thường** trên thị trường.
+        """)
+
+    with st.expander("❓ Câu hỏi 7: Làm thế nào nhóm đảm bảo dữ liệu trong Kho dữ liệu BigQuery là sạch, đáng tin cậy và không bị sai lệch?"):
+        st.markdown("""
+        **Trả lời**:
+        Nhóm đã thiết kế một quy trình Kiểm soát Chất lượng Dữ liệu (Data Quality - DQ) 3 tầng chặt chẽ:
+        *   **Tầng 1 (ETL Cleanse)**: Tự động loại bỏ các bản ghi trùng lặp dựa trên khóa chính (`date_key`, `bank_key`), định dạng lại toàn bộ tên cột thành `snake_case` và chuẩn hóa kiểu dữ liệu.
+        *   **Tầng 2 (Imputation)**: Đối với các khoảng trống dữ liệu lịch sử giai đoạn 2002-2005, nhóm không dùng phương pháp điền bừa (forward-fill) mà áp dụng phương pháp gán giá trị trung vị (`median`) tính toán riêng cho từng ngân hàng trong giai đoạn bình thường để tránh làm lệch phân phối dữ liệu gốc.
+        *   **Tầng 3 (Validate)**: Chạy script kiểm tra toàn vẹn độc lập (`validate_integrity.py`) sau mỗi chu kỳ ETL để kiểm soát số lượng bản ghi và logic dòng thời gian trước khi nạp vào BigQuery.
+        """)
+
+    with st.expander("❓ Câu hỏi 8: Tại sao tỷ lệ chi phí trên thu nhập (CIR) trên đồ thị phân phối của nhóm lại tập trung ở mức rất cao từ 90% - 95%, trong khi lý thuyết thông thường chỉ khoảng 35% - 45%?"):
+        st.markdown("""
+        **Trả lời**:
+        Đây là điểm đặc thù của bộ dữ liệu thô đầu vào mà nhóm đã phát hiện và xử lý:
+        *   Thông thường, CIR sách giáo khoa chỉ tính **Chi phí vận hành phi lãi suất / Tổng thu nhập hoạt động**. 
+        *   Tuy nhiên, trong bộ dữ liệu gốc này, phần chi phí (Cost) được tính toán gộp cả **Chi phí trả lãi tiền gửi đầu vào** (Interest Expenses). Vì trả lãi tiền gửi luôn là chi phí lớn nhất của một ngân hàng thương mại để huy động vốn, tỷ lệ CIR trong mô hình bị đẩy lên sát mức 90% - 95%.
+        *   Nhóm đã ghi nhận điểm đặc thù này để mô hình phân loại Random Forest và phân cụm K-Means học đúng bản chất phân phối của dữ liệu gốc.
+        """)
+
 
 if __name__ == "__main__":
     main()
