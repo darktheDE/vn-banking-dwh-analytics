@@ -14,15 +14,14 @@ Tài liệu này tổng hợp chi tiết các công việc đã thực hiện đ
 
 ## 2. Tiền Xử Lý & Trích Xuất Đặc Trưng (Feature Engineering)
 
-### 2.1. Feature Engineering cho Cổ Phiếu (BID)
+### 2.1. Feature Engineering cho Cổ Phiếu
 - **File**: `feature_engineering_stock.py` (Task C-01)
 - **Đã làm**:
-  - Viết các hàm truy vấn trực tiếp vào 3 bảng Fact trên BigQuery: `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`.
-  - Thực hiện phép kết nối (inner join) dựa trên `date_key` để đảm bảo chỉ những ngày giao dịch hợp lệ mới được giữ lại.
-  - Xây dựng 3 đặc trưng mới (derived features) theo yêu cầu: 
-    - `price_change_pct`: Tỷ lệ thay đổi giá hàng ngày.
-    - `foreign_net_lag_1`: Dòng tiền ròng của khối ngoại (đẩy lùi 1 ngày).
-    - `prop_net_lag_1`: Dòng tiền ròng tự doanh (đẩy lùi 1 ngày).
+  - Viết các hàm truy vấn trực tiếp vào bảng Fact hợp nhất trên BigQuery: `fact_stock_daily_metrics`.
+  - Xây dựng các đặc trưng mới (derived features) theo yêu cầu: 
+    - `price_change_pct`: Tỷ lệ thay đổi giá đóng cửa hàng ngày.
+    - `volume_change_pct`: Tỷ lệ thay đổi khối lượng giao dịch hàng ngày.
+    - Tạo các đặc trưng trễ (lags) của Close Price và Volume phục vụ cho mô hình LSTM Multivariate cho cả 4 mã ngân hàng (BID, TCB, VCB, CTG).
 
 ### 2.2. Feature Engineering cho Ngân Hàng (CAMELS)
 - **File**: `feature_engineering_bank.py` (Task C-02)
@@ -87,7 +86,7 @@ Tài liệu này tổng hợp chi tiết các công việc đã thực hiện đ
 Khi chạy các file model này trên môi trường đã có dữ liệu thực trong BigQuery, kết quả hiển thị trên Terminal/Log sẽ có dạng như sau:
 
 1. **Feature Engineering**:
-   - Thành công kết nối BigQuery, truy xuất được dữ liệu cổ phiếu với đúng 22 dòng (theo giới hạn của tập data mẫu) và tạo ra ma trận đặc trưng hợp lệ.
+    - Thành công kết nối BigQuery, truy xuất được dữ liệu cổ phiếu với 11.835 dòng dữ liệu thực tế và tạo ra ma trận đặc trưng hợp lệ.
 
 2. **Quá trình Train LSTM**:
    - Bắt đầu chạy các Epoch của Keras. Loss (MSE) và MAE sẽ giảm dần.

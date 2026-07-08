@@ -17,10 +17,7 @@ Tài liệu này cung cấp hướng dẫn chi tiết từng bước (Step-by-St
 3. Chọn dự án: `vn-banking-dwh-analytics`.
 4. Chọn tập dữ liệu: `financial_dwh`.
 5. Thực hiện thêm lần lượt các bảng sau vào báo cáo bằng cách chọn bảng và nhấp vào nút **Thêm (Add)** ở góc dưới cùng bên phải:
-   * `fact_price_history`
-   * `fact_foreign_trading`
-   * `fact_proprietary_trading`
-   * `fact_order_stats`
+   * `fact_stock_daily_metrics`
    * `fact_bank_performance`
    * `dim_date`
    * `dim_stock`
@@ -78,7 +75,7 @@ SELECT
   f.close_price AS close_price,
   p.predicted_close_price AS predicted_close_price,
   p.horizon
-FROM `vn-banking-dwh-analytics.financial_dwh.fact_price_history` f
+FROM `vn-banking-dwh-analytics.financial_dwh.fact_stock_daily_metrics` f
 FULL OUTER JOIN predictions_with_target p 
   ON f.date_key = p.target_date_key AND f.stock_key = p.stock_key
 JOIN `vn-banking-dwh-analytics.financial_dwh.dim_date` d 
@@ -113,14 +110,14 @@ JOIN `vn-banking-dwh-analytics.financial_dwh.dim_stock` s
 
 2. **Tạo nguồn hợp nhất `blend_market_movement`**:
    * Chọn **Tiện ích quản lý (Manage)** -> **Quản lý dữ liệu đã kết hợp (Manage blended data)** -> Nhấp vào **Thêm thực thể kết hợp (Add a blend)**.
-   * **Bảng 1 (`fact_price_history`)**: Kéo `date_key`, `stock_key` làm Dimensions; `close_price`, `trading_volume` làm Metrics.
+   * **Bảng 1 (`fact_stock_daily_metrics`)**: Kéo `date_key`, `stock_key` làm Dimensions; `close_price`, `trading_volume` làm Metrics.
    * **Bảng 2 (`fact_model_predictions`)**: Kéo `target_date`, `stock_key` làm Dimensions; `predicted_close_price` làm Metrics.
    * **Bảng 3 (`dim_date`)**: Kéo `date_key`, `full_date` làm Dimensions; kéo `full_date` thả vào ô **Phạm vi ngày (Date Range)** ở dưới cùng.
    * **Bảng 4 (`dim_stock`)**: Kéo `stock_key`, `ticker` làm Dimensions.
    * **Cấu hình kết nối (Join Configuration)**:
-     * Khớp Bảng 1 và Bảng 3: Khớp ngoài bên trái (Left Outer), điều kiện `fact_price_history.date_key = dim_date.date_key`.
-     * Khớp Bảng 3 và Bảng 2: Khớp ngoài bên trái (Left Outer), điều kiện `dim_date.full_date = fact_model_predictions.target_date` VÀ `fact_price_history.stock_key = fact_model_predictions.stock_key`.
-     * Khớp Bảng 1 và Bảng 4: Khớp ngoài bên trái (Left Outer), điều kiện `fact_price_history.stock_key = dim_stock.stock_key`.
+     * Khớp Bảng 1 và Bảng 3: Khớp ngoài bên trái (Left Outer), điều kiện `fact_stock_daily_metrics.date_key = dim_date.date_key`.
+     * Khớp Bảng 3 và Bảng 2: Khớp ngoài bên trái (Left Outer), điều kiện `dim_date.full_date = fact_model_predictions.target_date` VÀ `fact_stock_daily_metrics.stock_key = fact_model_predictions.stock_key`.
+     * Khớp Bảng 1 và Bảng 4: Khớp ngoài bên trái (Left Outer), điều kiện `fact_stock_daily_metrics.stock_key = dim_stock.stock_key`.
    * Đặt tên nguồn dữ liệu là `blend_market_movement`. Nhấp **Lưu (Save)** -> **Đóng (Close)**.
 
 ---
@@ -272,29 +269,25 @@ Vì thẻ chỉ số chuẩn của Looker Studio tính toán tổng hợp (SUM/A
    * Dòng chỉ số 2 (`Giá dự báo LSTM`): Chọn kiểu vẽ là đường nét đứt (Dashed line), màu sắc cam `#ea580c`, độ dày 3px.
    * Bật tùy chọn **Hiển thị điểm dữ liệu (Show data points)**.
 
-### Bước 3.5: Biểu đồ cột Khối lượng giao dịch ròng Khối ngoại (MM-02)
-1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Biểu đồ cột (Bar chart)**.
+### Bước 3.5: Biểu đồ Ma trận khoảng cách DTW (MM-02)
+1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Bảng nhiệt (Pivot table with heatmap)** hoặc **Bảng (Table)** có định dạng màu nhiệt.
 2. Trong tab **Thiết lập (Setup)**:
-   * Nguồn dữ liệu (Data Source): Kết nối trực tiếp với bảng `fact_foreign_trading` (hoặc Blend với `dim_date` để lấy `full_date`).
-   * Chiều kích trục X (Dimension): Kéo trường `full_date`.
-   * Chỉ số trục Y (Metric): Kéo trường `foreign_net_volume` (Giá trị khối ngoại giao dịch ròng).
-   * Sắp xếp (Sort): Chọn trường `full_date` theo chiều **Tăng dần (Ascending)**.
+   * Nguồn dữ liệu (Data Source): Kết nối với nguồn dữ liệu phân tích DTW (được xuất từ tệp tin JSON `dtw_correlation_report.json` và nạp vào BigQuery).
+   * Chiều kích hàng (Row dimension): Tên cổ phiếu ngân hàng thứ nhất (`ticker_1`).
+   * Chiều kích cột (Column dimension): Tên cổ phiếu ngân hàng thứ hai (`ticker_2`).
+   * Chỉ số (Metric): Kéo trường khoảng cách DTW (`dtw_distance`).
 3. Trong tab **Kiểu (Style)**:
-   * Thiết lập màu cột theo điều kiện: Nhấp vào **Định dạng có điều kiện (Conditional formatting)** -> Thêm quy tắc:
-     * Quy tắc 1: Nếu `foreign_net_volume >= 0` -> Tô màu cột màu xanh lá cây `#16a34a`.
-     * Quy tắc 2: Nếu `foreign_net_volume < 0` -> Tô màu cột màu đỏ `#dc2626`.
+   * Chọn bảng màu chuyển sắc (gradient) từ vàng sang đỏ để thể hiện mức độ tương đồng chuỗi thời gian (khoảng cách DTW càng nhỏ thể hiện mức độ đồng pha càng cao).
 
-### Bước 3.6: Biểu đồ cột Khối lượng giao dịch ròng Tự doanh (MM-03)
-1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Biểu đồ cột (Bar chart)**.
+### Bước 3.6: Biểu đồ tương quan lăn 60 phiên (MM-03)
+1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Biểu đồ đường (Time series chart / Line chart)**.
 2. Trong tab **Thiết lập (Setup)**:
-   * Nguồn dữ liệu (Data Source): Chọn bảng `fact_proprietary_trading`.
-   * Chiều kích trục X (Dimension): Kéo trường `full_date`.
-   * Chỉ số trục Y (Metric): Kéo trường `prop_net_volume` (Giá trị tự doanh giao dịch ròng).
-   * Sắp xếp (Sort): Chọn trường `full_date` theo chiều **Tăng dần (Ascending)**.
+   * Nguồn dữ liệu (Data Source): Chọn bảng dữ liệu chứa hệ số tương quan lăn 60 phiên giữa các cặp cổ phiếu.
+   * Chiều kích (Dimension): Kéo trường `full_date` hoặc `date_key`.
+   * Chỉ số (Metric): Lần lượt kéo hệ số tương quan của các cặp cổ phiếu chính (như `BID_VCB`, `BID_TCB`, `TCB_VCB`).
+   * Sắp xếp (Sort): Chọn trường ngày theo chiều **Tăng dần (Ascending)**.
 3. Trong tab **Kiểu (Style)**:
-   * Nhấp vào **Định dạng có điều kiện (Conditional formatting)** -> Thêm quy tắc:
-     * Quy tắc 1: Nếu `prop_net_volume >= 0` -> Tô màu cột màu xanh biển/teal `#0d9488`.
-     * Quy tắc 2: Nếu `prop_net_volume < 0` -> Tô màu cột màu hồng đậm `#db2777`.
+   * Hiển thị đường lưới (gridlines) và thêm một đường tham chiếu tĩnh (Reference Line) tại giá trị 0 để dễ dàng quan sát sự đảo chiều tương quan (đồng pha sang phân hóa).
 
 ### Bước 3.7: Bảng số liệu chi tiết các phiên dự báo (MM-05)
 1. Chọn **Thêm biểu đồ (Add a chart)** -> Chọn **Bảng (Table)**.

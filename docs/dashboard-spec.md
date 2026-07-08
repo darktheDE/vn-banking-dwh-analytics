@@ -12,19 +12,19 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 
 ---
 
-## 2. Page 1 — Market Movement (BID Stock Forecasting)
+## 2. Page 1 — Market Movement (Stock Price Forecasting & Similarity)
 
-**Purpose**: Allow Persona B to monitor actual BID stock price movements and evaluate LSTM model predictions alongside the foreign and proprietary cash flow context.
+**Purpose**: Allow users to monitor actual stock price movements, evaluate LSTM model predictions (comparing Univariate vs Multivariate vs ARIMA), and analyze the co-movement and similarity between the 4 focus bank stocks using Dynamic Time Warping (DTW) and rolling correlations.
 
 ### 2.1 Required Charts and Components
 
 | Component ID | Chart Type | Data Source | Metrics and Dimensions | Notes |
 |-------------|------------|-------------|----------------------|-------|
-| MM-01 | Line Chart | `fact_price_history` + prediction table | X-axis: Date. Y-axis: `close_price` (actual, blue) vs. predicted price (orange dashed) | Must show both actual and predicted on the same axis |
-| MM-02 | Bar Chart | `fact_foreign_trading` | X-axis: Date. Y-axis: `foreign_net_volume`. Color: positive = green, negative = red | Overlay on MM-01 as secondary axis if possible |
-| MM-03 | Bar Chart | `fact_proprietary_trading` | X-axis: Date. Y-axis: `prop_net_volume`. Color: positive = teal, negative = pink | |
-| MM-04 | Scorecard | `fact_price_history` | Latest `close_price`. Percentage change from previous day | Prominent position at top of page |
-| MM-05 | Data Table | Prediction table | Date, Predicted T+1 to T+5 prices, Actual price (where available), Error (Predicted minus Actual) | Allows download for further analysis |
+| MM-01 | Line Chart | `fact_stock_daily_metrics` + prediction table | X-axis: Date. Y-axis: `close_price` (actual, blue) vs. predicted price (orange dashed) | Show actual prices and LSTM predictions for the selected bank |
+| MM-02 | Heatmap | DTW correlation report | Pairwise Dynamic Time Warping (DTW) distance matrix between BID, TCB, VCB, CTG | Displays price co-movement and time-shifting similarity |
+| MM-03 | Line Chart | DTW correlation report | 60-day rolling correlation between stock pairs over time | Shows how stock correlations evolve |
+| MM-04 | Scorecard | `fact_stock_daily_metrics` | Latest `close_price`. Percentage change from previous trading session | Prominent position at top of page |
+| MM-05 | Data Table | Prediction table | Date, Predicted T+1 to T+5 prices, Model configurations (Uni vs Multi), baseline ARIMA RMSE | Allows comparison of model metrics |
 
 ### 2.2 Filters
 
@@ -71,9 +71,9 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 
 ---
 
-## 4. Page 3 — Risk Monitoring (Random Forest Classification)
+## 4. Page 3 — Risk Monitoring (Random Forest Classification & Causal Analysis)
 
-**Purpose**: Provide Persona A (Risk Managers) with an early warning view of banks approaching or exceeding the 3% NPL threshold, based on Random Forest classification outputs.
+**Purpose**: Provide Risk Managers with an early warning view of banks approaching or exceeding the 3% NPL threshold, based on Random Forest classification outputs, and demonstrate the causal statistical link between Loan Loss Provisions (`llp_ratio`) and NPL (`npl_ratio`) using Granger Causality and Panel Regression.
 
 ### 4.1 Required Charts and Components
 
@@ -83,6 +83,7 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 | RM-02 | Line Chart | `fact_bank_performance` filtered by High Risk banks | X-axis: Year. Y-axis: `npl_ratio`. Series: One per High-Risk bank | Shows NPL trend for flagged banks over time |
 | RM-03 | Bar Chart | Feature importance output | X-axis: Feature Name. Y-axis: Importance Score | Static chart from the Random Forest model output |
 | RM-04 | Scorecard (x3) | Classification output table | Total Banks Analyzed: 45 (39 in active clustering). High Risk Banks (Predicted): count. Recall Achieved: value | Top of page KPIs |
+| RM-05 | Text / Table | Causal analysis report | Granger Causality p-values (Lag 1 to 3) + Lagged Panel Regression coefficients | Displays statistical evidence of credit risk causality |
 
 ### 4.2 Filters
 
@@ -97,6 +98,7 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 - The data table RM-01 clearly distinguishes High Risk rows with red color coding.
 - A user can filter by a specific bank name and immediately see its risk trend in RM-02.
 - The feature importance bar chart RM-03 renders the top 10 features, sorted descending by importance.
+- The statistical summary RM-05 displays clear p-values and regression coefficients for the causal link between LLP and NPL.
 - All three KPI scorecards RM-04 are always visible at the top of the page regardless of filter state.
 
 ---

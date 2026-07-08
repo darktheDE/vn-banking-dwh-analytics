@@ -86,7 +86,7 @@ This project is driven by four core research questions:
 
 | # | Research Question | Hypothesis |
 |---|------------------|------------|
-| **Q1** | How do foreign investor and proprietary desk cash flows affect short-term BID stock price movements? | Sustained net buying from foreign and proprietary desks has a strong positive correlation with BID price trends in the T+1 to T+5 window. |
+| **Q1** | Does a Multivariate LSTM model (incorporating historical OHLCV, price change, and volume change metrics) outperform a Univariate LSTM model and a baseline ARIMA model in predicting short-term closing prices for bank stocks? | The Multivariate LSTM model achieves lower RMSE and MAE compared to both the Univariate LSTM and ARIMA models, as volume and volatility features provide significant predictive power. |
 | **Q2** | Do the short-term closing price movements of the four banking stocks (BID, TCB, VCB, CTG) exhibit co-movement or divergence? | There is a strong short-term co-movement among state-owned commercial banks (BID, VCB, CTG), while the joint-stock commercial bank (TCB) exhibits more independent price movements. |
 | **Q3** | Which financial indicators determine whether a bank falls into a high NPL risk group? | Banks with a high Cost-to-Income Ratio and low Equity-to-Asset ratio are most likely to exceed the 3% NPL threshold. |
 | **Q4** | Can Vietnamese bank operating strategies be clearly segmented based on financial data? | Analysis will reveal 3 distinct clusters: state-owned banks optimizing scale, joint-stock banks optimizing profitability, and foreign banks optimizing capital safety. |
@@ -157,14 +157,11 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 
 *Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
 
-**5 Fact Tables** (quantitative measurements):
+**2 Fact Tables** (quantitative measurements):
 
 | Table | Granularity | Key Metrics |
 |-------|-------------|-------------|
-| `fact_price_history` | Daily per stock | OHLCV prices |
-| `fact_foreign_trading` | Daily per stock | Foreign net volume and value |
-| `fact_proprietary_trading` | Daily per stock | Proprietary desk net volume |
-| `fact_order_stats` | Daily per stock | Buy/sell order counts and matched volume |
+| `fact_stock_daily_metrics` | Daily per stock | OHLCV prices |
 | `fact_bank_performance` | Annual per bank | Full CAMELS indicators — ROA, ROE, NIM, CIR, NPL, ETA |
 
 **3 Machine Learning Output Tables** (model predictions and clusterings):
@@ -192,7 +189,7 @@ Three production ML models are deployed, each solving a distinct financial analy
 ### Model 1 — LSTM: Stock Price Forecasting
 
 ```
-Input  : Stock OHLCV + Foreign Net Volume + Proprietary Net Volume (rolling window)
+Input  : Stock OHLCV (open, high, low, close, volume) + price change pct + volume change pct (rolling window)
 Output : Predicted closing price for T+1, T+2, T+3, T+4, T+5 (BID, TCB, VCB, CTG)
 Scaler : MinMaxScaler on sequence windows
 Baseline: ARIMA (comparison only — not deployed in production)

@@ -31,15 +31,11 @@ These rules apply universally before loading to BigQuery:
 
 ### 3.1 Daily Stock Metrics Consolidation (Consolidated Market Data) → `fact_stock_daily_metrics`
 
-**Source**: Cleaned CSV files of price history, foreign trading, proprietary trading, and order stats:
+**Source**: Cleaned CSV files of price history:
 - `fact_price_history_clean.csv` (Price base for BID, TCB, VCB, CTG - 11,835 rows)
-- `fact_foreign_trading_clean.csv` (Foreign trading flow for BID - 22 rows)
-- `fact_proprietary_trading_clean.csv` (Proprietary trading flow for BID - 22 rows)
-- `fact_order_stats_clean.csv` (Order statistics for BID - 22 rows)
 
 **Consolidation Logic**:
-- Python ETL script `consolidate_stock_metrics.py` performs a Left Join with `fact_price_history_clean.csv` as the base table and joins the other three flow tables on `(date_key, stock_key)`.
-- For stocks and dates lacking flow metrics (TCB, VCB, CTG, and non-sample dates of BID), the respective flow/order fields are filled with `NULL`.
+- Python ETL script `consolidate_stock_metrics.py` reads the base price history data, ensures correct data types, drops duplicate rows, and prepares the output dataset.
 
 **Column Mappings**:
 
@@ -52,25 +48,9 @@ These rules apply universally before loading to BigQuery:
 | `low_price` | Low / Thấp nhất | Cast to `float64` |
 | `close_price` | Close / Đóng cửa | Cast to `float64`. This is the **LSTM target variable**. |
 | `trading_volume` | Volume / Khối lượng | Cast to `Int64`. Remove commas. |
-| `foreign_buy_volume` | Foreign Buy Volume | Cast to `Int64` |
-| `foreign_sell_volume` | Foreign Sell Volume | Cast to `Int64` |
-| `foreign_net_volume` | Foreign Net Volume | Compute as `foreign_buy_volume - foreign_sell_volume` |
-| `foreign_net_value` | Foreign Net Value | Cast to `float64` |
-| `foreign_ownership_ratio` | Foreign Ownership Ratio | Cast to `float64`. Divide by 100 if stored as percentage. |
-| `prop_buy_volume` | Prop Buy Volume | Cast to `Int64` |
-| `prop_sell_volume` | Prop Sell Volume | Cast to `Int64` |
-| `prop_net_volume` | Prop Net Volume | Compute as `prop_buy_volume - prop_sell_volume` |
-| `prop_net_value` | Prop Net Value | Cast to `float64` |
-| `total_buy_orders` | Total Buy Orders | Cast to `Int64` |
-| `total_buy_volume` | Total Buy Volume | Cast to `Int64` |
-| `total_sell_orders` | Total Sell Orders | Cast to `Int64` |
-| `total_sell_volume` | Total Sell Volume | Cast to `Int64` |
-| `matched_volume` | Matched Volume | Cast to `Int64` |
 
 **Missing Value Rule**:
 - For price history metrics: If `close_price` is null, reject the row and log an ERROR.
-- For foreign and proprietary trading flow features (only populated on BID sample dates): forward-fill with maximum 1 day in the source clean step, else keep NULL.
-- For order statistics: No forward-fill. Keep NULL if not present.
 
 ---
 
@@ -146,7 +126,7 @@ To enable robust incremental loading (upserts) and guarantee idempotency without
 
 ### BigQuery MERGE Upsert Template
 
-For daily fact tables (e.g. `fact_price_history`), the incremental loading logic should follow this template:
+For daily fact tables (e.g. `fact_stock_daily_metrics`), the incremental loading logic should follow this template:
 
 ```sql
 MERGE INTO `{project_id}.{dataset_id}.fact_stock_daily_metrics` target

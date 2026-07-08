@@ -14,8 +14,8 @@
 
 ## 2. Câu Hỏi Nghiên Cứu & Giả Thuyết
 
-**Q1:** Dòng tiền từ nhà đầu tư nước ngoài và khối tự doanh có tác động như thế nào đến biến động giá ngắn hạn của cổ phiếu ngân hàng BID?
--> **Giả thuyết:** Hành vi mua ròng liên tục từ khối ngoại và tự doanh có tương quan thuận chiều mạnh mẽ với xu hướng tăng giá của cổ phiếu BID trong khung thời gian T+1 đến T+5.
+**Q1:** Mô hình LSTM đa biến (kết hợp OHLCV và phần trăm biến động) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong việc dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
+-> **Giả thuyết:** Mô hình LSTM đa biến đạt sai số RMSE và MAE thấp hơn so với cả mô hình LSTM đơn biến và ARIMA, nhờ bổ sung các đặc trưng động lực học về khối lượng giao dịch và biên độ dao động.
 
 **Q2:** Xu hướng biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng BID, TCB, VCB, CTG có sự đồng pha hay phân hóa?
 -> **Giả thuyết:** Có sự đồng pha mạnh mẽ trong ngắn hạn giữa các cổ phiếu thuộc nhóm quốc doanh (BID, VCB, CTG), trong khi nhóm cổ phần tư nhân (TCB) có xu hướng biến động độc lập hơn.
@@ -140,10 +140,7 @@ da_project/
 **Sơ đồ 1: Kiến trúc Kho dữ liệu - Star Schema**
 
 - **Trung tâm - Fact Tables:**
-    - Bảng fact_foreign_trading: foreign_volume, foreign_value, ownership
-    - Bảng fact_proprietary_trading: prop_buy, prop_sell, prop_net
-    - Bảng fact_price_history: open, high, low, close, volume
-    - Bảng fact_order_stats: buy_orders, sell_orders, matched
+    - Bảng fact_stock_daily_metrics: open, high, low, close, volume
     - Bảng fact_bank_performance: deposits, loans, npl, roa, roe
 - **Các vệ tinh xung quanh - Dimension Tables trỏ khóa ngoại vào Fact:**
     - Bảng dim_date: date_key, day, month, year, quarter
@@ -156,7 +153,7 @@ da_project/
 
 - **Khối 1 Nguồn dữ liệu:** File Excel, Tài liệu yêu cầu. Mũi tên hướng sang Khối 2.
 - **Khối 2 ETL Pipeline:** Extract bằng Python Pandas. Transform làm sạch dữ liệu. Load bằng Google Cloud API. Mũi tên hướng sang Khối 3.
-- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 5 bảng Dim và 5 bảng Fact. Mũi tên hướng sang Khối 4.
+- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 5 bảng Dim và 2 bảng Fact. Mũi tên hướng sang Khối 4.
 - **Khối 4 Analytics & Machine Learning:** Trực quan hóa EDA. Chạy mô hình Học máy có giám sát và không giám sát. Xuất báo cáo Dashboard.
 
 **Sơ đồ 3: Cấu trúc Mô hình Học máy**

@@ -54,17 +54,10 @@ Tài liệu này là kịch bản nói chi tiết dưới dạng **bullet points
     *   *Khóa chính*: `audit_key`. Đăng ký mã chạy tự động `run_id`, trạng thái chạy `status` giúp kiểm soát lỗi vận hành.
 
 ### 2.2 Hệ thống Fact Tables (Bảng sự kiện - Số liệu đo lường)
-*   **`fact_price_history`** (Lịch sử giá cổ phiếu):
+*   **`fact_stock_daily_metrics`** (Lịch sử giá và giao dịch cổ phiếu):
     *   *Metrics*: `open_price`, `high_price`, `low_price`, `close_price` (Giá đóng cửa), `trading_volume`.
     *   *Liên hệ mô hình*: `close_price` là biến mục tiêu cho mô hình chuỗi thời gian LSTM (xem [ml-spec.md](../ml-spec.md) Section 4.1).
-*   **`fact_foreign_trading`** (Giao dịch khối ngoại):
-    *   *Metrics*: `foreign_buy_volume`, `foreign_sell_volume`, `foreign_net_volume` (Khối lượng mua ròng), `foreign_net_value` (Giá trị mua ròng).
-    *   *Liên hệ câu hỏi nghiên cứu*: `foreign_net_volume` giúp trả lời câu hỏi **Q1** trong [RESULT.md](../../RESULT.md) về tác động của dòng tiền ngoại đến giá BID.
-*   **`fact_proprietary_trading`** (Giao dịch tự doanh):
-    *   *Metrics*: `prop_net_volume` (Tự doanh mua ròng), `prop_net_value`.
-    *   *Ý nghĩa*: Phản ánh xu hướng dòng tiền của các định chế tài chính trong nước.
-*   **`fact_order_stats`** (Thống kê đặt lệnh):
-    *   *Metrics*: `total_buy_orders`, `total_sell_orders`, `matched_volume` (Khối lượng khớp lệnh).
+    *   *Liên hệ câu hỏi nghiên cứu*: Dữ liệu giá đóng cửa và khối lượng giao dịch giúp trả lời câu hỏi **Q1** về sự vượt trội của mô hình LSTM đa biến (Multivariate LSTM sử dụng OHLCV và biến động khối lượng) so với mô hình LSTM đơn biến (Univariate LSTM chỉ dùng giá đóng cửa) và mô hình baseline ARIMA.
 *   **`fact_bank_performance`** (Hiệu suất tài chính ngân hàng):
     *   *Metrics tài chính vĩ mô*: `total_assets` (Tổng tài sản), `total_deposits` (Tiền gửi khách hàng), `total_loans` (Dư nợ cho vay), `total_equity` (Vốn chủ sở hữu).
     *   *Ánh xạ chỉ số CAMELS chuẩn NetSuite & VCBS* (xem công thức và giải nghĩa chi tiết tại [RESULT.md](../../RESULT.md)):

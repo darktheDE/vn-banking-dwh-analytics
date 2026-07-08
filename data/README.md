@@ -16,11 +16,8 @@ This directory stores all data files used by the Financial Data Analytics Platfo
 
 | File | Description | Target Fact Table |
 |------|-------------|-------------------|
-| `BID_foreign_trading.xlsx` | BID daily foreign investor trading data | `fact_foreign_trading` |
-| `BID_proprietary_trading.xlsx` | BID daily proprietary desk trading data | `fact_proprietary_trading` |
-| `BID_price_history.xlsx` | BID daily OHLCV price history | `fact_price_history` |
-| `BID_order_stats.xlsx` | BID daily order placement statistics | `fact_order_stats` |
-| `bank_financials_part1.xlsx` | CAMELS financial data for 45 banks (Part 1) | `fact_bank_performance` |
-| `bank_financials_part2.xlsx` | CAMELS financial data for 45 banks (Part 2) | `fact_bank_performance` |
+| `VN banks dataset (updated August 2023).xlsx` | CAMELS financial data for 45 commercial banks (2002–2022) | `fact_bank_performance` |
+
+*Note: Daily stock OHLCV data for BID, TCB, VCB, and CTG is programmatically crawled using [extract_data.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/extract_data.py) and loaded directly into the pipeline without requiring manual spreadsheet downloads.*
 
 For full column mappings and transformation rules, see [`docs/etl-spec.md`](../docs/etl-spec.md).

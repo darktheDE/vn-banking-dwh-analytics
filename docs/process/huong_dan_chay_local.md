@@ -17,10 +17,10 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Bước 2: Tạo dữ liệu thô mẫu (Raw Mock Data)
-Do các file thô về giao dịch cổ phiếu không được đẩy lên Git, tệp lệnh sau sẽ tự động tạo các tệp Excel mẫu tại thư mục `data/raw/` (kết hợp trích xuất 22 ngày thực tế của BID) để chạy thử nghiệm:
+### Bước 2: Trích xuất dữ liệu thực tế (Crawl dữ liệu)
+Tập lệnh trích xuất sẽ gọi API `vnstock` để tự động tải lịch sử giá thực tế của 4 mã ngân hàng (BID, TCB, VCB, CTG) và báo cáo tài chính BCTC về máy cục bộ:
 ```bash
-python -m src.etl.generate_mock_stock_data
+python extract_data.py
 ```
 
 ### Bước 3: Chạy sinh các bảng chiều (Dimension Tables)
@@ -31,18 +31,18 @@ python -m src.etl.populate_dim_bank
 python -m src.etl.populate_dim_trading_session
 ```
 
-### Bước 4: Chạy ETL cho các bảng sự kiện (Fact Tables)
+### Bước 4: Chạy ETL cho các bảng sự kiện (Fact Tables) và Hợp nhất
 ```bash
+# Xử lý giá lịch sử và dữ liệu CAMELS ngân hàng
 python -m src.etl.load_price_history
-python -m src.etl.load_foreign_trading
-python -m src.etl.load_proprietary_trading
-python -m src.etl.load_order_stats
-python -m src.etl.load_intraday_matching
 python -m src.etl.load_bank_performance
+
+# Hợp nhất dữ liệu giá và khối lượng chứng khoán
+python -m src.etl.consolidate_stock_metrics
 ```
 
 ### Bước 5: Chạy kiểm tra tính toàn vẹn (Validation)
-Tập lệnh này sẽ kiểm tra đối chiếu khóa ngoại giữa các file CSV Fact và Dimension vừa tạo trong `data/processed/`, kiểm tra trùng lặp khóa chính và định dạng dữ liệu (DQ-01 đến DQ-06):
+Tập lệnh này sẽ kiểm tra đối chiếu khóa ngoại giữa các file CSV Fact và Dimension vừa tạo trong `data/processed/`, kiểm tra trùng lặp khóa chính và định dạng dữ liệu (DQ-01 đến DQ-05):
 ```bash
 python -m src.etl.validate_integrity
 ```
@@ -52,17 +52,13 @@ python -m src.etl.validate_integrity
 
 ## 2. Kết Quả Đầu Ra Cần Kiểm Tra Trên Local
 
-Sau khi chạy xong, hãy truy cập thư mục [data/processed/](file:///d:/DWH/vn-banking-dwh-analytics/data/processed/) để kiểm tra xem đã có đủ các file CSV sau chưa:
+Sau khi chạy xong, hãy truy cập thư mục [data/processed/](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/data/processed/) để kiểm tra xem đã có đủ các file CSV sau chưa:
 
 - `dim_date_clean.csv`
 - `dim_stock_clean.csv`
 - `dim_bank_clean.csv`
 - `dim_trading_session_clean.csv`
-- `fact_price_history_clean.csv`
-- `fact_foreign_trading_clean.csv`
-- `fact_proprietary_trading_clean.csv`
-- `fact_order_stats_clean.csv`
-- `fact_intraday_matching_clean.csv`
+- `fact_stock_daily_metrics_clean.csv`
 - `fact_bank_performance_clean.csv`
 
 ---

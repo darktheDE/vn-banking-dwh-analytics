@@ -34,24 +34,21 @@ Toàn bộ dữ liệu được thu thập từ các tệp Excel có cấu trúc
 
 | Mã nguồn | Mô tả | Bảng đích trên BigQuery | Độ chi tiết |
 |-----------|--------|-------------------------|-------------|
-| F1 | Giao dịch khối ngoại cổ phiếu BID | `fact_foreign_trading` | Theo ngày — 22 phiên |
-| F2 | Giao dịch tự doanh cổ phiếu BID | `fact_proprietary_trading` | Theo ngày — 22 phiên |
-| F3 | Lịch sử giá OHLCV cho BID, TCB, VCB, CTG | `fact_price_history` | Theo ngày — khoảng 11,835 dòng |
-| F4 | Thống kê lệnh mua/bán BID | `fact_order_stats` | Theo ngày — 22 phiên |
-| F6–F7 | Chỉ số tài chính CAMELS 46 ngân hàng | `fact_bank_performance` | Theo năm, 2002–2022 — khoảng 667 dòng |
+| F3 | Lịch sử giá OHLCV cho BID, TCB, VCB, CTG | `fact_stock_daily_metrics` | Theo ngày — khoảng 11,835 dòng |
+| F6–F7 | Chỉ số tài chính CAMELS 45 ngân hàng | `fact_bank_performance` | Theo năm, 2002–2022 — khoảng 667 dòng |
 
 ### Phương pháp luận
 
 Dự án tuân theo quy trình chuẩn hóa dữ liệu vòng đời **CRISP-DM** — Cross-Industry Standard Process for Data Mining, bao gồm:
 
 1. **ETL Pipeline tự động hóa** với Python + Pandas + Openpyxl:
-   - Trích xuất từ 7 tệp Excel nguyên bản
+   - Trích xuất dữ liệu, crawl lịch sử giá bằng thư viện `vnstock`
    - Biến đổi: xử lý giá trị khuyết bằng median imputation cho ngân hàng và forward-fill tối đa 1 ngày cho cổ phiếu, chuẩn hóa kiểu dữ liệu, tạo surrogate key
    - Nạp vào BigQuery với cơ chế upsert MERGE đảm bảo tính idempotent
 
 2. **Kiến trúc lưu trữ Star Schema** trên Google BigQuery:
    - 5 bảng Dimension: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, `dim_audit`
-   - 5 bảng Fact: `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`, `fact_order_stats`, `fact_bank_performance`
+   - 2 bảng Fact: `fact_stock_daily_metrics`, `fact_bank_performance`
    - 3 bảng ML Output: `bank_cluster_assignments`, `bank_risk_predictions`, `fact_model_predictions`
    - Tối ưu bằng Partitioning trên `date_key` và Clustering trên `stock_key`/`bank_key`
 

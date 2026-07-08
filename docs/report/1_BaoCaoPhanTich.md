@@ -35,14 +35,13 @@ Dự án được dẫn dắt bởi bốn mục tiêu cốt lõi:
 | Phạm vi | Chi tiết |
 |---------|----------|
 | **Dữ liệu cổ phiếu** | Lịch sử giá OHLCV hàng ngày của 4 mã: BID, TCB, VCB, CTG — khoảng 11,835 dòng |
-| **Dữ liệu giao dịch bổ trợ** | Khối lượng giao dịch khối ngoại và tự doanh của BID — 22 phiên |
-| **Dữ liệu tài chính ngân hàng** | 46 ngân hàng thương mại, 47+ chỉ số CAMELS, giai đoạn 2002–2022 — khoảng 667 dòng |
+| **Dữ liệu tài chính ngân hàng** | 45 ngân hàng thương mại, 47+ chỉ số CAMELS, giai đoạn 2002–2022 — khoảng 667 dòng |
 | **Ngoài phạm vi** | Giao dịch thuật toán tự động HFT, phân tích ngôn ngữ tự nhiên NLP, mở rộng toàn bộ VN-Index |
 
 ### Câu hỏi nghiên cứu và Giả thuyết
 
-**Q1:** Dòng tiền từ nhà đầu tư nước ngoài và khối tự doanh có tác động như thế nào đến biến động giá ngắn hạn của cổ phiếu ngân hàng BID?
-> **Giả thuyết:** Hành vi mua ròng liên tục từ khối ngoại và tự doanh có tương quan thuận chiều mạnh mẽ với xu hướng tăng giá của cổ phiếu BID trong khung thời gian T+1 đến T+5.
+**Q1:** Mô hình LSTM đa biến (kết hợp OHLCV và phần trăm biến động) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong việc dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
+> **Giả thuyết:** Mô hình LSTM đa biến đạt sai số RMSE và MAE thấp hơn so với cả mô hình LSTM đơn biến và ARIMA, nhờ bổ sung các đặc trưng động lực học về khối lượng giao dịch và biên độ dao động.
 
 **Q2:** Xu hướng biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng BID, TCB, VCB, CTG có sự đồng pha hay phân hóa?
 > **Giả thuyết:** Có sự đồng pha mạnh mẽ trong ngắn hạn giữa các cổ phiếu thuộc nhóm quốc doanh gồm BID, VCB, CTG, trong khi nhóm cổ phần tư nhân như TCB có xu hướng biến động độc lập hơn.

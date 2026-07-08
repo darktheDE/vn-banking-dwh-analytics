@@ -55,7 +55,7 @@ Quy trình thực thi khi nạp thông tin ngân hàng:
 Để hỗ trợ cập nhật dữ liệu liên tục và ngăn ngừa hiện tượng trùng lặp dữ liệu khi nạp lại nhiều lần, pipeline triển khai cơ chế load tăng trưởng sử dụng câu lệnh SQL `MERGE`.
 
 ### 3.1 Cơ chế Nạp dữ liệu qua Bảng Staging (`MERGE`)
-1.  Dữ liệu từ tệp CSV đã làm sạch được tải lên một bảng tạm (ví dụ: `staging_fact_price_history`) sử dụng chế độ ghi đè `WRITE_TRUNCATE`.
+1.  Dữ liệu từ tệp CSV đã làm sạch được tải lên một bảng tạm (ví dụ: `staging_fact_stock_daily_metrics`) sử dụng chế độ ghi đè `WRITE_TRUNCATE`.
 2.  Một lệnh SQL `MERGE` được thực thi để kết hợp bảng tạm và bảng đích dựa trên các cột khóa chính (ví dụ: `date_key` và `stock_key`).
 3.  `WHEN MATCHED`: Cập nhật các cột dữ liệu thay đổi trong bảng đích dựa trên dữ liệu mới (loại trừ cột khóa chính và cột thời gian khởi tạo `_created_at`).
 4.  `WHEN NOT MATCHED`: Chèn mới toàn bộ bản ghi.

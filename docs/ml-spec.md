@@ -8,17 +8,16 @@ This document outlines the technical specifications for the Machine Learning mod
 
 ## 1. Time Series Forecasting: LSTM (Long Short-Term Memory)
 
-**Objective**: Predict the short-term closing price (T+1 to T+5) for all 4 focus bank stocks (BID, TCB, VCB, CTG) by analyzing historical prices and trading volumes. For BID, the model additionally factors in foreign and proprietary cash flow signals.
+**Objective**: Predict the short-term closing price (T+1 to T+5) for all 4 focus bank stocks (BID, TCB, VCB, CTG) by analyzing historical prices and trading volumes. The model compares two configurations: a Univariate LSTM baseline (using only closing price) and a Multivariate LSTM (using OHLCV, price change percentage, and volume change percentage).
 
 ### 1.1 Model Selection Rationale
 
-LSTM, a specialized Recurrent Neural Network (RNN) architecture, is chosen because it excels at capturing long-term dependencies and non-linear patterns in volatile financial time series data, outperforming traditional statistical models like ARIMA when handling complex external regressors (like cash flow signals).
+LSTM, a specialized Recurrent Neural Network (RNN) architecture, is chosen because it excels at capturing long-term dependencies and non-linear patterns in volatile financial time series data, outperforming traditional statistical models like ARIMA when handling complex multivariate sequence data.
 
 ### 1.2 Data Inputs (Features)
 
-- Historical OHLCV (Open, High, Low, Close, Volume) data.
-- Foreign trading net volume and value.
-- Proprietary trading net volume.
+- **LSTM Univariate**: Historical Close Price.
+- **LSTM Multivariate**: Historical OHLCV (Open, High, Low, Close, Volume) data + Price Change Percentage + Volume Change Percentage.
 - *Transformation*: Sequence windowing (e.g., rolling windows of the past N days) normalized using `MinMaxScaler`.
 
 ### 1.3 Target Variable
@@ -109,7 +108,7 @@ To ensure the deployed models provide tangible business value, they must outperf
 
 ### 5.2 Data Freshness
 
-- **Batch Processing**: Data (OHLCV, foreign/proprietary cash flows) will be ingested via an **End-of-Day (EOD) Batch Process**. Real-time streaming is out of scope for this architecture.
+- **Batch Processing**: Data (OHLCV) will be ingested via an **End-of-Day (EOD) Batch Process**. Real-time streaming is out of scope for this architecture.
 
 ---
 
@@ -137,7 +136,7 @@ Extreme market volatility (e.g., macroeconomic shocks, global pandemics) can cau
 
 ### 7.2 Missing Features in Production
 
-If external data sources (e.g., foreign cash flow API) fail to deliver data for a specific day:
+If external data sources fail to deliver data for a specific day:
 - **Fallback Imputation**: The ETL pipeline will default to using the previous day’s value (Forward-fill) or a rolling 5-day moving average to prevent the pipeline and subsequent LSTM predictions from crashing.
 
 ---

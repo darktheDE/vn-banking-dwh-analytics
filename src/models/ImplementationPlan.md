@@ -16,9 +16,9 @@ We will build and finalize 7 Python scripts in the `src/models/` directory.
 ### 1. Feature Engineering (Extraction and Standardization)
 
 #### [MODIFY] `feature_engineering_stock.py`
-- **Goal**: Extract data from fact tables (`fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`) for BID stock.
-- **Key Features**: Connect to BigQuery, query, merge data based on `date_key`, and ensure only valid trading days are fetched.
-- **Output**: A features DataFrame for the stock.
+- **Goal**: Extract data from fact table `fact_stock_daily_metrics` for focus bank stocks (BID, TCB, VCB, CTG).
+- **Key Features**: Connect to BigQuery, query, generate derived features (`price_change_pct`, `volume_change_pct`), and create lag sequences.
+- **Output**: A features DataFrame for the stocks.
 
 #### [MODIFY] `feature_engineering_bank.py`
 - **Goal**: Extract bank performance data from `fact_bank_performance`.

@@ -21,8 +21,8 @@ Dự án được thiết lập nhằm xây dựng một hệ thống tích hợ
 
 ### 1.3 Câu Hỏi Nghiên Cứu và Giả Thuyết Thực Nghiệm
 Dự án tập trung giải quyết 4 câu hỏi nghiên cứu cốt lõi:
-1. **Câu hỏi 1 (Q1):** Dòng tiền ròng của nhà đầu tư nước ngoài và khối tự doanh tác động như thế nào đến biến động giá ngắn hạn của cổ phiếu BID?
-   - **Giả thuyết:** Lực mua ròng liên tục từ khối ngoại và tự doanh có mối tương quan thuận chiều mạnh mẽ với xu hướng tăng giá của cổ phiếu BID trong khung thời gian ngắn hạn từ T+1 đến T+5.
+1. **Câu hỏi 1 (Q1):** Mô hình LSTM đa biến (kết hợp OHLCV và phần trăm biến động) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong việc dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
+   - **Giả thuyết:** Mô hình LSTM đa biến đạt sai số RMSE và MAE thấp hơn so với cả mô hình LSTM đơn biến và ARIMA, do khối lượng giao dịch và biến động biên độ cung cấp thông tin dự báo giá ngắn hạn tốt hơn.
 2. **Câu hỏi 2 (Q2):** Xu hướng biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) là đồng pha hay phân hóa?
    - **Giả thuyết:** Có sự đồng pha mạnh mẽ trong ngắn hạn giữa các cổ phiếu thuộc nhóm quốc doanh (BID, VCB, CTG), trong khi nhóm cổ phần tư nhân (TCB) thể hiện sự phân hóa độc lập hơn.
 3. **Câu hỏi 3 (Q3):** Những chỉ số tài chính nào quyết định việc một ngân hàng rơi vào nhóm có rủi ro nợ xấu cao?
@@ -62,21 +62,12 @@ Hệ thống gồm 5 bảng chiều chính:
    - *Các trường thông tin:* `run_id`, `run_timestamp`, `script_name`, `source_file`, `rows_processed`, `status`.
 
 ### 2.3 Các Bảng Thực Tế (Fact Tables)
-Hệ thống gồm 5 bảng thực tế kết nối với các bảng chiều qua khóa ngoại:
-1. **fact_price_history:** Lưu trữ lịch sử giá cổ phiếu hàng ngày.
+Hệ thống gồm 2 bảng thực tế kết nối với các bảng chiều qua khóa ngoại:
+1. **fact_stock_daily_metrics:** Lưu trữ lịch sử giao dịch và giá cổ phiếu hàng ngày.
    - *Khóa ngoại:* `date_key`, `stock_key`.
    - *Các trường đo lường:* `open_price`, `high_price`, `low_price`, `close_price`, `trading_volume`.
    - *Thiết kế vật lý:* Bảng được phân vùng (Partitioned) theo trường `date_key` và phân cụm (Clustered) theo trường `stock_key`. Điều này giúp BigQuery chỉ quét các vùng dữ liệu của ngày cụ thể và cổ phiếu cụ thể khi thực hiện truy vấn, giảm thiểu chi phí quét dữ liệu và tăng tốc độ xử lý.
-2. **fact_foreign_trading:** Ghi nhận dữ liệu giao dịch của khối nhà đầu tư nước ngoài đối với cổ phiếu.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `foreign_buy_volume`, `foreign_sell_volume`, `foreign_net_volume`, `foreign_net_value`, `foreign_ownership_ratio`.
-3. **fact_proprietary_trading:** Ghi nhận dữ liệu giao dịch tự doanh của các công ty chứng khoán.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `prop_buy_volume`, `prop_sell_volume`, `prop_net_volume`, `prop_net_value`.
-4. **fact_order_stats:** Lưu trữ dữ liệu về khối lượng đặt lệnh mua/bán của thị trường.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `total_buy_orders`, `total_buy_volume`, `total_sell_orders`, `total_sell_volume`, `matched_volume`.
-5. **fact_bank_performance:** Lưu trữ 47 chỉ số tài chính CAMELS của 45 ngân hàng trong 20 năm.
+2. **fact_bank_performance:** Lưu trữ 47 chỉ số tài chính CAMELS của 45 ngân hàng trong 20 năm.
    - *Khóa ngoại:* `date_key`, `bank_key`.
    - *Các trường đo lường:* Các chỉ số tài chính cốt lõi bao gồm tiền gửi (`deposits`), dư nợ (`loans`), tài sản (`tassets`), vốn chủ sở hữu (`equity`), dự phòng rủi ro tín dụng (`llp`), nợ xấu (`npl`), tỷ lệ nợ xấu (`npl_ratio`), hiệu số sinh lời (`roa`, `roe`), biên lãi ròng (`nim`), tỷ lệ chi phí trên thu nhập (`cir`), tỷ lệ dư nợ trên tiền gửi (`ltd`), vốn chủ sở hữu trên tổng tài sản (`eta`), và vốn chủ sở hữu trên tiền gửi khách hàng (`etd`).
    - *Trường bổ sung:* Trường `is_imputed` dùng để đánh dấu các hàng dữ liệu sử dụng phương pháp nội suy trung vị để làm sạch.
