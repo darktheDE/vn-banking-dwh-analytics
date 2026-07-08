@@ -48,6 +48,11 @@ These rules apply universally before loading to BigQuery:
 | `low_price` | Low / Thấp nhất | Cast to `float64` |
 | `close_price` | Close / Đóng cửa | Cast to `float64`. This is the **LSTM target variable**. |
 | `trading_volume` | Volume / Khối lượng | Cast to `Int64`. Remove commas. |
+| `price_change` | *Calculated* | `close_price - open_price` |
+| `price_change_pct` | *Calculated* | `(close_price - close_price_t-1) / close_price_t-1` (grouped by stock, sorted by date) |
+| `price_amplitude` | *Calculated* | `(high_price - low_price) / open_price` |
+| `volume_change_pct` | *Calculated* | `(trading_volume - trading_volume_t-1) / trading_volume_t-1` (grouped by stock, sorted by date) |
+| `trading_value` | *Calculated* | `close_price * trading_volume` |
 
 **Missing Value Rule**:
 - For price history metrics: If `close_price` is null, reject the row and log an ERROR.

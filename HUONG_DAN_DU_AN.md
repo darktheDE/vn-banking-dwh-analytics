@@ -36,7 +36,7 @@ Chi tiết về kết quả kiểm chứng các câu hỏi nghiên cứu này đ
 
 ## 2. Kiến Trúc Kho Dữ Liệu (Star Schema Data Warehouse)
 
-Để tối ưu hóa hiệu năng truy vấn cho các công cụ Business Intelligence và chuẩn bị dữ liệu đầu vào cho các thuật toán học máy, dự án thiết kế Kho dữ liệu theo mô hình hình sao (Star Schema) lưu trữ trên Google BigQuery. Đặc tả chi tiết về các bảng và trường dữ liệu được tài liệu hóa tại [star-schema.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/star-schema.md) và [data-dictionary.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-dictionary.md).
+Để tối ưu hóa hiệu năng truy vấn cho các công cụ Business Intelligence và chuẩn bị dữ liệu đầu vào cho các thuật toán học máy, dự án thiết kế Kho dữ liệu theo mô hình hình sao (Star Schema) lưu trữ trên Google BigQuery. Đặc tả chi tiết về các bảng và trường dữ liệu được tài liệu hóa tại [star-schema.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/star-schema.md) và [data-dictionary.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-dictionary.md). Luồng di chuyển dữ liệu chi tiết giữa các tầng (Data Lineage) được mô tả cụ thể tại [data-lineage.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-lineage.md).
 
 ### 2.1 Tại Sao Chọn Mô Hình Star Schema?
 - **Hiệu năng truy vấn vượt trội:** Giảm thiểu số lượng liên kết bảng (JOIN) phức tạp khi thực hiện truy vấn phân tích.
