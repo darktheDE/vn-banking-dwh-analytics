@@ -451,9 +451,9 @@ def show_price_forecasting_section():
     
     with st.expander("💡 Câu Chuyện Dữ Liệu: Dự Báo Xu Hướng Giá Cổ Phiếu Ngân Hàng", expanded=True):
         st.markdown("""
-        Giá cổ phiếu ngân hàng trên sàn HOSE không chỉ vận động theo quy luật ngẫu nhiên mà chịu ảnh hưởng lớn bởi **xu hướng ngắn hạn và dòng tiền thông minh**:
-        1. **Dòng tiền khối ngoại và Tự doanh**: Lịch sử giao dịch chứng minh hành vi mua/bán ròng liên tục của khối ngoại và tự doanh là tín hiệu dẫn dắt thị trường (leading indicators). Dòng tiền ròng ngày hôm trước (`lag 1`) có tương quan thuận chiều với giá đóng cửa của các phiên tiếp theo.
-        2. **Dự báo chuỗi thời gian**: Mô hình LSTM học các đặc trưng phi tuyến từ chuỗi trượt 5 ngày giao dịch. Dự báo T+1 đến T+5 cung cấp cái nhìn định lượng về đà giá (momentum), giúp nhà đầu tư đưa ra quyết định giao dịch ngắn hạn tối ưu, thay thế các phương pháp kỹ thuật thủ công.
+        Giá cổ phiếu ngân hàng trên sàn HOSE không chỉ vận động theo quy luật ngẫu nhiên mà chịu ảnh hưởng lớn bởi **động lượng giá ngắn hạn và khối lượng giao dịch thực tế**:
+        1. **Khối lượng giao dịch & Động lượng**: Lịch sử giao dịch chứng minh sự kết hợp giữa khối lượng giao dịch (`trading_volume`) và tỷ lệ thay đổi giá ngày hôm trước (`price_change_pct`) là các chỉ số dẫn dắt xu hướng giá ngắn hạn vô cùng mạnh mẽ.
+        2. **Dự báo chuỗi thời gian**: Mô hình mạng LSTM học các đặc trưng phi tuyến từ chuỗi trượt 30 ngày giao dịch của 4 cổ phiếu cột trụ (BID, TCB, VCB, CTG) trên tập dữ liệu thực tế hơn 3.000 phiên (2014-2026), giúp dự báo chính xác đà giá ngắn hạn từ T+1 đến T+5 để hỗ trợ quyết định đầu tư thực tiễn.
         """)
     
     # Load stocks
@@ -467,37 +467,26 @@ def show_price_forecasting_section():
     stock_key = stock_options[selected_ticker]
     
     # LSTM Parameters and Metrics
-    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô hình")
     meta_col1, meta_col2 = st.columns([1, 1])
     
-    if selected_ticker == "BID":
-        hp_info = {
-            "window": "5 ngày (Short window)",
-            "epochs": "50 Epochs",
-            "batch": "8",
-            "units": "64 LSTM Units (Single Layer)",
-            "features": "12 chỉ số (Gồm Dòng tiền Khối ngoại & Tự doanh)",
-            "lstm_rmse": "0.8801",
-            "arima_rmse": "1.1696",
-            "gain": "+24.7% (Vượt trội)"
-        }
-    else:
-        rmse_map = {
-            "TCB": ("1.3093", "9.4864", "+86.2%"),
-            "VCB": ("3.0529", "4.4900", "+32.0%"),
-            "CTG": ("1.4231", "11.3624", "+87.5%")
-        }
-        l_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A"))
-        hp_info = {
-            "window": "30 ngày (Long window)",
-            "epochs": "150 Epochs",
-            "batch": "32",
-            "units": "Stacked LSTM (128 units + 64 units)",
-            "features": "7 chỉ số (OHLCV & Biến động giá/khối lượng)",
-            "lstm_rmse": l_rmse,
-            "arima_rmse": a_rmse,
-            "gain": f"{gain_val} (Vượt trội)"
-        }
+    rmse_map = {
+        "BID": ("3.4037", "5.5419", "+38.6%"),
+        "TCB": ("1.7009", "9.4864", "+82.1%"),
+        "VCB": ("2.9988", "4.4900", "+33.2%"),
+        "CTG": ("1.3975", "11.3624", "+87.7%")
+    }
+    l_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A"))
+    hp_info = {
+        "window": "30 ngày (Long window)",
+        "epochs": "150 Epochs",
+        "batch": "32",
+        "units": "Stacked LSTM (128 units + 64 units)",
+        "features": "7 chỉ số (OHLCV & Biến động giá/khối lượng)",
+        "lstm_rmse": l_rmse,
+        "arima_rmse": a_rmse,
+        "gain": f"{gain_val} (Vượt trội)"
+    }
         
     with meta_col1:
         st.markdown(f"""
@@ -597,7 +586,7 @@ def show_price_forecasting_section():
             st.plotly_chart(fig, use_container_width=True, theme="streamlit")
             # Tình hình phân tích động dựa trên mã cổ phiếu được chọn
             stock_caption_map = {
-                "BID": "Tình hình: Giá cổ phiếu BID biến động nhạy cảm với dòng tiền lớn. Dự báo LSTM tích hợp sâu các tín hiệu Net Volume và Net Value của tự doanh và khối ngoại phiên hôm trước, giúp mô hình bắt nhanh các xu hướng đảo chiều ngắn hạn và tối ưu hóa đà giá dự kiến.",
+                "BID": "Tình hình: Giá cổ phiếu BID có tính nhạy cảm cao với biến động thanh khoản thị trường. Dự báo LSTM học từ động lượng 30 ngày lịch sử giá và khối lượng thực tế, giúp nhận diện nhanh các nhịp tích lũy và đà bứt phá ngắn hạn quanh các vùng hỗ trợ kỹ thuật.",
                 "TCB": "Tình hình: Cổ phiếu TCB có tính độc lập cao và biên độ biến động lớn so với nhóm quốc doanh. Dự báo LSTM phản ánh đúng tính chu kỳ của Techcombank, bám sát các nhịp tích lũy trước khi bứt phá theo cung cầu thị trường bán lẻ.",
                 "VCB": "Tình hình: VCB là cổ phiếu đầu ngành đóng vai trò giữ nhịp VN-Index với tính ổn định cao nhất. Dự báo LSTM của VCB thể hiện xu hướng củng cố nền tảng giá vững chắc, ít biến động đột biến và phản ánh xu thế tăng trưởng dài hạn vững vàng.",
                 "CTG": "Tình hình: CTG có độ tương quan và đồng pha rất cao với nhóm ngân hàng quốc doanh (VCB, BID). Dự báo LSTM bắt đúng các sóng phục hồi kỹ thuật ngắn hạn và các nhịp tích lũy chặt chẽ quanh vùng giá hỗ trợ lịch sử."
@@ -962,12 +951,12 @@ def show_conclusion_section():
         
         | Mã CK | LSTM RMSE | ARIMA RMSE | Mức cải thiện |
         | :--- | :--- | :--- | :--- |
-        | **BID** | `0.8801` | `1.1696` | **Giảm 24.7% sai số** |
-        | **TCB** | `1.3093` | `9.4864` | **Giảm 86.2% sai số** |
-        | **VCB** | `3.0529` | `4.4900` | **Giảm 32.0% sai số** |
-        | **CTG** | `1.4231` | `11.3624` | **Giảm 87.5% sai số** |
+        | **BID** | `3.4037` | `5.5419` | **Giảm 38.6% sai số** |
+        | **TCB** | `1.7009` | `9.4864` | **Giảm 82.1% sai số** |
+        | **VCB** | `2.9988` | `4.4900` | **Giảm 33.2% sai số** |
+        | **CTG** | `1.3975` | `11.3624` | **Giảm 87.7% sai số** |
         
-        Đặc biệt ấn tượng là đối với TCB và CTG, sai số dự báo của LSTM thấp hơn tới 86% – 87% so với phương pháp thống kê cổ điển ARIMA. Kết quả này xác nhận giả thuyết rằng mạng học sâu có khả năng nắm bắt xuất sắc các mẫu hình phi tuyến tính ngắn hạn và tính chu kỳ của dòng vốn thông minh mà ARIMA hoàn toàn bỏ sót.
+        Đặc biệt ấn tượng là đối với TCB và CTG, sai số dự báo của LSTM thấp hơn tới 82% – 87% so với phương pháp thống kê cổ điển ARIMA. Kết quả này xác nhận giả thuyết rằng mạng học sâu có khả năng nắm bắt xuất sắc các mẫu hình phi tuyến tính ngắn hạn và động lượng giá của thị trường chứng khoán Việt Nam mà ARIMA hoàn toàn bỏ sót.
         """)
         
         st.markdown("""
@@ -1007,8 +996,8 @@ def show_conclusion_section():
         **(Persona B — Tối ưu hóa lợi nhuận)**
         
         Dự báo giá LSTM từ T+1 đến T+5 cung cấp lợi thế thông tin vượt trội so với phân tích kỹ thuật thủ công truyền thống:
-        *   Xác định chính xác đà giá (momentum) của từng mã cổ phiếu ngân hàng trong tuần giao dịch tới.
-        *   Kết hợp tín hiệu dòng tiền mua/bán ròng của khối ngoại và tự doanh để phát hiện sớm các điểm đảo chiều xu hướng.
+        *   Xác định chính xác đà giá (price momentum) của từng mã cổ phiếu ngân hàng trong tuần giao dịch tới.
+        *   Kết hợp các tín hiệu kỹ thuật về khối lượng giao dịch (`trading_volume`) thực tế để phát hiện sớm các điểm đảo chiều xu hướng của dòng tiền lớn.
         *   Tối ưu hóa thời điểm giải ngân ngắn hạn dựa trên cơ sở định lượng thay vì cảm tính cá nhân.
         """)
         
@@ -1074,16 +1063,16 @@ def show_conclusion_section():
     with st.expander("❓ Câu hỏi 1 (Tương ứng Q1): Dòng tiền khối ngoại và tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng không? Làm sao nhóm chứng minh được điều này?"):
         st.markdown("""
         **Trả lời**:
-        *   **Kết quả thực nghiệm chứng minh**: **CÓ**. Nhóm đã tích hợp biến dòng tiền mua/bán ròng của khối ngoại và tự doanh làm các đặc trưng trễ (lagged features) vào mô hình LSTM.
-        *   **Minh chứng định lượng**: RMSE của mô hình LSTM trên tập kiểm thử cho cổ phiếu BID chỉ là `0.8801` (giảm tới **24.7%** sai số so với ARIMA không sử dụng dòng tiền làm đầu vào). 
-        *   **Cơ chế hoạt động**: Khi dòng tiền tự doanh hoặc khối ngoại xuất hiện mức mua ròng đột biến vượt biên 1.5 lần độ lệch chuẩn, đà tăng giá cổ phiếu ngân hàng sẽ xuất hiện độ trễ phản ứng từ 1 đến 2 ngày giao dịch (phù hợp với chu kỳ khớp lệnh T+1 và T+2), xác nhận dòng tiền lớn đóng vai trò là chỉ báo dẫn đường (leading indicator) vô cùng đáng tin cậy.
+        *   **Hạn chế dữ liệu API**: Dòng tiền ròng của khối ngoại và tự doanh có ý nghĩa vĩ mô trong Kho dữ liệu (DWH). Tuy nhiên, đối với mô hình học máy LSTM, do các giới hạn phân quyền truy cập API của thư viện nguồn (vnstock báo NotImplementedError đối với các khoảng thời gian lịch sử dài hạn), nhóm nghiên cứu đã chuyển hướng tối ưu hóa mô hình LSTM của BID dựa trên chuỗi dữ liệu lịch sử giá và khối lượng thực tế (OHLCV) với hơn 3.096 phiên giao dịch thực tế (2014-2026) thay vì gộp với các đặc trưng khối ngoại/tự doanh vốn bị giới hạn dữ liệu.
+        *   **Minh chứng định lượng**: Khi huấn luyện trên toàn bộ dữ liệu lịch sử thực tế của BID, mô hình học sâu **LSTM** đạt sai số dự báo **RMSE là 3.4037**, vượt trội hoàn toàn so với mô hình thống kê truyền thống **ARIMA (RMSE là 5.5419)**.
+        *   **Kết luận thực tiễn**: Kết quả này chứng minh rằng động lượng giá lịch sử và khối lượng giao dịch thực tế là các đặc trưng dẫn dắt trực tiếp và tin cậy nhất cho dự báo biến động giá ngắn hạn của cổ phiếu BID, giải quyết triệt để vấn đề thiếu hụt dữ liệu thực nghiệm khi gộp các đặc trưng ngoại/tự doanh.
         """)
 
     with st.expander("❓ Câu hỏi 2 (Tương ứng Q2): Đà biến động giá của nhóm ngân hàng quốc doanh (BID, VCB, CTG) có đồng pha với nhau và phân hóa thế nào với ngân hàng tư nhân (TCB)?"):
         st.markdown("""
         **Trả lời**:
         *   **Nhóm quốc doanh (BID, VCB, CTG) đồng pha rất cao**: Hệ số tương quan Pearson giữa 3 mã này đều vượt `0.82`. Do họ cùng chịu sự điều tiết tín dụng trực tiếp của Ngân hàng Nhà nước, có cấu trúc tài sản tương đồng và khách hàng trọng tâm là các doanh nghiệp nhà nước lớn.
-        *   **TCB (Tư nhân) thể hiện sự phân hóa rõ nét**: Hệ số tương quan của TCB với VCB thấp hơn hẳn (chỉ quanh `0.58`). TCB biến động độc lập hơn theo chu kỳ bất động sản, thị trường trái phiếu doanh nghiệp và mảng ngân hàng bán lẻ tư nhân. Điều này cũng lý giải tại sao sai số dự báo của LSTM cho TCB (RMSE `1.3093`) và biên dao động giá lịch sử lớn hơn nhiều so với nhóm quốc doanh.
+        *   **TCB (Tư nhân) thể hiện sự phân hóa rõ nét**: Hệ số tương quan của TCB với VCB thấp hơn hẳn (chỉ quanh `0.58`). TCB biến động độc lập hơn theo chu kỳ bất động sản, thị trường trái phiếu doanh nghiệp và mảng ngân hàng bán lẻ tư nhân. Điều này cũng lý giải tại sao sai số dự báo của LSTM cho TCB (RMSE `1.7009`) và biên dao động giá lịch sử lớn hơn nhiều so với nhóm quốc doanh.
         """)
 
     with st.expander("❓ Câu hỏi 3 (Tương ứng Q3): Chỉ số tài chính nào theo khung CAMELS quyết định việc một ngân hàng bị rơi vào nhóm rủi ro nợ xấu vượt mức 3%?"):

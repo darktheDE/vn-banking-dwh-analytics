@@ -68,8 +68,7 @@ def _get_hyperparams(n_rows: int) -> dict:
 STOCK_CONFIGS = {
     1: {"symbol": "BID", "features": [
         "close_price", "open_price", "high_price", "low_price", "trading_volume",
-        "foreign_net_volume", "foreign_net_value", "prop_net_volume", "prop_net_value",
-        "price_change_pct", "foreign_net_lag_1", "prop_net_lag_1"
+        "price_change_pct", "volume_change_pct"
     ]},
     2: {"symbol": "TCB", "features": [
         "close_price", "open_price", "high_price", "low_price", "trading_volume",

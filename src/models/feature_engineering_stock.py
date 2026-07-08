@@ -104,14 +104,14 @@ def query_proprietary_trading(client, stock_key: int) -> pd.DataFrame:
 def build_stock_features(stock_key: int = 1) -> pd.DataFrame:
     """Execute the full C-01 feature engineering pipeline for the given stock key.
 
-    Queries BigQuery fact tables, merges them, adds derived features,
+    Queries BigQuery fact tables, adds derived features,
     and returns a clean DataFrame ready for LSTM training.
 
     Args:
         stock_key: Stock key (1: BID, 2: TCB, 3: VCB, 4: CTG)
 
     Returns:
-        A merged and enriched DataFrame with stock features.
+        A cleaned and enriched DataFrame with stock features.
     """
     client = get_bigquery_client()
     df_price = query_price_history(client, stock_key)
@@ -120,30 +120,14 @@ def build_stock_features(stock_key: int = 1) -> pd.DataFrame:
         logger.warning("No price history rows found for stock_key %d.", stock_key)
         return pd.DataFrame()
 
-    if stock_key == 1:
-        # BID has external trading indicators
-        df_foreign = query_foreign_trading(client, stock_key)
-        df_prop = query_proprietary_trading(client, stock_key)
+    # All stocks use standard price history (OHLCV) features to avoid mock data constraints
+    df = df_price.copy()
+    df = df.sort_values("date_key").reset_index(drop=True)
 
-        # Merge on date_key using inner join
-        df = df_price.merge(df_foreign, on="date_key", how="inner")
-        df = df.merge(df_prop, on="date_key", how="inner")
-        df = df.sort_values("date_key").reset_index(drop=True)
-
-        # Add derived features for BID
-        df["price_change_pct"] = df["close_price"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
-        df["foreign_net_lag_1"] = df["foreign_net_volume"].shift(1).fillna(0)
-        df["prop_net_lag_1"] = df["prop_net_volume"].shift(1).fillna(0)
-        df = df.dropna().reset_index(drop=True)
-    else:
-        # Other banks use price history features
-        df = df_price.copy()
-        df = df.sort_values("date_key").reset_index(drop=True)
-
-        # Add derived features for other stocks
-        df["price_change_pct"] = df["close_price"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
-        df["volume_change_pct"] = df["trading_volume"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
-        df = df.dropna().reset_index(drop=True)
+    # Add derived features
+    df["price_change_pct"] = df["close_price"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
+    df["volume_change_pct"] = df["trading_volume"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
+    df = df.dropna().reset_index(drop=True)
 
     # Validate: close_price must not be null
     if not df.empty:
