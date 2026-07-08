@@ -271,10 +271,14 @@ def train_and_evaluate_stock(stock_key: int, symbol: str, config) -> dict:
     with open(os.path.join(config.model_artifact_path, f"scaler_{symbol.lower()}_best.pkl"), "wb") as f:
         pickle.dump(best_scaler, f)
 
-    # Generate predictions using the best model
-    predictions_df = _generate_predictions_df(
-        df, best_model, best_scaler, stock_key, best_features, best_model_name, hp["window_size"]
+    # Generate predictions using both models
+    uni_pred_df = _generate_predictions_df(
+        df, uni_model, uni_scaler, stock_key, univariate_features, "LSTM_Univariate", hp["window_size"]
     )
+    multi_pred_df = _generate_predictions_df(
+        df, multi_model, multi_scaler, stock_key, multivariate_features, "LSTM_Multivariate", hp["window_size"]
+    )
+    predictions_df = pd.concat([uni_pred_df, multi_pred_df], ignore_index=True)
 
     return {
         "symbol": symbol,

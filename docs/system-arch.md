@@ -42,11 +42,12 @@ Responsible for preparing the raw data for storage and modeling.
 
 The centralized “Single Source of Truth.”
 - **Technology Stack**: Google BigQuery as a Serverless Enterprise Data Warehouse.
-- **Design Pattern**: **Star Schema** optimized for OLAP aggregations.
+- **Design Pattern**: **Star Schema** optimized for OLAP aggregations, streamlined from 10 to 7 core tables (5 Dimensions, 2 Facts) to eliminate sparse mock data columns and improve query execution performance.
 - **Dimension Tables**: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, `dim_audit`.
-- **Fact Tables**: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_bank_performance`.
+- **Fact Tables**: `fact_stock_daily_metrics` (consolidated daily OHLCV price metrics for 4 banks), `fact_bank_performance` (20-year CAMELS financial indicators for 45 banks).
 - **ML Output Tables**: `bank_cluster_assignments`, `bank_risk_predictions`, `fact_model_predictions`.
 - **Optimization**: Partitioning applied on `date_key` and Clustering applied on `stock_key` and `bank_key` to heavily reduce query latency and scanning costs for reporting.
+- **OLTP-OLAP Architecture Adjustment**: In alignment with academic guidelines, the integration of a Supabase OLTP database was deferred. The system focuses on batch ETL loading directly to the Cloud BigQuery DWH to prioritize data cleanliness, Kimball Star Schema integrity, and the removal of simulated data.
 
 ### 2.4 Machine Learning & Analytics Layer
 
@@ -82,7 +83,7 @@ graph TD
     A[Raw Data: Excel Files] -->|Extract| B(Python ETL Pipeline)
     B -->|Transform & Clean| C{Google BigQuery}
 
-    C -->|Star Schema| D[(DWH: 5 Dims, 5 Facts, 3 ML Tables)]
+    C -->|Star Schema| D[(DWH: 5 Dims, 2 Facts, 3 ML Tables)]
 
     D -->|Feature Query| E[ML Layer]
     E -->|1. LSTM: Predict Price| E1((Predictions))
