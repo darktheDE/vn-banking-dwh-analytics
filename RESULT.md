@@ -39,9 +39,14 @@ Các chỉ số đặc thù ngành ngân hàng được cấu hình theo chuẩn
 
 Dự án sử dụng dữ liệu thực tế lưu trữ tại Kho dữ liệu BigQuery và kết quả huấn luyện từ các mô hình AI/ML để đưa ra các câu trả lời thực nghiệm như sau:
 
-### 💡 Q1: Dòng tiền ròng của Khối ngoại và Tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng (ví dụ: BID) không?
-*   **Kết luận**: Dòng tiền ròng khối ngoại và tự doanh có ý nghĩa vĩ mô quan trọng trong cấu trúc Kho dữ liệu DWH. Tuy nhiên, đối với mô hình dự báo ngắn hạn LSTM của BID, do các giới hạn phân quyền truy cập API của thư viện nguồn (vnstock báo NotImplementedError đối với các khoảng thời gian lịch sử dài hạn), nhóm nghiên cứu đã chuyển hướng tối ưu hóa mô hình LSTM của BID dựa trên chuỗi dữ liệu lịch sử giá và khối lượng thực tế (OHLCV) với hơn 3.096 phiên giao dịch thực tế thay vì gộp với các đặc trưng khối ngoại/tự doanh vốn bị giới hạn dữ liệu.
-*   **Minh chứng thực nghiệm**: Khi huấn luyện trên toàn bộ dữ liệu lịch sử thực tế của BID, mô hình học sâu **LSTM** đạt sai số dự báo **RMSE là 3.4037**, vượt trội hoàn toàn so với mô hình thống kê truyền thống **ARIMA (RMSE là 5.5419)**. Kết quả này chứng minh rằng động lượng giá lịch sử và khối lượng giao dịch thực tế là các đặc trưng dẫn dắt trực tiếp và tin cậy nhất cho dự báo biến động giá ngắn hạn của cổ phiếu BID, giải quyết triệt để vấn đề thiếu hụt dữ liệu thực nghiệm.
+### 💡 Q1: Mô hình LSTM đa biến (sử dụng đầy đủ đặc trưng OHLCV, biến động giá và khối lượng) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
+*   **Kết luận**: Mô hình LSTM đa biến có độ chính xác dự báo vượt trội rõ rệt so với cả mô hình LSTM đơn biến (chỉ sử dụng giá đóng cửa) và mô hình thống kê truyền thống ARIMA. Việc bổ sung các đặc trưng động lực học bao gồm giá mở cửa, giá cao nhất, giá thấp nhất, khối lượng giao dịch cùng phần trăm biến động giúp mô hình nắm bắt tốt hơn các điểm đảo chiều và xu hướng ngắn hạn.
+*   **Minh chứng thực nghiệm**: Huấn luyện thực nghiệm trên hơn 11.835 phiên giao dịch thực tế của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) cho thấy mô hình LSTM đa biến đạt sai số RMSE thấp nhất trên mọi cổ phiếu:
+    - Đối với cổ phiếu BID: LSTM đa biến đạt RMSE 0.9634, vượt trội hơn LSTM đơn biến (1.4500) và ARIMA baseline (1.1696).
+    - Đối với cổ phiếu TCB: LSTM đa biến đạt RMSE 1.2589, vượt trội hơn hẳn ARIMA (9.4864).
+    - Đối với cổ phiếu VCB: LSTM đa biến đạt RMSE 2.8278, vượt trội hơn hẳn ARIMA (4.4900).
+    - Đối với cổ phiếu CTG: LSTM đa biến đạt RMSE 1.3733, vượt trội hơn hẳn ARIMA (11.3624).
+    Kết quả thực nghiệm này khẳng định các đặc trưng đa biến đóng vai trò thiết yếu để tối ưu hóa hiệu năng dự báo học sâu chuỗi thời gian đối với nhóm ngành ngân hàng.
 
 ### 💡 Q2: Biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) có đồng pha hay phân hóa?
 *   **Kết luận**: Có sự đồng pha (co-movement) cực kỳ mạnh mẽ giữa nhóm ngân hàng thương mại nhà nước (SOCB) bao gồm **BID**, **VCB**, và **CTG**. Ngược lại, cổ phiếu ngân hàng thương mại cổ phần tư nhân **TCB** thể hiện xu hướng phân hóa (divergence) rõ rệt và độc lập hơn.

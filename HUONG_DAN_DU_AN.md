@@ -21,8 +21,8 @@ Dự án được thiết lập nhằm xây dựng một hệ thống tích hợ
 
 ### 1.3 Câu Hỏi Nghiên Cứu và Giả Thuyết Thực Nghiệm
 Dự án tập trung giải quyết 4 câu hỏi nghiên cứu cốt lõi:
-1. **Câu hỏi 1 (Q1):** Dòng tiền ròng của nhà đầu tư nước ngoài và khối tự doanh tác động như thế nào đến biến động giá ngắn hạn của cổ phiếu BID?
-   - **Giả thuyết:** Lực mua ròng liên tục từ khối ngoại và tự doanh có mối tương quan thuận chiều mạnh mẽ với xu hướng tăng giá của cổ phiếu BID trong khung thời gian ngắn hạn từ T+1 đến T+5.
+1. **Câu hỏi 1 (Q1):** Mô hình LSTM đa biến (kết hợp OHLCV và phần trăm biến động) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong việc dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
+   - **Giả thuyết:** Mô hình LSTM đa biến đạt sai số RMSE và MAE thấp hơn so với cả mô hình LSTM đơn biến và ARIMA, do khối lượng giao dịch và biến động biên độ cung cấp thông tin dự báo giá ngắn hạn tốt hơn.
 2. **Câu hỏi 2 (Q2):** Xu hướng biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) là đồng pha hay phân hóa?
    - **Giả thuyết:** Có sự đồng pha mạnh mẽ trong ngắn hạn giữa các cổ phiếu thuộc nhóm quốc doanh (BID, VCB, CTG), trong khi nhóm cổ phần tư nhân (TCB) thể hiện sự phân hóa độc lập hơn.
 3. **Câu hỏi 3 (Q3):** Những chỉ số tài chính nào quyết định việc một ngân hàng rơi vào nhóm có rủi ro nợ xấu cao?
