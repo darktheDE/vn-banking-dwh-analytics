@@ -64,7 +64,7 @@ def build_stock_features(stock_key: int = 1) -> pd.DataFrame:
         return pd.DataFrame()
 
     # All stocks use standard price history (OHLCV) features to avoid mock data constraints
-    df = df_price.copy()
+    df = df.copy()
     df = df.sort_values("date_key").reset_index(drop=True)
 
     # Add derived features

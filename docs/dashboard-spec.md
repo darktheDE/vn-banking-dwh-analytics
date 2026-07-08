@@ -111,3 +111,25 @@ This document defines the acceptance criteria for the Looker Studio interactive 
 | **No Manual Exports** | All data must be served directly from BigQuery. CSV uploads to Looker Studio are prohibited. |
 | **Accessibility** | Chart colors must remain distinguishable for color-blind users (use shapes or patterns in addition to color where needed). |
 | **Responsiveness** | Dashboard must be usable on both a standard 16:9 desktop screen and a compact 13" laptop screen. |
+
+---
+
+## 6. Streamlit Interactive Analytical Dashboard (Ad-hoc Analysis Add-on)
+
+**Purpose**: Complement the Looker Studio dashboard with dynamic deep-learning price forecasts, DTW co-movement clustering, and statistical Granger Causality validation.
+
+### 6.1 Interactive Components and Tab Layouts
+
+#### 6.1.1 Section: Price Forecasting (LSTM)
+*   **Tab 1: LSTM Đơn biến vs Đa biến**: Line charts displaying actual close prices vs. rolling predicted prices (T+1 to T+5) from both LSTM Univariate and LSTM Multivariate models.
+*   **Tab 2: DTW & Rolling Correlation**: Displays the Dynamic Time Warping (DTW) distance matrix and Pearson correlation matrix for BID, TCB, VCB, CTG, accompanied by the aligned co-movement plots.
+*   **Tab 3: Univariate vs. Multivariate Comparison**: Performance metrics table showing RMSE/MAE for LSTM Univariate vs. LSTM Multivariate against the ARIMA baseline.
+
+#### 6.1.2 Section: Credit Risk Classification (Random Forest)
+*   **Tab 1: Random Forest Classifier**: Scorecards of global metrics (Recall >= 85%, AUC-ROC > 0.80), Feature Importance bar chart, and the bank risk monitoring table.
+*   **Tab 2: Granger Causality (LLP -> NPL)**: Displays Augmented Dickey-Fuller (ADF) unit root tests, Granger Causality p-values, and Entity Fixed Effects panel regression results with lag 1, showing the causality visualization.
+
+### 6.2 Verification and Performance Standards
+*   **Data Integrity**: Must read clean CSV data cached in `data/processed/` and forecast arrays stored in BigQuery.
+*   **Load Time**: Streamlit caching (`@st.cache_data`) must keep load times under 3 seconds after the initial query.
+

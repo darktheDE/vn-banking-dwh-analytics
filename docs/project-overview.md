@@ -74,10 +74,10 @@ Tạo thêm các biến phái sinh nhằm phục vụ mô hình hóa, bao gồm 
 
 **Bước 4: Phân tích chuyên sâu và Model**
 
-- **Xây dựng Data Warehouse:** Cấu trúc lại dữ liệu theo dạng Star Schema và nạp lên Google BigQuery.
-- **Time Series Forecasting:** Áp dụng mô hình ARIMA và LSTM để dự báo xu hướng giá cổ phiếu BID.
-- **Clustering:** Sử dụng thuật toán K-Means kết hợp PCA để giảm chiều dữ liệu và phân cụm hành vi tài chính của các ngân hàng.
-- **Classification:** Triển khai thuật toán Logistic Regression và Random Forest để dự đoán khả năng ngân hàng vi phạm mốc rủi ro nợ xấu.
+- **Xây dựng Data Warehouse:** Thiết kế và triển khai mô hình Star Schema tinh gọn gồm 7 bảng (5 Dimensions, 2 Facts) trên Cloud Google BigQuery, loại bỏ hoàn toàn các bảng giả lập rời rạc và hợp nhất thành một bảng Fact giá chứng khoán sạch duy nhất `fact_stock_daily_metrics` với 11.835 dòng dữ liệu thực tế. Hoãn tích hợp Supabase OLTP để tập trung cho chất lượng kho dữ liệu OLAP.
+- **Time Series Forecasting:** Huấn luyện và so sánh thực nghiệm mô hình LSTM Đơn biến (chỉ dùng giá đóng cửa) và LSTM Đa biến (giá + khối lượng + biến động) cho cả 4 ngân hàng (BID, TCB, VCB, CTG), lấy ARIMA làm đường cơ sở (baseline) so sánh.
+- **Clustering:** Sử dụng thuật toán K-Means kết hợp PCA để giảm chiều dữ liệu từ 47+ chỉ số tài chính CAMELS thực tế và phân cụm hành vi tài chính của 39 ngân hàng thương mại Việt Nam.
+- **Causality & Classification:** Kiểm định nhân quả Granger và Hồi quy bảng trễ Fixed Effects cho cặp biến `llp_ratio` -> `npl_ratio` để tìm tính nhân quả thực tế. Triển khai thuật toán Random Forest Classifier để cảnh báo sớm các ngân hàng có rủi ro nợ xấu vượt mức 3%.
 
 ---
 

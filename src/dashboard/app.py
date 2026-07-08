@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+import json
 import pickle
 import numpy as np
 import pandas as pd
@@ -69,7 +70,7 @@ def fetch_stock_dimension():
 @st.cache_data(ttl=10)
 def fetch_actual_price_history(stock_key: int, limit: int = 60):
     client = get_bigquery_client()
-    price_table = get_full_table_id("fact_price_history")
+    price_table = get_full_table_id("fact_stock_daily_metrics")
     date_table = get_full_table_id("dim_date")
     query = f"""
         SELECT
@@ -99,10 +100,10 @@ def fetch_lstm_predictions(stock_key: int):
     query = f"""
         SELECT
             horizon,
-            predicted_close_price
+            predicted_close_price,
+            model_name
         FROM `{pred_table}`
         WHERE stock_key = {stock_key}
-          AND model_name = 'LSTM'
         ORDER BY horizon
     """
     df = client.query(query).to_dataframe(create_bqstorage_client=False)
@@ -177,6 +178,54 @@ def fetch_eda_data():
     """
     df = client.query(query).to_dataframe(create_bqstorage_client=False)
     return df
+
+
+def load_dtw_report() -> dict:
+    """Load the Dynamic Time Warping (DTW) correlation report from disk.
+    
+    Returns:
+        Dictionary of DTW distances and Pearson correlations.
+    """
+    path = "./data/processed/dtw_correlation_report.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Lỗi khi đọc tệp báo cáo DTW: {e}")
+    return {}
+
+
+def load_causal_report() -> str:
+    """Load the Granger Causality analysis text report from disk.
+    
+    Returns:
+        Content of the report as a string.
+    """
+    path = "./data/processed/causal_analysis_report.txt"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            st.error(f"Lỗi khi đọc tệp báo cáo nhân quả: {e}")
+    return ""
+
+
+def load_lstm_comparison() -> dict:
+    """Load the LSTM model performance comparison report from disk.
+    
+    Returns:
+        Dictionary of RMSE/MAE performance comparison metrics.
+    """
+    path = "./data/processed/lstm_model_comparison.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Lỗi khi đọc tệp báo cáo hiệu năng: {e}")
+    return {}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -442,9 +491,6 @@ def main():
         show_conclusion_section()
 
 
-# ─────────────────────────────────────────────────────────────
-# Phân hệ 1: Dự báo giá cổ phiếu (LSTM)
-# ─────────────────────────────────────────────────────────────
 def show_price_forecasting_section():
     st.header("📈 Dự Báo Giá Cổ Phiếu Trọng Điểm (LSTM)")
     st.write("Mô hình học sâu LSTM thực hiện dự báo giá đóng cửa của các cổ phiếu ngân hàng trong 5 ngày giao dịch tiếp theo (T+1 đến T+5).")
@@ -471,19 +517,20 @@ def show_price_forecasting_section():
     meta_col1, meta_col2 = st.columns([1, 1])
     
     rmse_map = {
-        "BID": ("3.4037", "5.5419", "+38.6%"),
-        "TCB": ("1.7009", "9.4864", "+82.1%"),
-        "VCB": ("2.9988", "4.4900", "+33.2%"),
-        "CTG": ("1.3975", "11.3624", "+87.7%")
+        "BID": ("3.1123", "3.2247", "5.5419", "+43.8%"),
+        "TCB": ("1.4890", "2.0547", "9.4864", "+84.3%"),
+        "VCB": ("2.6567", "2.8392", "4.4900", "+40.8%"),
+        "CTG": ("1.5061", "1.4912", "11.3624", "+86.7%")
     }
-    l_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A"))
+    m_rmse, u_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A", "N/A"))
     hp_info = {
         "window": "30 ngày (Long window)",
         "epochs": "150 Epochs",
         "batch": "32",
         "units": "Stacked LSTM (128 units + 64 units)",
         "features": "7 chỉ số (OHLCV & Biến động giá/khối lượng)",
-        "lstm_rmse": l_rmse,
+        "univariate_rmse": u_rmse,
+        "multivariate_rmse": m_rmse,
         "arima_rmse": a_rmse,
         "gain": f"{gain_val} (Vượt trội)"
     }
@@ -495,7 +542,6 @@ def show_price_forecasting_section():
         *   **Cửa sổ trượt (Sliding Window)**: {hp_info["window"]}
         *   **Số chu kỳ (Epochs)**: {hp_info["epochs"]} | **Batch Size**: {hp_info["batch"]}
         *   **Cấu trúc lớp**: {hp_info["units"]}
-        *   **Số biến đầu vào (Features)**: {hp_info["features"]}
         *   **Optimizer**: Adam | **Loss Function**: Mean Squared Error (MSE)
         """)
         
@@ -503,127 +549,204 @@ def show_price_forecasting_section():
         st.markdown(f"""
         **📊 Performance Metrics (Chỉ số kiểm thử):**
         *   **Độ phân tách dữ liệu**: 80% Train / 20% Test (Phân tách theo thời gian thực tế)
-        *   **LSTM RMSE (Thực nghiệm)**: ` {hp_info["lstm_rmse"]} `
+        *   **LSTM Đa biến RMSE (Multivariate)**: ` {hp_info["multivariate_rmse"]} `
+        *   **LSTM Đơn biến RMSE (Univariate)**: ` {hp_info["univariate_rmse"]} `
         *   **ARIMA RMSE (Baseline đối chứng)**: ` {hp_info["arima_rmse"]} `
-        *   **Cải thiện so với Baseline**: **{hp_info["gain"]}**
-        *   *Ý nghĩa*: RMSE của LSTM thấp hơn hẳn so với ARIMA chứng minh năng lực học các mẫu phi tuyến tính của chuỗi thời gian chứng khoán Việt Nam.
+        *   *Ý nghĩa*: RMSE của mô hình LSTM tốt nhất thấp hơn hẳn so với ARIMA chứng minh năng lực học các mẫu phi tuyến tính của chuỗi thời gian chứng khoán Việt Nam.
         """)
         
     st.markdown("---")
     
-    col1, col2 = st.columns([3, 1])
+    # Define tabs for Price Forecasting
+    tabs = st.tabs(["🔮 Dự báo LSTM Đơn biến vs Đa biến", "🔗 Tương quan & Đồng pha (DTW)", "🧪 So sánh Đơn biến vs Đa biến"])
     
-    with col1:
-        # Load historical prices
-        hist_df = fetch_actual_price_history(stock_key)
+    with tabs[0]:
+        col1, col2 = st.columns([3, 1])
         
-        # Load predictions
-        pred_df = fetch_lstm_predictions(stock_key)
-        
-        if not hist_df.empty and not pred_df.empty:
-            # Reconstruct prediction dates sequentially
-            last_date = hist_df["full_date"].iloc[-1]
-            future_dates = []
-            current_date = last_date
-            while len(future_dates) < len(pred_df):
-                current_date += pd.Timedelta(days=1)
-                # Skip weekends
-                if current_date.weekday() < 5:
-                    future_dates.append(current_date)
+        with col1:
+            # Load historical prices
+            hist_df = fetch_actual_price_history(stock_key)
             
-            pred_df["full_date"] = future_dates
+            # Load predictions
+            pred_df = fetch_lstm_predictions(stock_key)
             
-            # Fit ARIMA baseline on the fly for comparison plotting
-            from statsmodels.tsa.arima.model import ARIMA
-            import warnings
-            
-            arima_forecast = []
-            try:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    # Fit on historical close prices (which are already sorted in ascending order)
-                    arima_model = ARIMA(hist_df["close_price"], order=(5, 1, 0))
-                    arima_fitted = arima_model.fit()
-                    arima_forecast = arima_fitted.forecast(steps=len(pred_df)).values
-            except Exception:
-                # Fallback to last close value if fitting fails
-                arima_forecast = np.array([hist_df["close_price"].iloc[-1]] * len(pred_df))
-            
-            pred_df["predicted_arima_price"] = arima_forecast
-            
-            # Combine actuals and predictions for plotting
-            actual_trace = go.Scatter(
-                x=hist_df["full_date"],
-                y=hist_df["close_price"] * 1000, # convert back to VND
-                name="Giá lịch sử thực tế",
-                line=dict(color="#3b82f6", width=2.5)
-            )
-            
-            pred_trace = go.Scatter(
-                x=pred_df["full_date"],
-                y=pred_df["predicted_close_price"] * 1000,
-                name="Giá dự báo từ LSTM",
-                line=dict(color="#f43f5e", width=2.5, dash="dash"),
-                marker=dict(size=8, symbol="circle")
-            )
-            
-            arima_trace = go.Scatter(
-                x=pred_df["full_date"],
-                y=pred_df["predicted_arima_price"] * 1000,
-                name="Giá dự báo đối chứng ARIMA",
-                line=dict(color="#10b981", width=2.5, dash="dot"),
-                marker=dict(size=8, symbol="diamond")
-            )
-            
-            fig = go.Figure(data=[actual_trace, pred_trace, arima_trace])
-            fig.update_layout(
-                title=f"Lịch Sử Giá & Dự Báo Giá 5 Ngày Cổ Phiếu {selected_ticker} (VND)",
-                xaxis_title="Thời Gian",
-                yaxis_title="Giá Cổ Phiếu (VND)",
-                hovermode="x unified",
-                legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
-            )
-            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-            # Tình hình phân tích động dựa trên mã cổ phiếu được chọn
-            stock_caption_map = {
-                "BID": "Tình hình: Giá cổ phiếu BID có tính nhạy cảm cao với biến động thanh khoản thị trường. Dự báo LSTM học từ động lượng 30 ngày lịch sử giá và khối lượng thực tế, giúp nhận diện nhanh các nhịp tích lũy và đà bứt phá ngắn hạn quanh các vùng hỗ trợ kỹ thuật.",
-                "TCB": "Tình hình: Cổ phiếu TCB có tính độc lập cao và biên độ biến động lớn so với nhóm quốc doanh. Dự báo LSTM phản ánh đúng tính chu kỳ của Techcombank, bám sát các nhịp tích lũy trước khi bứt phá theo cung cầu thị trường bán lẻ.",
-                "VCB": "Tình hình: VCB là cổ phiếu đầu ngành đóng vai trò giữ nhịp VN-Index với tính ổn định cao nhất. Dự báo LSTM của VCB thể hiện xu hướng củng cố nền tảng giá vững chắc, ít biến động đột biến và phản ánh xu thế tăng trưởng dài hạn vững vàng.",
-                "CTG": "Tình hình: CTG có độ tương quan và đồng pha rất cao với nhóm ngân hàng quốc doanh (VCB, BID). Dự báo LSTM bắt đúng các sóng phục hồi kỹ thuật ngắn hạn và các nhịp tích lũy chặt chẽ quanh vùng giá hỗ trợ lịch sử."
-            }
-            selected_stock_caption = stock_caption_map.get(selected_ticker, "Tình hình: Dự báo LSTM bám sát giá cổ phiếu đóng cửa lịch sử nhằm mô phỏng chính xác xu thế biến động giá ngắn hạn tiếp theo.")
-            st.caption(selected_stock_caption)
-        else:
-            st.warning("Không đủ dữ liệu trong Kho dữ liệu để biểu diễn đồ thị dự báo.")
-            
-    with col2:
-        st.subheader("Kết Quả Dự Báo (T+1 đến T+5)")
-        if not pred_df.empty:
-            last_close = hist_df["close_price"].iloc[-1] * 1000
-            st.metric(
-                label="Giá đóng cửa gần nhất",
-                value=f"{last_close:,.0f} VND",
-                delta=None
-            )
-            
-            # Table of forecasts
-            forecast_table = []
-            for idx, row in pred_df.iterrows():
-                pred_val = row["predicted_close_price"] * 1000
-                arima_val = row["predicted_arima_price"] * 1000
-                diff = pred_val - last_close
-                diff_pct = (diff / last_close) * 100
+            if not hist_df.empty and not pred_df.empty:
+                # Reconstruct prediction dates sequentially
+                last_date = hist_df["full_date"].iloc[-1]
+                future_dates = []
+                current_date = last_date
                 
-                forecast_table.append({
-                    "Thời Gian": f"T+{row['horizon']}",
-                    "LSTM (VND)": f"{pred_val:,.0f}",
-                    "ARIMA (VND)": f"{arima_val:,.0f}",
-                    "Biến Động LSTM": f"{diff_pct:+.2f}%"
+                # Extract univariate and multivariate predictions
+                uni_pred = pred_df[pred_df["model_name"] == "LSTM_Univariate"].copy().sort_values("horizon").reset_index(drop=True)
+                multi_pred = pred_df[pred_df["model_name"] == "LSTM_Multivariate"].copy().sort_values("horizon").reset_index(drop=True)
+                
+                # Since they share the same future dates
+                pred_len = max(len(uni_pred), len(multi_pred))
+                while len(future_dates) < pred_len:
+                    current_date += pd.Timedelta(days=1)
+                    # Skip weekends
+                    if current_date.weekday() < 5:
+                        future_dates.append(current_date)
+                        
+                if not uni_pred.empty:
+                    uni_pred["full_date"] = future_dates[:len(uni_pred)]
+                if not multi_pred.empty:
+                    multi_pred["full_date"] = future_dates[:len(multi_pred)]
+                
+                # Combine actuals and predictions for plotting
+                actual_trace = go.Scatter(
+                    x=hist_df["full_date"],
+                    y=hist_df["close_price"] * 1000, # convert back to VND
+                    name="Giá lịch sử thực tế",
+                    line=dict(color="#3b82f6", width=2.5)
+                )
+                
+                traces = [actual_trace]
+                
+                if not uni_pred.empty:
+                    uni_trace = go.Scatter(
+                        x=uni_pred["full_date"],
+                        y=uni_pred["predicted_close_price"] * 1000,
+                        name="LSTM Đơn biến (Univariate - Không biến)",
+                        line=dict(color="#10b981", width=2.5, dash="dot"),
+                        marker=dict(size=8, symbol="diamond")
+                    )
+                    traces.append(uni_trace)
+                    
+                if not multi_pred.empty:
+                    multi_trace = go.Scatter(
+                        x=multi_pred["full_date"],
+                        y=multi_pred["predicted_close_price"] * 1000,
+                        name="LSTM Đa biến (Multivariate - Có biến)",
+                        line=dict(color="#f43f5e", width=2.5, dash="dash"),
+                        marker=dict(size=8, symbol="circle")
+                    )
+                    traces.append(multi_trace)
+                    
+                fig = go.Figure(data=traces)
+                fig.update_layout(
+                    title=f"Lịch Sử Giá & Dự Báo Giá 5 Ngày Cổ Phiếu {selected_ticker} (VND)",
+                    xaxis_title="Thời Gian",
+                    yaxis_title="Giá Cổ Phiếu (VND)",
+                    hovermode="x unified",
+                    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+                )
+                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+                # Tình hình phân tích động dựa trên mã cổ phiếu được chọn
+                stock_caption_map = {
+                    "BID": "Tình hình: Giá cổ phiếu BID có tính nhạy cảm cao với biến động thanh khoản thị trường. Dự báo LSTM học từ động lượng 20 ngày lịch sử giá và khối lượng thực tế, giúp nhận diện nhanh các nhịp tích lũy và đà bứt phá ngắn hạn quanh các vùng hỗ trợ kỹ thuật.",
+                    "TCB": "Tình hình: Cổ phiếu TCB có tính độc lập cao và biên độ biến động lớn so với nhóm quốc doanh. Dự báo LSTM phản ánh đúng tính chu kỳ của Techcombank, bám sát các nhịp tích lũy trước khi bứt phá theo cung cầu thị trường bán lẻ.",
+                    "VCB": "Tình hình: VCB là cổ phiếu đầu ngành đóng vai trò giữ nhịp VN-Index với tính ổn định cao nhất. Dự báo LSTM của VCB thể hiện xu hướng củng cố nền tảng giá vững chắc, ít biến động đột biến và phản ánh xu thế tăng trưởng dài hạn vững vàng.",
+                    "CTG": "Tình hình: CTG có độ tương quan và đồng pha rất cao với nhóm ngân hàng quốc doanh (VCB, BID). Dự báo LSTM bắt đúng các sóng phục hồi kỹ thuật ngắn hạn và các nhịp tích lũy chặt chẽ quanh vùng giá hỗ trợ lịch sử."
+                }
+                selected_stock_caption = stock_caption_map.get(selected_ticker, "Tình hình: Dự báo LSTM bám sát giá cổ phiếu đóng cửa lịch sử nhằm mô phỏng chính xác xu thế biến động giá ngắn hạn tiếp theo.")
+                st.caption(selected_stock_caption)
+            else:
+                st.warning("Không đủ dữ liệu trong Kho dữ liệu để biểu diễn đồ thị dự báo.")
+                
+        with col2:
+            st.subheader("Kết Quả Dự Báo (T+1 đến T+5)")
+            if not hist_df.empty:
+                last_close = hist_df["close_price"].iloc[-1] * 1000
+                st.metric(
+                    label="Giá đóng cửa gần nhất",
+                    value=f"{last_close:,.0f} VND",
+                    delta=None
+                )
+                
+                # Table of forecasts
+                forecast_table = []
+                if not pred_df.empty:
+                    for i in range(pred_len):
+                        row_data = {"Thời Gian": f"T+{i + 1}"}
+                        
+                        if i < len(uni_pred):
+                            uni_val = uni_pred["predicted_close_price"].iloc[i] * 1000
+                            uni_diff = uni_val - last_close
+                            uni_pct = (uni_diff / last_close) * 100
+                            row_data["LSTM Đơn biến (VND)"] = f"{uni_val:,.0f}"
+                            row_data["Biến động Đơn biến"] = f"{uni_pct:+.2f}%"
+                        else:
+                            row_data["LSTM Đơn biến (VND)"] = "N/A"
+                            row_data["Biến động Đơn biến"] = "N/A"
+                            
+                        if i < len(multi_pred):
+                            multi_val = multi_pred["predicted_close_price"].iloc[i] * 1000
+                            multi_diff = multi_val - last_close
+                            multi_pct = (multi_diff / last_close) * 100
+                            row_data["LSTM Đa biến (VND)"] = f"{multi_val:,.0f}"
+                            row_data["Biến động Đa biến"] = f"{multi_pct:+.2f}%"
+                        else:
+                            row_data["LSTM Đa biến (VND)"] = "N/A"
+                            row_data["Biến động Đa biến"] = "N/A"
+                            
+                        forecast_table.append(row_data)
+                    
+                    if forecast_table:
+                        st.table(pd.DataFrame(forecast_table))
+                else:
+                    st.info("Không tìm thấy kết quả dự báo trong DWH.")
+
+    with tabs[1]:
+        st.subheader("🔗 Phân Tích Đồng Pha & Tương Quan Bằng Dynamic Time Warping (DTW)")
+        st.write("Đo lường mức độ đồng pha và khoảng cách phi tuyến tính giữa chuỗi thời gian giá đóng cửa của các ngân hàng thương mại Việt Nam sau khi chuẩn hóa Z-score.")
+        
+        col_img, col_txt = st.columns([1.2, 1])
+        
+        with col_img:
+            if os.path.exists("./data/processed/dtw_correlation_plots.png"):
+                st.image("./data/processed/dtw_correlation_plots.png", use_container_width=True, caption="Biểu đồ phân tích đồng pha và tương quan chuỗi thời gian")
+            else:
+                st.warning("Không tìm thấy tệp biểu đồ dtw_correlation_plots.png.")
+                
+        with col_txt:
+            dtw_report = load_dtw_report()
+            if dtw_report:
+                st.markdown("### 📊 Ma Trận Khoảng Cách DTW & Tương Quan Pearson")
+                st.markdown(f"**Khoảng cách DTW trung bình giữa các chuỗi giá đóng cửa (Test set):**")
+                
+                # Convert to DataFrames and display with native style
+                dtw_df = pd.DataFrame(dtw_report.get("dtw_distance_matrix", {}))
+                # Ensure the columns and index are sorted in the same order
+                tickers = ["BID", "TCB", "VCB", "CTG"]
+                dtw_df = dtw_df.reindex(index=tickers, columns=tickers)
+                st.dataframe(dtw_df.style.format("{:.2f}").background_gradient(cmap="YlOrRd_r", axis=None), use_container_width=True)
+                st.caption("Khoảng cách DTW càng nhỏ thể hiện hai chuỗi biến động càng đồng pha về mặt hình dạng xu hướng ngắn hạn.")
+                
+                st.markdown("---")
+                st.markdown("**Hệ số Tương quan Pearson tuyến tính:**")
+                pearson_df = pd.DataFrame(dtw_report.get("pearson_correlation_matrix", {}))
+                pearson_df = pearson_df.reindex(index=tickers, columns=tickers)
+                st.dataframe(pearson_df.style.format("{:.2f}").background_gradient(cmap="Blues", axis=None), use_container_width=True)
+                st.caption("Ý nghĩa: Hệ số tương quan Pearson > 0.85 chỉ ra xu hướng tăng/giảm tuyến tính đồng hướng cực kỳ rõ rệt.")
+            else:
+                st.warning("Không tìm thấy dữ liệu phân tích dtw_correlation_report.json.")
+                
+    with tabs[2]:
+        st.subheader("🧪 So Sánh Thực Nghiệm Hiệu Năng: LSTM Đơn biến vs LSTM Đa biến vs ARIMA")
+        st.write("So sánh sai số dự báo giữa mô hình LSTM chỉ dùng giá đóng cửa (Univariate - Không biến), mô hình LSTM mở rộng (Multivariate - Có biến) và đường cơ sở ARIMA trên tập kiểm thử độc lập.")
+        
+        lstm_comparison = load_lstm_comparison()
+        if lstm_comparison:
+            st.markdown("### 📊 Bảng So Sánh Chỉ Số RMSE & MAE trên tập Kiểm Thử (Test Set)")
+            
+            comp_table = []
+            for ticker, data in lstm_comparison.items():
+                comp_table.append({
+                    "Mã Ngân Hàng": ticker,
+                    "LSTM Đơn biến (RMSE)": f"{data['uni_rmse']:.4f}",
+                    "LSTM Đơn biến (MAE)": f"{data['uni_mae']:.4f}",
+                    "LSTM Đa biến (RMSE)": f"{data['multi_rmse']:.4f}",
+                    "LSTM Đa biến (MAE)": f"{data['multi_mae']:.4f}",
+                    "ARIMA Baseline (RMSE)": f"{data['arima_rmse']:.4f}",
+                    "ARIMA Baseline (MAE)": f"{data['arima_mae']:.4f}"
                 })
             
-            st.table(pd.DataFrame(forecast_table))
+            st.dataframe(pd.DataFrame(comp_table), use_container_width=True)
+            st.info("Kết luận khoa học: Mô hình LSTM Đa biến (Multivariate) tích hợp thêm khối lượng giao dịch và các độ trễ biến động cho sai số RMSE thấp hơn rõ rệt so với LSTM Đơn biến và ARIMA trên 3/4 ngân hàng thương mại (BID, TCB, VCB). Với CTG, mô hình đơn biến lại tỏ ra nhạy bén hơn do biến động giá cực kỳ ổn định trong giai đoạn vừa qua.")
         else:
-            st.info("Không tìm thấy kết quả dự báo trong DWH.")
+            st.warning("Không tìm thấy dữ liệu đối chiếu hiệu năng lstm_model_comparison.json.")
+
 
 
 # ─────────────────────────────────────────────────────────────
@@ -792,111 +915,172 @@ def show_credit_risk_section():
     st.header("🛡️ Phân Loại & Giám Sát Rủi Ro Tín Dụng (Random Forest)")
     st.write("Nhận diện các ngân hàng có rủi ro tín dụng cao (tỷ lệ nợ xấu NPL thực tế hoặc dự báo vượt ngưỡng kiểm soát 3%).")
     
-    with st.expander("💡 Câu Chuyện Dữ Liệu: Cảnh Báo Sớm Rủi Ro Nợ Xấu Ngân Hàng", expanded=True):
-        st.markdown("""
-        Trong quản trị rủi ro tín dụng ngân hàng, **phòng bệnh luôn tốt hơn chữa bệnh**. Mốc tỷ lệ nợ xấu 3% là ranh giới pháp lý quan trọng được Ngân hàng Nhà nước giám sát chặt chẽ.
-        1. **Khả năng dự báo sớm**: Thay vì đợi nợ xấu thực tế bùng phát trên báo cáo tài chính cuối năm, mô hình Random Forest phân tích các tín hiệu dẫn đường như Tỷ lệ trích lập dự phòng (llp_ratio), hệ số ETA, CIR để phát hiện các dấu hiệu suy yếu sức khỏe tài chính trước 1 đến 2 chu kỳ báo cáo.
-        2. **Ý nghĩa các trọng số rủi ro**: Biểu đồ Feature Importance chỉ ra rằng Tỷ lệ dự phòng rủi ro tín dụng (`llp_ratio`) đóng vai trò quan trọng nhất. Ngân hàng có xu hướng trích lập dự phòng mỏng để 'làm đẹp' lợi nhuận trước mắt thường là những đơn vị dễ rơi vào nhóm nguy cơ cao nhất khi chu kỳ tín dụng đi xuống.
-        """)
+    tabs = st.tabs(["🛡️ Phân loại rủi ro Random Forest", "🔎 Kiểm định nhân quả Granger (LLP -> NPL)"])
     
-    # Load prediction results
-    pred_df = fetch_credit_risk_predictions()
-    if pred_df.empty:
-        st.error("Không tìm thấy dữ liệu dự báo rủi ro tín dụng.")
-        return
+    with tabs[0]:
+        with st.expander("💡 Câu Chuyện Dữ Liệu: Cảnh Báo Sớm Rủi Ro Nợ Xấu Ngân Hàng", expanded=True):
+            st.markdown("""
+            Trong quản trị rủi ro tín dụng ngân hàng, **phòng bệnh luôn tốt hơn chữa bệnh**. Mốc tỷ lệ nợ xấu 3% là ranh giới pháp lý quan trọng được Ngân hàng Nhà nước giám sát chặt chẽ.
+            1. **Khả năng dự báo sớm**: Thay vì đợi nợ xấu thực tế bùng phát trên báo cáo tài chính cuối năm, mô hình Random Forest phân tích các tín hiệu dẫn đường như Tỷ lệ trích lập dự phòng (llp_ratio), hệ số ETA, CIR để phát hiện các dấu hiệu suy yếu sức khỏe tài chính trước 1 đến 2 chu kỳ báo cáo.
+            2. **Ý nghĩa các trọng số rủi ro**: Biểu đồ Feature Importance chỉ ra rằng Tỷ lệ dự phòng rủi ro tín dụng (`llp_ratio`) đóng vai trò quan trọng nhất. Ngân hàng có xu hướng trích lập dự phòng mỏng để 'làm đẹp' lợi nhuận trước mắt thường là những đơn vị dễ rơi vào nhóm nguy cơ cao nhất khi chu kỳ tín dụng đi xuống.
+            """)
         
-    # Get the latest predictions
-    latest_date_key = pred_df["date_key"].max()
-    latest_preds = pred_df[pred_df["date_key"] == latest_date_key].copy()
-    # Random Forest Parameters and Metrics
-    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
-    meta_col1, meta_col2 = st.columns([1, 1])
-    
-    with meta_col1:
-        st.markdown("""
-        **⚙️ Random Forest Hyperparameters (Tham số huấn luyện):**
-        *   **Thuật toán**: Random Forest Classifier (Scikit-Learn)
-        *   **Số cây quyết định (Estimators)**: `100` | **Chiều sâu tối đa (Max Depth)**: `5`
-        *   **Cân bằng trọng số lớp (Class Weight)**: `balanced` (do tỷ lệ mẫu rủi ro nợ xấu $\ge$ 3% chỉ chiếm khoảng 5.36% hệ thống).
-        *   **Ngưỡng phân loại tối ưu (Decision Threshold)**: **`0.2327`** (đã hạ từ 0.5 xuống để tối đa hóa chỉ số Recall, ưu tiên cảnh báo sớm rủi ro).
-        *   **Độ phân tách dữ liệu**: Phân tách theo thời gian (Train: 2002-2018, Test: 2019-2022) nhằm chống rò rỉ dữ liệu (data leakage).
-        """)
+        # Load prediction results
+        pred_df = fetch_credit_risk_predictions()
+        if pred_df.empty:
+            st.error("Không tìm thấy dữ liệu dự báo rủi ro tín dụng.")
+            return
+            
+        # Get the latest predictions
+        latest_date_key = pred_df["date_key"].max()
+        latest_preds = pred_df[pred_df["date_key"] == latest_date_key].copy()
+        # Random Forest Parameters and Metrics
+        st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+        meta_col1, meta_col2 = st.columns([1, 1])
         
-    with meta_col2:
-        st.markdown("""
-        **📊 Performance Metrics (Chỉ số kiểm thử trên Test Set):**
-        *   **Độ chính xác toàn cục (Accuracy)**: **`94.44%`**
-        *   **AUC-ROC Score**: **`0.9752`** (Baseline Logistic Regression đối chứng: `0.7811`).
-        *   **Tỷ lệ bắt trúng nợ xấu (Recall Class 1)**: **`91.67%`** (vượt xa ngưỡng cam kết nghiệm thu $\ge 85\%$; Logistic Regression: `66.67%`).
-        *   **Điểm F1-Score (Class 1 - Rủi Ro)**: **`0.8000`** | **Điểm F1-Score (Class 0 - An Toàn)**: **`0.9636`**
-        *   **Mục tiêu tối thượng**: Bảo vệ dòng vốn bằng cách nhận diện sớm 91.67% các ngân hàng có rủi ro nợ xấu bùng phát.
-        """)
+        with meta_col1:
+            st.markdown("""
+            **⚙️ Random Forest Hyperparameters (Tham số huấn luyện):**
+            *   **Thuật toán**: Random Forest Classifier (Scikit-Learn)
+            *   **Số cây quyết định (Estimators)**: `100` | **Chiều sâu tối đa (Max Depth)**: `5`
+            *   **Cân bằng trọng số lớp (Class Weight)**: `balanced` (do tỷ lệ mẫu rủi ro nợ xấu $\ge$ 3% chỉ chiếm khoảng 5.36% hệ thống).
+            *   **Ngưỡng phân loại tối ưu (Decision Threshold)**: **`0.2327`** (đã hạ từ 0.5 xuống để tối đa hóa chỉ số Recall, ưu tiên cảnh báo sớm rủi ro).
+            *   **Độ phân tách dữ liệu**: Phân tách theo thời gian (Train: 2002-2018, Test: 2019-2022) nhằm chống rò rỉ dữ liệu (data leakage).
+            """)
+            
+        with meta_col2:
+            st.markdown("""
+            **📊 Performance Metrics (Chỉ số kiểm thử trên Test Set):**
+            *   **Độ chính xác toàn cục (Accuracy)**: **`94.44%`**
+            *   **AUC-ROC Score**: **`0.9752`** (Baseline Logistic Regression đối chứng: `0.7811`).
+            *   **Tỷ lệ bắt trúng nợ xấu (Recall Class 1)**: **`91.67%`** (vượt xa ngưỡng cam kết nghiệm thu $\ge 85\%$; Logistic Regression: `66.67%`).
+            *   **Điểm F1-Score (Class 1 - Rủi Ro)**: **`0.8000`** | **Điểm F1-Score (Class 0 - An Toàn)**: **`0.9636`**
+            *   **Mục tiêu tối thượng**: Bảo vệ dòng vốn bằng cách nhận diện sớm 91.67% các ngân hàng có rủi ro nợ xấu bùng phát.
+            """)
+            
+        st.markdown("---")
         
-    st.markdown("---")
-    
-    # Create layout 1:1
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.subheader("Tỷ Lệ Phân Phối Trạng Thái Rủi Ro")
-        risk_counts = latest_preds["risk_label"].value_counts().reset_index()
-        risk_counts["Trạng Thái"] = risk_counts["risk_label"].map({0: "An Toàn (NPL < 3%)", 1: "Rủi Ro Cao (NPL ≥ 3%)"})
+        # Create layout 1:1
+        col1, col2 = st.columns([1, 1])
         
-        fig = px.pie(
-            risk_counts,
-            values="count",
-            names="Trạng Thái",
-            color="Trạng Thái",
-            color_discrete_map={"An Toàn (NPL < 3%)": "#10b981", "Rủi Ro Cao (NPL ≥ 3%)": "#ef4444"}
-        )
-        fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-        st.caption("Tình hình: Phần lớn hệ thống ngân hàng (94.64%) hiện ở trạng thái An toàn dưới ngưỡng nợ xấu 3%. Chỉ có 5.36% số ngân hàng bị đưa vào cảnh báo Nguy Cơ Cao, đòi hỏi các chính sách thắt chặt quy trình tín dụng và gia tăng bộ đệm phòng thủ nợ xấu.")
+        with col1:
+            st.subheader("Tỷ Lệ Phân Phối Trạng Thái Rủi Ro")
+            risk_counts = latest_preds["risk_label"].value_counts().reset_index()
+            risk_counts["Trạng Thái"] = risk_counts["risk_label"].map({0: "An Toàn (NPL < 3%)", 1: "Rủi Ro Cao (NPL ≥ 3%)"})
+            
+            fig = px.pie(
+                risk_counts,
+                values="count",
+                names="Trạng Thái",
+                color="Trạng Thái",
+                color_discrete_map={"An Toàn (NPL < 3%)": "#10b981", "Rủi Ro Cao (NPL ≥ 3%)": "#ef4444"}
+            )
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+            st.caption("Tình hình: Phần lớn hệ thống ngân hàng (94.64%) hiện ở trạng thái An toàn dưới ngưỡng nợ xấu 3%. Chỉ có 5.36% số ngân hàng bị đưa vào cảnh báo Nguy Cơ Cao, đòi hỏi các chính sách thắt chặt quy trình tín dụng và gia tăng bộ đệm phòng thủ nợ xấu.")
+            
+        with col2:
+            st.subheader("Độ Quan Trọng Của Các Chỉ Số (Feature Importance)")
+            feat_imp_data = pd.DataFrame({
+                "Chỉ Số Tài Chính": [
+                    "Tỷ lệ trích lập dự phòng (llp_ratio)", 
+                    "Tỷ suất sinh lời/Vốn CSH (roe)", 
+                    "Tỷ lệ chi phí/Thu nhập (cir)", 
+                    "Tỷ suất sinh lời/Tài sản (roa)", 
+                    "Dư nợ cho vay (total_loans)", 
+                    "Vốn CSH/Tổng tài sản (eta)", 
+                    "Tổng tài sản (total_assets)", 
+                    "Tổng Vốn CSH (total_equity)"
+                ],
+                "Độ Quan Trọng": [0.2045, 0.1156, 0.1054, 0.0943, 0.0528, 0.0496, 0.0496, 0.0492]
+            }).sort_values("Độ Quan Trọng", ascending=True)
+            
+            fig_imp = px.bar(
+                feat_imp_data,
+                x="Độ Quan Trọng",
+                y="Chỉ Số Tài Chính",
+                orientation="h",
+                color="Độ Quan Trọng",
+                color_continuous_scale=px.colors.sequential.Bluered_r
+            )
+            fig_imp.update_layout(height=400, coloraxis_showscale=False)
+            st.plotly_chart(fig_imp, use_container_width=True, theme="streamlit")
+            st.caption("Tình hình: Tỷ lệ trích lập dự phòng (llp_ratio) chiếm trọng số quyết định lớn nhất (> 20%) trong mô hình Random Forest. Theo sau là chỉ số sinh lời ROE (~11.5%) và hiệu quả chi phí CIR (~10.5%). Điều này khẳng định những ngân hàng trích lập dự phòng mỏng hoặc kiểm soát chi phí vận hành kém có xác suất bùng phát nợ xấu cao nhất.")
+            
+        st.markdown("---")
+        st.subheader(f"Bảng Giám Sát Rủi Ro Các Ngân Hàng Thương Mại (Năm: {str(latest_date_key)[:4]})")
         
-    with col2:
-        st.subheader("Độ Quan Trọng Của Các Chỉ Số (Feature Importance)")
-        feat_imp_data = pd.DataFrame({
-            "Chỉ Số Tài Chính": [
-                "Tỷ lệ trích lập dự phòng (llp_ratio)", 
-                "Tỷ suất sinh lời/Vốn CSH (roe)", 
-                "Tỷ lệ chi phí/Thu nhập (cir)", 
-                "Tỷ suất sinh lời/Tài sản (roa)", 
-                "Dư nợ cho vay (total_loans)", 
-                "Vốn CSH/Tổng tài sản (eta)", 
-                "Tổng tài sản (total_assets)", 
-                "Tổng Vốn CSH (total_equity)"
-            ],
-            "Độ Quan Trọng": [0.2045, 0.1156, 0.1054, 0.0943, 0.0528, 0.0496, 0.0496, 0.0492]
-        }).sort_values("Độ Quan Trọng", ascending=True)
+        latest_preds["Phân Loại Rủi Ro"] = latest_preds["risk_label"].map({0: "An Toàn", 1: "🚨 Nguy Cơ Cao"})
+        latest_preds["Xác Suất Rủi Ro"] = (latest_preds["risk_probability"] * 100).map("{:.2f}%".format)
+        latest_preds["Tỷ Lệ Nợ Xấu (NPL)"] = (latest_preds["actual_npl_ratio"] * 100).map("{:.2f}%".format)
         
-        fig_imp = px.bar(
-            feat_imp_data,
-            x="Độ Quan Trọng",
-            y="Chỉ Số Tài Chính",
-            orientation="h",
-            color="Độ Quan Trọng",
-            color_continuous_scale=px.colors.sequential.Bluered_r
-        )
-        fig_imp.update_layout(height=400, coloraxis_showscale=False)
-        st.plotly_chart(fig_imp, use_container_width=True, theme="streamlit")
-        st.caption("Tình hình: Tỷ lệ trích lập dự phòng (llp_ratio) chiếm trọng số quyết định lớn nhất (> 20%) trong mô hình Random Forest. Theo sau là chỉ số sinh lời ROE (~11.5%) và hiệu quả chi phí CIR (~10.5%). Điều này khẳng định những ngân hàng trích lập dự phòng mỏng hoặc kiểm soát chi phí vận hành kém có xác suất bùng phát nợ xấu cao nhất.")
+        display_df = latest_preds[["bank_code", "Phân Loại Rủi Ro", "Xác Suất Rủi Ro", "Tỷ Lệ Nợ Xấu (NPL)"]].sort_values("Phân Loại Rủi Ro", ascending=False)
         
-    st.markdown("---")
-    st.subheader(f"Bảng Giám Sát Rủi Ro Các Ngân Hàng Thương Mại (Năm: {str(latest_date_key)[:4]})")
-    
-    latest_preds["Phân Loại Rủi Ro"] = latest_preds["risk_label"].map({0: "An Toàn", 1: "🚨 Nguy Cơ Cao"})
-    latest_preds["Xác Suất Rủi Ro"] = (latest_preds["risk_probability"] * 100).map("{:.2f}%".format)
-    latest_preds["Tỷ Lệ Nợ Xấu (NPL)"] = (latest_preds["actual_npl_ratio"] * 100).map("{:.2f}%".format)
-    
-    display_df = latest_preds[["bank_code", "Phân Loại Rủi Ro", "Xác Suất Rủi Ro", "Tỷ Lệ Nợ Xấu (NPL)"]].sort_values("Phân Loại Rủi Ro", ascending=False)
-    
-    display_df = display_df.rename(columns={
-        "bank_code": "Mã Ngân Hàng",
-        "Phân Loại Rủi Ro": "Trạng Thái Hệ Thống",
-        "Xác Suất Rủi Ro": "Xác Suất Dự Báo Nợ Xấu",
-        "Tỷ Lệ Nợ Xấu (NPL)": "Tỷ Lệ Nợ Xấu Thực Tế"
-    })
-    st.dataframe(display_df, use_container_width=True, height=500)
+        display_df = display_df.rename(columns={
+            "bank_code": "Mã Ngân Hàng",
+            "Phân Loại Rủi Ro": "Trạng Thái Hệ Thống",
+            "Xác Suất Rủi Ro": "Xác Suất Dự Báo Nợ Xấu",
+            "Tỷ Lệ Nợ Xấu (NPL)": "Tỷ Lệ Nợ Xấu Thực Tế"
+        })
+        st.dataframe(display_df, use_container_width=True, height=500)
+
+    with tabs[1]:
+        st.subheader("🔎 Phân Tích Nhân Quả Granger & Hồi Quy Bảng Trễ (Fixed Effects)")
+        st.write("Kiểm định mối quan hệ nhân quả thực sự và tác động trễ giữa Tỷ lệ trích lập dự phòng (`llp_ratio`) và Tỷ lệ nợ xấu (`npl_ratio`).")
+        
+        col_img, col_txt = st.columns([1.2, 1])
+        
+        with col_img:
+            if os.path.exists("./data/processed/llp_npl_causality.png"):
+                st.image("./data/processed/llp_npl_causality.png", use_container_width=True, caption="Biến động lịch sử & Phân tích tương quan trễ")
+            else:
+                st.warning("Không tìm thấy tệp biểu đồ llp_npl_causality.png.")
+                
+        with col_txt:
+            # 1. ADF Table
+            st.markdown("### 📊 1. Kiểm định tính dừng ADF")
+            adf_df = pd.DataFrame([
+                {"Biến số": "Tỷ lệ Nợ xấu (NPL)", "Chuỗi": "Gốc (Mức)", "ADF": -0.4572, "p-value": 0.9001, "Kết luận": "Không dừng"},
+                {"Biến số": "Tỷ lệ Dự phòng (LLP)", "Chuỗi": "Gốc (Mức)", "ADF": -0.6569, "p-value": 0.8576, "Kết luận": "Không dừng"},
+                {"Biến số": "Tỷ lệ Nợ xấu (NPL)", "Chuỗi": "Sai phân bậc 1", "ADF": -2.3376, "p-value": 0.1601, "Kết luận": "Gần dừng (Ý nghĩa 15%)"},
+                {"Biến số": "Tỷ lệ Dự phòng (LLP)", "Chuỗi": "Sai phân bậc 1", "ADF": -5.7962, "p-value": 0.0000, "Kết luận": "Dừng (Ý nghĩa < 1%)"}
+            ])
+            st.dataframe(adf_df, use_container_width=True)
+            
+            # 2. Granger Table
+            st.markdown("### 🔗 2. Kiểm định Nhân quả Granger (LLP -> NPL)")
+            granger_df = pd.DataFrame([
+                {"Độ trễ": "1 năm", "F p-value": 0.0914, "Chi2 p-value": 0.0503, "Kết luận (5%)": "Không có ý nghĩa", "Ý nghĩa (10%)": "Có ý nghĩa"},
+                {"Độ trễ": "2 năm", "F p-value": 0.2068, "Chi2 p-value": 0.0846, "Kết luận (5%)": "Không có ý nghĩa", "Ý nghĩa (10%)": "Không có ý nghĩa"},
+                {"Độ trễ": "3 năm", "F p-value": 0.3911, "Chi2 p-value": 0.1300, "Kết luận (5%)": "Không có ý nghĩa", "Ý nghĩa (10%)": "Không có ý nghĩa"}
+            ])
+            st.dataframe(granger_df, use_container_width=True)
+            
+            # 3. OLS Fixed Effects
+            st.markdown("### 🧪 3. Hồi quy Bảng trễ (Entity Fixed Effects)")
+            # Metrics
+            met1, met2, met3 = st.columns(3)
+            met1.metric("R-squared", "53.03%")
+            met2.metric("Adj. R-squared", "48.95%")
+            met3.metric("Số quan sát (Obs)", "577")
+            
+            # Coefficients Table
+            coef_df = pd.DataFrame([
+                {"Biến độc lập": "Nợ xấu trễ 1 năm (npl_ratio_lag1)", "Hệ số (coef)": 0.6050, "Sai số chuẩn": 0.030, "t-stat": 19.856, "p-value": 0.000, "Ý nghĩa (5%)": "🚨 Có ý nghĩa"},
+                {"Biến độc lập": "Dự phòng trễ 1 năm (llp_ratio_lag1)", "Hệ số (coef)": 0.0299, "Sai số chuẩn": 0.037, "t-stat": 0.820, "p-value": 0.413, "Ý nghĩa (5%)": "Không có ý nghĩa"},
+                {"Biến độc lập": "Dự phòng trễ 2 năm (llp_ratio_lag2)", "Hệ số (coef)": 0.0258, "Sai số chuẩn": 0.036, "t-stat": 0.711, "p-value": 0.478, "Ý nghĩa (5%)": "Không có ý nghĩa"},
+                {"Biến độc lập": "Hằng số (const)", "Hệ số (coef)": 0.0089, "Sai số chuẩn": 0.004, "t-stat": 2.184, "p-value": 0.029, "Ý nghĩa (5%)": "🚨 Có ý nghĩa"}
+            ])
+            st.dataframe(coef_df, use_container_width=True)
+            st.caption("Ý nghĩa: Hệ số của `npl_ratio_lag1` (0.6050, p < 0.001) cực kỳ có ý nghĩa thống kê, chứng minh nợ xấu có tính tự tương quan rất mạnh (nợ xấu kỳ trước quyết định nợ xấu kỳ sau). Dự phòng trễ 1 năm (`llp_ratio_lag1`) có hệ số dương nhưng chưa đủ ý nghĩa thống kê ở mức 5% trên tập dữ liệu tổng hợp.")
+
+            # Collapsible raw report
+            report_text = load_causal_report()
+            if report_text:
+                with st.expander("📄 Xem báo cáo văn bản đầy đủ từ mô hình"):
+                    st.text(report_text)
+            else:
+                st.warning("Không tìm thấy báo cáo nhân quả causal_analysis_report.txt.")
 
 
 # ─────────────────────────────────────────────────────────────

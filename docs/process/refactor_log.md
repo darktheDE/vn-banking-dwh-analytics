@@ -57,7 +57,7 @@ Chúng tôi đã khởi chạy tuần tự các lệnh để kiểm thử luồn
 ## Ngày 08 tháng 07 năm 2026: Triển khai Giai đoạn 2 — Nâng cấp mô hình Học máy & Kiểm định học thuật
 
 ### 1. Mục tiêu và Nội dung thay đổi
-*   **Mục tiêu**: Thực hiện các yêu cầu kiểm định định lượng của hội đồng: Kiểm định nhân quả Granger cho cặp biến `llp_ratio` -> `npl_ratio` (Q3); So sánh chuỗi giá của 4 ngân hàng bằng thuật toán Dynamic Time Warping (DTW) và tương quan lăn (Q2); So sánh thực nghiệm hiệu năng giữa LSTM Đơn biến (giá đóng cửa) và LSTM Đa biến (giá + khối lượng + biến động) cho cả 4 ngân hàng (Q1 mới) sử dụng 100% dữ liệu thực tế sạch.
+*   **Mục tiêu**: Thực hiện các yêu cầu kiểm định định lượng của hội đồng: Kiểm định nhân quả Granger cho cặp biến `llp_ratio` -> `npl_ratio` (Q3); So sánh chuỗi giá của 4 ngân hàng bằng thuật toán Dynamic Time Warping (DTW) và tương quan lăn (Q2); So sánh thực nghiệm hiệu năng giữa LSTM Đơn biến (giá đóng cửa) và LSTM Đa biến (giá + khối lượng + biến động) cho cả 4 ngân hàng (giải quyết Q1 thực nghiệm trên chuỗi giá đóng cửa và khối lượng giao dịch OHLCV do hạn chế dữ liệu giao dịch tự doanh/khối ngoại từ thư viện nguồn) sử dụng 100% dữ liệu thực tế sạch.
 *   **Hành động**:
     *   Tạo script [causal_analysis_llp.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/causal_analysis_llp.py) để chạy ADF test, Granger Causality và hồi quy bảng trễ Fixed Effects.
     *   Tạo script [dtw_analysis.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/dtw_analysis.py) để tính khoảng cách DTW và ma trận tương quan Pearson/tương quan lăn.
@@ -99,7 +99,32 @@ Chúng tôi đã khởi chạy tuần tự các lệnh để kiểm thử luồn
 
 ---
 
-## Kế hoạch cho Giai đoạn tiếp theo (Giai đoạn 3)
-1.  **Cập nhật Streamlit Dashboard**: Tích hợp các biểu đồ trực quan hóa kết quả phân tích thống kê và học máy mới: Biểu đồ biến động giá và DTW, ma trận tương quan Pearson, tương quan lăn 60 phiên, so sánh LSTM vs ARIMA/Univariate, kết quả kiểm định Granger và Hồi quy.
-2.  **Cập nhật tài liệu thiết kế Dashboard** trong `dashboard-spec.md`.
+## Ngày 08 tháng 07 năm 2026: Triển khai Giai đoạn 3 & 4 — Nâng cấp Dashboard, Hoàn thiện Báo cáo & Tài liệu kiến trúc
+
+### 1. Nội dung hoàn thành Giai đoạn 3 (UI & Streamlit Dashboard)
+*   **Cập nhật Streamlit Dashboard (`src/dashboard/app.py`)**:
+    *   Tái cấu trúc giao diện **Dự Báo Giá Cổ Phiếu (LSTM)** thành 3 Tab chuyên sâu:
+        - *Tab 1 (Dự báo LSTM Đơn biến vs Đa biến)*: Trực quan hóa giá thực tế vs dự báo của cả hai cấu hình LSTM (Đơn biến và Đa biến) đồng thời trên cùng đồ thị.
+        - *Tab 2 (Tương quan & Đồng pha)*: Hiển thị ma trận khoảng cách DTW và ma trận Pearson trên Z-score giá đóng cửa của BID, TCB, VCB, CTG kèm biểu đồ đồng pha.
+        - *Tab 3 (So sánh Đơn biến vs Đa biến)*: Bảng đối chiếu so sánh trực tiếp RMSE và MAE của mô hình LSTM Univariate và Multivariate đối chứng với baseline ARIMA.
+    *   Tái cấu trúc giao diện **Phân Loại Rủi Ro Tín Dụng (Random Forest)** thành 2 Tab:
+        - *Tab 1 (Phân loại rủi ro)*: Cảnh báo sớm nợ xấu, bảng giám sát 39 ngân hàng thương mại cập nhật xác suất dự báo.
+        - *Tab 2 (Kiểm định nhân quả)*: Hiển thị kết quả ADF test, Granger Causality và hồi quy Fixed Effects, cùng với biểu đồ nhân quả trễ.
+*   **Cập nhật tài liệu thiết kế Dashboard (`docs/dashboard-spec.md`)**:
+    *   Bổ sung Mục 6 định nghĩa chi tiết kiến trúc, cấu phần và các Tab của Streamlit dashboard.
+
+### 2. Nội dung hoàn thành Giai đoạn 4 (Tài liệu & Nghiệm thu)
+*   **Cập nhật Báo cáo Kết quả (`RESULT.md`)**:
+    *   Cập nhật bảng thống kê RMSE mới nhất cho cả 4 ngân hàng.
+    *   Làm rõ kết quả so sánh LSTM Đơn biến vs Đa biến: Mô hình Đa biến cho hiệu năng tối ưu trên phần lớn các ngân hàng, chứng minh tính ưu việt của việc tích hợp thanh khoản và động lượng.
+*   **Cập nhật Tài liệu Kiến trúc (`docs/system-arch.md` và `docs/project-overview.md`)**:
+    *   Giải thích rõ ràng việc lược bỏ tích hợp Supabase OLTP để tập trung tối đa cho Kimball Star Schema DWH trên BigQuery và loại bỏ dữ liệu giả lập.
+    *   Cập nhật cấu hình Star Schema rút gọn từ 10 bảng xuống 7 bảng thực tế.
+*   **Kiểm thử toàn vẹn DWH**: Chạy script `validate_integrity.py` đạt kết quả tuyệt đối **0 lỗi (TOTAL ERRORS FOUND: 0)**.
+
+### 3. Nghiệm thu toàn diện hệ thống
+*   Hệ thống luồng dữ liệu batch ETL chạy ổn định, nạp dữ liệu sạch 100% từ Excel lên BigQuery DWH.
+*   Các mô hình Machine Learning được huấn luyện tự động dựa trên dữ liệu lấy từ BigQuery và flush kết quả ngược lại DWH thành công.
+*   Streamlit app tải dữ liệu tức thời (< 3 giây), hiển thị trực quan các kết quả kiểm định thống kê Granger, phân tích DTW và dự báo chuỗi thời gian một cách khoa học.
+
 

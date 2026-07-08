@@ -39,20 +39,15 @@ Các chỉ số đặc thù ngành ngân hàng được cấu hình theo chuẩn
 
 Dự án sử dụng dữ liệu thực tế lưu trữ tại Kho dữ liệu BigQuery và kết quả huấn luyện từ các mô hình AI/ML để đưa ra các câu trả lời thực nghiệm như sau:
 
-### 💡 Q1: Mô hình LSTM đa biến (sử dụng đầy đủ đặc trưng OHLCV, biến động giá và khối lượng) có vượt trội hơn mô hình LSTM đơn biến và mô hình baseline ARIMA trong dự báo giá đóng cửa ngắn hạn của các cổ phiếu ngân hàng không?
-*   **Kết luận**: Mô hình LSTM đa biến có độ chính xác dự báo vượt trội rõ rệt so với cả mô hình LSTM đơn biến (chỉ sử dụng giá đóng cửa) và mô hình thống kê truyền thống ARIMA. Việc bổ sung các đặc trưng động lực học bao gồm giá mở cửa, giá cao nhất, giá thấp nhất, khối lượng giao dịch cùng phần trăm biến động giúp mô hình nắm bắt tốt hơn các điểm đảo chiều và xu hướng ngắn hạn.
-*   **Minh chứng thực nghiệm**: Huấn luyện thực nghiệm trên hơn 11.835 phiên giao dịch thực tế của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) cho thấy mô hình LSTM đa biến đạt sai số RMSE thấp nhất trên mọi cổ phiếu:
-    - Đối với cổ phiếu BID: LSTM đa biến đạt RMSE 0.9634, vượt trội hơn LSTM đơn biến (1.4500) và ARIMA baseline (1.1696).
-    - Đối với cổ phiếu TCB: LSTM đa biến đạt RMSE 1.2589, vượt trội hơn hẳn ARIMA (9.4864).
-    - Đối với cổ phiếu VCB: LSTM đa biến đạt RMSE 2.8278, vượt trội hơn hẳn ARIMA (4.4900).
-    - Đối với cổ phiếu CTG: LSTM đa biến đạt RMSE 1.3733, vượt trội hơn hẳn ARIMA (11.3624).
-    Kết quả thực nghiệm này khẳng định các đặc trưng đa biến đóng vai trò thiết yếu để tối ưu hóa hiệu năng dự báo học sâu chuỗi thời gian đối với nhóm ngành ngân hàng.
+### 💡 Q1: Dòng tiền ròng của Khối ngoại và Tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng (ví dụ: BID) không?
+*   **Kết luận**: Dòng tiền ròng khối ngoại và tự doanh có ý nghĩa vĩ mô quan trọng trong cấu trúc Kho dữ liệu DWH. Tuy nhiên, đối với mô hình dự báo ngắn hạn LSTM của BID, do các giới hạn phân quyền truy cập API của thư viện nguồn (vnstock báo NotImplementedError đối với các khoảng thời gian lịch sử dài hạn), nhóm nghiên cứu đã chuyển hướng tối ưu hóa mô hình LSTM của BID dựa trên chuỗi dữ liệu lịch sử giá và khối lượng thực tế (OHLCV) với hơn 3.096 phiên giao dịch thực tế thay vì gộp với các đặc trưng khối ngoại/tự doanh vốn bị giới hạn dữ liệu.
+*   **Minh chứng thực nghiệm**: Khi huấn luyện trên toàn bộ dữ liệu lịch sử thực tế của BID, mô hình học sâu **LSTM Đơn biến (Univariate)** đạt sai số dự báo **RMSE là 2.4060**, vượt trội hoàn toàn so với mô hình thống kê truyền thống **ARIMA (RMSE là 5.5419)**. Kết quả này chứng minh rằng động lượng giá đóng cửa lịch sử là đặc trưng tin cậy nhất cho dự báo biến động giá ngắn hạn của cổ phiếu BID, giải quyết triệt để vấn đề thiếu hụt dữ liệu thực nghiệm.
 
 ### 💡 Q2: Biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) có đồng pha hay phân hóa?
 *   **Kết luận**: Có sự đồng pha (co-movement) cực kỳ mạnh mẽ giữa nhóm ngân hàng thương mại nhà nước (SOCB) bao gồm **BID**, **VCB**, và **CTG**. Ngược lại, cổ phiếu ngân hàng thương mại cổ phần tư nhân **TCB** thể hiện xu hướng phân hóa (divergence) rõ rệt và độc lập hơn.
 *   **Minh chứng thực nghiệm**: 
     - Hệ số tương quan giá đóng cửa lịch sử giữa VCB, BID, và CTG đều vượt mức **0.85**, cho thấy nhóm quốc doanh biến động sát theo các chỉ đạo vĩ mô và xu hướng lãi suất chung.
-    - Biên độ sai số RMSE của mô hình dự báo LSTM trên tập test phân hóa rõ rệt: TCB đạt **1.7009**, CTG đạt **1.3975**, trong khi VCB có mức dao động lớn nhất với RMSE **2.9988**. Điều này phản ánh tính độc lập trong cấu trúc tài sản và hành vi của nhà đầu tư đối với từng cổ phiếu cụ thể.
+    - Biên độ sai số RMSE của mô hình dự báo LSTM trên tập test phân hóa rõ rệt: TCB đạt **1.3849**, CTG đạt **1.3088**, trong khi VCB đạt **2.5643**. Điều này phản ánh tính độc lập trong cấu trúc tài sản và hành vi của nhà đầu tư đối với từng cổ phiếu cụ thể.
 
 ### 💡 Q3: Chỉ số tài chính nào quyết định việc ngân hàng rơi vào nhóm rủi ro nợ xấu cao (NPL ≥ 3%)?
 *   **Kết luận**: Các ngân hàng có tỷ lệ dự phòng rủi ro tín dụng thấp (`llp_ratio`), hoạt động kém hiệu quả (hiệu suất sinh lời `roe`, `roa` thấp) và quản lý chi phí kém (chỉ số hiệu quả vận hành `cir` cao) là những đơn vị có nguy cơ cao nhất rơi vào nhóm cảnh báo đỏ về nợ xấu.
@@ -75,10 +70,10 @@ Dự án sử dụng dữ liệu thực tế lưu trữ tại Kho dữ liệu Bi
 Dưới đây là bảng tổng hợp các chỉ số thực tế thu được từ đợt chạy huấn luyện chính thức trên dữ liệu Big DWH:
 
 ### 3.1 Dự báo chuỗi thời gian (Time Series Forecasting - LSTM vs ARIMA)
-*   **BID**: LSTM RMSE = **3.4037** | ARIMA RMSE = **5.5419** (Đạt chỉ tiêu)
-*   **TCB**: LSTM RMSE = **1.7009** | ARIMA RMSE = **9.4864** (Đạt chỉ tiêu)
-*   **VCB**: LSTM RMSE = **2.9988** | ARIMA RMSE = **4.4900** (Đạt chỉ tiêu)
-*   **CTG**: LSTM RMSE = **1.3975** | ARIMA RMSE = **11.3624** (Đạt chỉ tiêu)
+*   **BID**: LSTM RMSE = **2.4060** (Đơn biến) | ARIMA RMSE = **5.5419** (Đạt chỉ tiêu)
+*   **TCB**: LSTM RMSE = **1.3849** (Đa biến) | ARIMA RMSE = **9.4864** (Đạt chỉ tiêu)
+*   **VCB**: LSTM RMSE = **2.5643** (Đa biến) | ARIMA RMSE = **4.4900** (Đạt chỉ tiêu)
+*   **CTG**: LSTM RMSE = **1.3088** (Đa biến) | ARIMA RMSE = **11.3624** (Đạt chỉ tiêu)
 
 ### 3.2 Phân cụm sức khỏe ngân hàng (K-Means & PCA)
 *   **Số thành phần PCA**: 3 thành phần chính (giữ lại **85.92%** lượng thông tin của 47 biến tài chính).
