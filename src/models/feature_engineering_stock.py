@@ -47,14 +47,14 @@ def query_stock_daily_metrics(client, stock_key: int) -> pd.DataFrame:
 def build_stock_features(stock_key: int = 1) -> pd.DataFrame:
     """Execute the feature engineering pipeline for the given stock key.
 
-    Queries BigQuery, adds derived features, and returns a clean DataFrame ready
-    for LSTM training.
+    Queries BigQuery fact tables, adds derived features,
+    and returns a clean DataFrame ready for LSTM training.
 
     Args:
         stock_key: Stock key (1: BID, 2: TCB, 3: VCB, 4: CTG)
 
     Returns:
-        A DataFrame with stock features.
+        A cleaned and enriched DataFrame with stock features.
     """
     client = get_bigquery_client()
     df = query_stock_daily_metrics(client, stock_key)
@@ -63,10 +63,11 @@ def build_stock_features(stock_key: int = 1) -> pd.DataFrame:
         logger.warning("No daily stock metrics found for stock_key %d.", stock_key)
         return pd.DataFrame()
 
-    # Sort to be absolutely sure of time order
+    # All stocks use standard price history (OHLCV) features to avoid mock data constraints
+    df = df_price.copy()
     df = df.sort_values("date_key").reset_index(drop=True)
 
-    # Add derived features (price change pct and volume change pct)
+    # Add derived features
     df["price_change_pct"] = df["close_price"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
     df["volume_change_pct"] = df["trading_volume"].pct_change().replace([np.inf, -np.inf], 0).fillna(0)
     df = df.dropna().reset_index(drop=True)

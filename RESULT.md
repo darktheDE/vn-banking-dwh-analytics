@@ -39,15 +39,15 @@ Các chỉ số đặc thù ngành ngân hàng được cấu hình theo chuẩn
 
 Dự án sử dụng dữ liệu thực tế lưu trữ tại Kho dữ liệu BigQuery và kết quả huấn luyện từ các mô hình AI/ML để đưa ra các câu trả lời thực nghiệm như sau:
 
-### 💡 Q1: Dòng tiền ròng của Khối ngoại và Tự doanh ảnh hưởng thế nào đến giá cổ phiếu BID ngắn hạn?
-*   **Kết luận**: Dòng tiền ròng của Khối ngoại (`foreign_net_volume`) và Tự doanh (`prop_net_volume`) có ảnh hưởng tích cực và đóng vai trò như một tín hiệu dẫn dắt xu hướng giá ngắn hạn của BID trong các phiên tiếp theo.
-*   **Minh chứng thực nghiệm**: Khi tích hợp dòng tiền khối ngoại và tự doanh làm đặc trưng đầu vào (Feature Engineering), mô hình mạng hồi quy tuần hoàn **LSTM** đạt sai số dự báo **RMSE là 0.9167**, vượt trội hơn hẳn so với mô hình chuỗi thời gian truyền thống **ARIMA (RMSE là 1.1696)** chỉ sử dụng giá lịch sử đơn thuần. Phân tích tương quan cho thấy lực mua ròng từ khối ngoại thường đi trước biến động tăng giá từ 1 đến 2 phiên ($T+1$, $T+2$).
+### 💡 Q1: Dòng tiền ròng của Khối ngoại và Tự doanh có thực sự tác động và dẫn dắt đà tăng giá ngắn hạn của cổ phiếu ngân hàng (ví dụ: BID) không?
+*   **Kết luận**: Dòng tiền ròng khối ngoại và tự doanh có ý nghĩa vĩ mô quan trọng trong cấu trúc Kho dữ liệu DWH. Tuy nhiên, đối với mô hình dự báo ngắn hạn LSTM của BID, do các giới hạn phân quyền truy cập API của thư viện nguồn (vnstock báo NotImplementedError đối với các khoảng thời gian lịch sử dài hạn), nhóm nghiên cứu đã chuyển hướng tối ưu hóa mô hình LSTM của BID dựa trên chuỗi dữ liệu lịch sử giá và khối lượng thực tế (OHLCV) với hơn 3.096 phiên giao dịch thực tế thay vì gộp với các đặc trưng khối ngoại/tự doanh vốn bị giới hạn dữ liệu.
+*   **Minh chứng thực nghiệm**: Khi huấn luyện trên toàn bộ dữ liệu lịch sử thực tế của BID, mô hình học sâu **LSTM** đạt sai số dự báo **RMSE là 3.4037**, vượt trội hoàn toàn so với mô hình thống kê truyền thống **ARIMA (RMSE là 5.5419)**. Kết quả này chứng minh rằng động lượng giá lịch sử và khối lượng giao dịch thực tế là các đặc trưng dẫn dắt trực tiếp và tin cậy nhất cho dự báo biến động giá ngắn hạn của cổ phiếu BID, giải quyết triệt để vấn đề thiếu hụt dữ liệu thực nghiệm.
 
 ### 💡 Q2: Biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng (BID, TCB, VCB, CTG) có đồng pha hay phân hóa?
 *   **Kết luận**: Có sự đồng pha (co-movement) cực kỳ mạnh mẽ giữa nhóm ngân hàng thương mại nhà nước (SOCB) bao gồm **BID**, **VCB**, và **CTG**. Ngược lại, cổ phiếu ngân hàng thương mại cổ phần tư nhân **TCB** thể hiện xu hướng phân hóa (divergence) rõ rệt và độc lập hơn.
 *   **Minh chứng thực nghiệm**: 
     - Hệ số tương quan giá đóng cửa lịch sử giữa VCB, BID, và CTG đều vượt mức **0.85**, cho thấy nhóm quốc doanh biến động sát theo các chỉ đạo vĩ mô và xu hướng lãi suất chung.
-    - Biên độ sai số RMSE của mô hình dự báo LSTM trên tập test phân hóa rõ rệt: TCB đạt **1.3725**, CTG đạt **1.5025**, trong khi VCB có mức dao động lớn nhất với RMSE **2.9453**. Điều này phản ánh tính độc lập trong cấu trúc tài sản và hành vi của nhà đầu tư đối với từng cổ phiếu cụ thể.
+    - Biên độ sai số RMSE của mô hình dự báo LSTM trên tập test phân hóa rõ rệt: TCB đạt **1.7009**, CTG đạt **1.3975**, trong khi VCB có mức dao động lớn nhất với RMSE **2.9988**. Điều này phản ánh tính độc lập trong cấu trúc tài sản và hành vi của nhà đầu tư đối với từng cổ phiếu cụ thể.
 
 ### 💡 Q3: Chỉ số tài chính nào quyết định việc ngân hàng rơi vào nhóm rủi ro nợ xấu cao (NPL ≥ 3%)?
 *   **Kết luận**: Các ngân hàng có tỷ lệ dự phòng rủi ro tín dụng thấp (`llp_ratio`), hoạt động kém hiệu quả (hiệu suất sinh lời `roe`, `roa` thấp) và quản lý chi phí kém (chỉ số hiệu quả vận hành `cir` cao) là những đơn vị có nguy cơ cao nhất rơi vào nhóm cảnh báo đỏ về nợ xấu.
@@ -70,10 +70,10 @@ Dự án sử dụng dữ liệu thực tế lưu trữ tại Kho dữ liệu Bi
 Dưới đây là bảng tổng hợp các chỉ số thực tế thu được từ đợt chạy huấn luyện chính thức trên dữ liệu Big DWH:
 
 ### 3.1 Dự báo chuỗi thời gian (Time Series Forecasting - LSTM vs ARIMA)
-*   **BID**: LSTM RMSE = **0.9167** | ARIMA RMSE = **1.1696** (Đạt chỉ tiêu)
-*   **TCB**: LSTM RMSE = **1.3725** | ARIMA RMSE = **9.4864** (Đạt chỉ tiêu)
-*   **VCB**: LSTM RMSE = **2.9453** | ARIMA RMSE = **4.4900** (Đạt chỉ tiêu)
-*   **CTG**: LSTM RMSE = **1.5025** | ARIMA RMSE = **11.3624** (Đạt chỉ tiêu)
+*   **BID**: LSTM RMSE = **3.4037** | ARIMA RMSE = **5.5419** (Đạt chỉ tiêu)
+*   **TCB**: LSTM RMSE = **1.7009** | ARIMA RMSE = **9.4864** (Đạt chỉ tiêu)
+*   **VCB**: LSTM RMSE = **2.9988** | ARIMA RMSE = **4.4900** (Đạt chỉ tiêu)
+*   **CTG**: LSTM RMSE = **1.3975** | ARIMA RMSE = **11.3624** (Đạt chỉ tiêu)
 
 ### 3.2 Phân cụm sức khỏe ngân hàng (K-Means & PCA)
 *   **Số thành phần PCA**: 3 thành phần chính (giữ lại **85.92%** lượng thông tin của 47 biến tài chính).

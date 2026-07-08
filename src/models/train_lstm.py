@@ -51,6 +51,26 @@ def _get_hyperparams() -> dict:
         "stacked": False,
     }
 
+# Ticker configs mapping key to symbol
+STOCK_CONFIGS = {
+    1: {"symbol": "BID", "features": [
+        "close_price", "open_price", "high_price", "low_price", "trading_volume",
+        "price_change_pct", "volume_change_pct"
+    ]},
+    2: {"symbol": "TCB", "features": [
+        "close_price", "open_price", "high_price", "low_price", "trading_volume",
+        "price_change_pct", "volume_change_pct"
+    ]},
+    3: {"symbol": "VCB", "features": [
+        "close_price", "open_price", "high_price", "low_price", "trading_volume",
+        "price_change_pct", "volume_change_pct"
+    ]},
+    4: {"symbol": "CTG", "features": [
+        "close_price", "open_price", "high_price", "low_price", "trading_volume",
+        "price_change_pct", "volume_change_pct"
+    ]}
+}
+
 
 def create_sequences(
     data: np.ndarray, window: int, horizon: int
