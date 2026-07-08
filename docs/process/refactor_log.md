@@ -153,3 +153,24 @@ Chúng tôi đã khởi chạy tuần tự các lệnh để kiểm thử luồn
 *   **Schema Provisioning**: Đã xóa bảng cũ và chạy lại thành công `provision_schema.py` để cập nhật cấu trúc bảng mới trên BigQuery.
 *   **ETL & Load**: Chạy lại thành công `consolidate_stock_metrics.py` và `load_to_bigquery.py`. Nạp thành công 11.835 dòng dữ liệu chứng khoán đã được tính toán sẵn chỉ số và 667 dòng hiệu năng ngân hàng lên BigQuery DWH.
 *   **Data Quality Validation**: Thực thi `validate_integrity.py` thành công với **`0 lỗi (TOTAL ERRORS FOUND: 0)`**, xác nhận tính toàn vẹn và hợp lệ tuyệt đối của dữ liệu.
+
+---
+
+## Ngày 09 tháng 07 năm 2026: Triển khai Giai đoạn 6 — Refactor Toàn diện Streamlit Dashboard & Trực quan hóa Cải tiến
+
+### 1. Mục tiêu và Nội dung thay đổi
+*   **Mục tiêu**: Nâng cấp và cải tiến toàn diện Streamlit Dashboard (`src/dashboard/app.py`) để đồng bộ với các chỉ số phái sinh và kết quả kiểm định toán học định lượng mới, khắc phục lỗi hiển thị/chạy thực tế, và đồng bộ tài liệu nghiên cứu học thuật của dự án.
+*   **Hành động**:
+    *   **Vá lỗi hệ thống & Tương thích DWH**:
+        - Sửa lỗi truy vấn giá lịch sử `fetch_actual_price_history` từ bảng cũ sang bảng thực tế hợp nhất `fact_stock_daily_metrics` (Sửa lỗi BigQuery 404).
+        - Định nghĩa bổ sung các hàm Python an toàn để đọc báo cáo cục bộ trên đĩa (`load_dtw_report`, `load_causal_report`, `load_lstm_comparison`).
+        - Khắc phục lỗi `KeyError: 'univariate'` bằng cách ánh xạ đúng cấu trúc khóa phẳng từ JSON báo cáo huấn luyện (`uni_rmse`, `uni_mae`...).
+    *   **Nâng cấp Trực quan hóa Phân hệ LSTM**:
+        - *Tab 1*: So sánh trực tiếp song song Giá thực tế vs LSTM Đơn biến (Univariate) vs LSTM Đa biến (Multivariate) trên cùng đồ thị Plotly.
+        - *Tab 2*: Khắc phục lỗi chữ trắng nền trắng ở chế độ Dark Mode của ma trận DTW & Pearson bằng cách chuyển sang `st.dataframe()` kết hợp Pandas Styler tô dải màu chuyển sắc (`cmap="YlOrRd_r"` và `cmap="Blues"`).
+        - *Tab 2 (Bổ sung Q2)*: Viết hàm `fetch_stock_q2_metrics` để vẽ thêm **Biểu đồ hộp (Box Plot)** Biên độ dao động giá (`price_amplitude`) và **Biểu đồ cột chồng (Stacked Bar Chart)** Dòng tiền giao dịch tháng (`trading_value`) hỗ trợ làm rõ mức độ đồng pha và phân hóa.
+    *   **Nâng cấp Trực quan hóa Phân hệ Rủi Ro**:
+        - *Tab 2 (Kiểm định nhân quả)*: Tách báo cáo kiểm định văn bản thô Granger và hồi quy OLS Fixed Effects thành các cấu phần giao diện riêng biệt: Bảng tính dừng ADF, Bảng nhân quả Granger, thẻ Metric (R-squared, Adj. R-squared, Obs) và bảng Hệ số hồi quy chi tiết có đánh dấu đỏ cho các biến có ý nghĩa. Thu gọn báo cáo gốc vào hộp thoại mở rộng.
+    *   **Thống nhất Tài liệu & Triển khai**:
+        - Đồng bộ hóa câu hỏi **Q1** và **Giả thuyết 1** nguyên bản về dòng tiền khối ngoại/tự doanh trong intro tab và `project-overview.md` để khớp với đề cương lý thuyết.
+        - Biên soạn nhật ký sửa đổi chi tiết tại [docs/process/streamlit_refactor_report.md](file:///c:/StudyZone/DAAN/project2/docs/process/streamlit_refactor_report.md) và đẩy (push) toàn bộ nhánh sửa đổi lên GitHub.
