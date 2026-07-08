@@ -17,7 +17,7 @@ Phạm Minh Quân chịu trách nhiệm chính về mảng **Machine Learning (T
 - Đã thiết lập `src/utils/config.py` và `src/utils/bigquery_client.py` để tự động khởi tạo kết nối đến BigQuery một cách an toàn thông qua biến môi trường.
 
 ### Bước 2: Kỹ thuật Trích xuất Đặc trưng (Feature Engineering)
-- **Cổ phiếu (BID)**: Tạo file `feature_engineering_stock.py`. Truy vấn và gộp dữ liệu từ 3 bảng Fact (`fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading`). Đã tính toán thêm các đặc trưng phái sinh: `% thay đổi giá`, `dòng tiền khối ngoại (trễ 1 ngày)`, `dòng tiền tự doanh (trễ 1 ngày)`.
+- **Cổ phiếu**: Tạo file `feature_engineering_stock.py`. Truy vấn từ bảng Fact hợp nhất `fact_stock_daily_metrics` cho cả 4 ngân hàng (BID, TCB, VCB, CTG). Đã tính toán thêm các đặc trưng phái sinh: `% thay đổi giá` (`price_change_pct`), `% thay đổi khối lượng` (`volume_change_pct`), và tạo các đặc trưng trễ (lags) để huấn luyện mô hình.
 - **Ngân hàng (CAMELS)**: Tạo file `feature_engineering_bank.py`. Lấy dữ liệu từ `fact_bank_performance`, loại bỏ nhiễu và sử dụng `StandardScaler` để đưa tất cả các tỷ số tài chính về cùng một thang đo chuẩn (mean=0, std=1) nhằm phục vụ tốt nhất cho thuật toán phân cụm dựa trên khoảng cách.
 
 ### Bước 3: Xây dựng Mô hình Baseline (Đường cơ sở)

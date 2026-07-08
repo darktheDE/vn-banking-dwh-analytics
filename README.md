@@ -157,14 +157,11 @@ The Data Warehouse implements a **Star Schema** on Google BigQuery, optimized fo
 
 *Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: `_created_at` (TIMESTAMP), `_updated_at` (TIMESTAMP), and `_source_file` (STRING).*
 
-**5 Fact Tables** (quantitative measurements):
+**2 Fact Tables** (quantitative measurements):
 
 | Table | Granularity | Key Metrics |
 |-------|-------------|-------------|
-| `fact_price_history` | Daily per stock | OHLCV prices |
-| `fact_foreign_trading` | Daily per stock | Foreign net volume and value |
-| `fact_proprietary_trading` | Daily per stock | Proprietary desk net volume |
-| `fact_order_stats` | Daily per stock | Buy/sell order counts and matched volume |
+| `fact_stock_daily_metrics` | Daily per stock | OHLCV prices |
 | `fact_bank_performance` | Annual per bank | Full CAMELS indicators — ROA, ROE, NIM, CIR, NPL, ETA |
 
 **3 Machine Learning Output Tables** (model predictions and clusterings):
@@ -192,7 +189,7 @@ Three production ML models are deployed, each solving a distinct financial analy
 ### Model 1 — LSTM: Stock Price Forecasting
 
 ```
-Input  : Stock OHLCV + Foreign Net Volume + Proprietary Net Volume (rolling window)
+Input  : Stock OHLCV (open, high, low, close, volume) + price change pct + volume change pct (rolling window)
 Output : Predicted closing price for T+1, T+2, T+3, T+4, T+5 (BID, TCB, VCB, CTG)
 Scaler : MinMaxScaler on sequence windows
 Baseline: ARIMA (comparison only — not deployed in production)

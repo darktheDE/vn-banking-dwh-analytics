@@ -62,21 +62,12 @@ Hệ thống gồm 5 bảng chiều chính:
    - *Các trường thông tin:* `run_id`, `run_timestamp`, `script_name`, `source_file`, `rows_processed`, `status`.
 
 ### 2.3 Các Bảng Thực Tế (Fact Tables)
-Hệ thống gồm 5 bảng thực tế kết nối với các bảng chiều qua khóa ngoại:
-1. **fact_price_history:** Lưu trữ lịch sử giá cổ phiếu hàng ngày.
+Hệ thống gồm 2 bảng thực tế kết nối với các bảng chiều qua khóa ngoại:
+1. **fact_stock_daily_metrics:** Lưu trữ lịch sử giao dịch và giá cổ phiếu hàng ngày.
    - *Khóa ngoại:* `date_key`, `stock_key`.
    - *Các trường đo lường:* `open_price`, `high_price`, `low_price`, `close_price`, `trading_volume`.
    - *Thiết kế vật lý:* Bảng được phân vùng (Partitioned) theo trường `date_key` và phân cụm (Clustered) theo trường `stock_key`. Điều này giúp BigQuery chỉ quét các vùng dữ liệu của ngày cụ thể và cổ phiếu cụ thể khi thực hiện truy vấn, giảm thiểu chi phí quét dữ liệu và tăng tốc độ xử lý.
-2. **fact_foreign_trading:** Ghi nhận dữ liệu giao dịch của khối nhà đầu tư nước ngoài đối với cổ phiếu.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `foreign_buy_volume`, `foreign_sell_volume`, `foreign_net_volume`, `foreign_net_value`, `foreign_ownership_ratio`.
-3. **fact_proprietary_trading:** Ghi nhận dữ liệu giao dịch tự doanh của các công ty chứng khoán.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `prop_buy_volume`, `prop_sell_volume`, `prop_net_volume`, `prop_net_value`.
-4. **fact_order_stats:** Lưu trữ dữ liệu về khối lượng đặt lệnh mua/bán của thị trường.
-   - *Khóa ngoại:* `date_key`, `stock_key`.
-   - *Các trường đo lường:* `total_buy_orders`, `total_buy_volume`, `total_sell_orders`, `total_sell_volume`, `matched_volume`.
-5. **fact_bank_performance:** Lưu trữ 47 chỉ số tài chính CAMELS của 45 ngân hàng trong 20 năm.
+2. **fact_bank_performance:** Lưu trữ 47 chỉ số tài chính CAMELS của 45 ngân hàng trong 20 năm.
    - *Khóa ngoại:* `date_key`, `bank_key`.
    - *Các trường đo lường:* Các chỉ số tài chính cốt lõi bao gồm tiền gửi (`deposits`), dư nợ (`loans`), tài sản (`tassets`), vốn chủ sở hữu (`equity`), dự phòng rủi ro tín dụng (`llp`), nợ xấu (`npl`), tỷ lệ nợ xấu (`npl_ratio`), hiệu số sinh lời (`roa`, `roe`), biên lãi ròng (`nim`), tỷ lệ chi phí trên thu nhập (`cir`), tỷ lệ dư nợ trên tiền gửi (`ltd`), vốn chủ sở hữu trên tổng tài sản (`eta`), và vốn chủ sở hữu trên tiền gửi khách hàng (`etd`).
    - *Trường bổ sung:* Trường `is_imputed` dùng để đánh dấu các hàng dữ liệu sử dụng phương pháp nội suy trung vị để làm sạch.

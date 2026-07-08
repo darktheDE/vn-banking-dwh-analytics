@@ -12,10 +12,7 @@ This document defines all data entities, source fields, and derived variables us
 
 | File ID | Source File Description | Target Fact Table | Granularity |
 |---------|------------------------|-------------------|-------------|
-| `F1` | BID — Foreign Trading (Net Volume, Value) | `fact_stock_daily_metrics` | Daily (22 sessions) |
-| `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_stock_daily_metrics` | Daily (22 sessions) |
-| `F3` | BID — Price History (OHLCV) | `fact_stock_daily_metrics` | Daily (22 sessions) |
-| `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_stock_daily_metrics` | Daily (22 sessions) |
+| `F3` | BID, TCB, VCB, CTG — Price History (OHLCV) | `fact_stock_daily_metrics` | Daily (11,835 rows total) |
 | `F6–F7` | 45 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
 
 ---
@@ -33,20 +30,6 @@ This document defines all data entities, source fields, and derived variables us
 | Low | `low_price` | FLOAT64 | Lowest traded price of the session (VND) |
 | Close | `close_price` | FLOAT64 | **Primary LSTM target variable.** Closing price (VND) |
 | Volume | `trading_volume` | INT64 | Total matched volume in the session |
-| Foreign Buy Volume | `foreign_buy_volume` | INT64 | Total shares purchased by foreign investors (BID only) |
-| Foreign Sell Volume | `foreign_sell_volume` | INT64 | Total shares sold by foreign investors (BID only) |
-| Foreign Net Volume | `foreign_net_volume` | INT64 | Buy Volume minus Sell Volume (BID only) |
-| Foreign Net Value | `foreign_net_value` | FLOAT64 | Net transaction value in VND billions (BID only) |
-| Foreign Ownership Ratio | `foreign_ownership_ratio` | FLOAT64 | Percentage of shares held by foreign investors (BID only) |
-| Prop Buy Volume | `prop_buy_volume` | INT64 | Total shares purchased by proprietary desks (Khối tự doanh - BID only) |
-| Prop Sell Volume | `prop_sell_volume` | INT64 | Total shares sold by proprietary desks (BID only) |
-| Prop Net Volume | `prop_net_volume` | INT64 | Buy minus Sell volume (BID only) |
-| Prop Net Value | `prop_net_value` | FLOAT64 | Net value in VND billions (BID only) |
-| Total Buy Orders | `total_buy_orders` | INT64 | Number of buy order placements (BID only) |
-| Total Buy Volume | `total_buy_volume` | INT64 | Total volume in buy orders (BID only) |
-| Total Sell Orders | `total_sell_orders` | INT64 | Number of sell order placements (BID only) |
-| Total Sell Volume | `total_sell_volume` | INT64 | Total volume in sell orders (BID only) |
-| Matched Volume | `matched_volume` | INT64 | Total volume successfully matched (BID only) |
 
 
 

@@ -10,11 +10,9 @@ ETL (Extract, Transform, Load) pipeline scripts for the Financial Data Analytics
 | `populate_dim_stock.py` | B-05 | Load `dim_stock` records for focus banks (BID, TCB, VCB, CTG) |
 | `populate_dim_bank.py` | B-06 | Load `dim_bank` records for 45 commercial banks |
 | `populate_dim_trading_session.py` | B-07 | Load `dim_trading_session` records (ATO, Morning, Afternoon, ATC) |
-| `load_price_history.py` | B-08 | ETL for bank OHLCV price history data → `fact_price_history` |
-| `load_foreign_trading.py` | B-09 | ETL for BID foreign trading data → `fact_foreign_trading` |
-| `load_proprietary_trading.py` | B-10 | ETL for BID proprietary trading data → `fact_proprietary_trading` |
-| `load_order_stats.py` | B-11 | ETL for BID order statistics → `fact_order_stats` |
+| `load_price_history.py` | B-08 | ETL for bank OHLCV price history data → `fact_stock_daily_metrics` (pre-consolidation) |
 | `load_bank_performance.py` | B-13 | ETL for 45 banks CAMELS data → `fact_bank_performance` |
+| `consolidate_stock_metrics.py` | - | Consolidate and finalize stock metrics → `fact_stock_daily_metrics` |
 | `validate_integrity.py` | B-14/15 | Referential integrity and data quality checks post-load |
 
 ## Transformation Rules

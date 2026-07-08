@@ -140,10 +140,7 @@ da_project/
 **Sơ đồ 1: Kiến trúc Kho dữ liệu - Star Schema**
 
 - **Trung tâm - Fact Tables:**
-    - Bảng fact_foreign_trading: foreign_volume, foreign_value, ownership
-    - Bảng fact_proprietary_trading: prop_buy, prop_sell, prop_net
-    - Bảng fact_price_history: open, high, low, close, volume
-    - Bảng fact_order_stats: buy_orders, sell_orders, matched
+    - Bảng fact_stock_daily_metrics: open, high, low, close, volume
     - Bảng fact_bank_performance: deposits, loans, npl, roa, roe
 - **Các vệ tinh xung quanh - Dimension Tables trỏ khóa ngoại vào Fact:**
     - Bảng dim_date: date_key, day, month, year, quarter
@@ -156,7 +153,7 @@ da_project/
 
 - **Khối 1 Nguồn dữ liệu:** File Excel, Tài liệu yêu cầu. Mũi tên hướng sang Khối 2.
 - **Khối 2 ETL Pipeline:** Extract bằng Python Pandas. Transform làm sạch dữ liệu. Load bằng Google Cloud API. Mũi tên hướng sang Khối 3.
-- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 5 bảng Dim và 5 bảng Fact. Mũi tên hướng sang Khối 4.
+- **Khối 3 Data Warehouse:** Google BigQuery lưu trữ 5 bảng Dim và 2 bảng Fact. Mũi tên hướng sang Khối 4.
 - **Khối 4 Analytics & Machine Learning:** Trực quan hóa EDA. Chạy mô hình Học máy có giám sát và không giám sát. Xuất báo cáo Dashboard.
 
 **Sơ đồ 3: Cấu trúc Mô hình Học máy**

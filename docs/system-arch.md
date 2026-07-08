@@ -44,7 +44,7 @@ The centralized “Single Source of Truth.”
 - **Technology Stack**: Google BigQuery as a Serverless Enterprise Data Warehouse.
 - **Design Pattern**: **Star Schema** optimized for OLAP aggregations.
 - **Dimension Tables**: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, `dim_audit`.
-- **Fact Tables**: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, `fact_bank_performance`.
+- **Fact Tables**: `fact_stock_daily_metrics`, `fact_bank_performance`.
 - **ML Output Tables**: `bank_cluster_assignments`, `bank_risk_predictions`, `fact_model_predictions`.
 - **Optimization**: Partitioning applied on `date_key` and Clustering applied on `stock_key` and `bank_key` to heavily reduce query latency and scanning costs for reporting.
 
@@ -67,9 +67,9 @@ The front-end interface where stakeholders interact with the data and insights.
     - **Market Price Forecasting (LSTM)**: Interactive line chart of historical vs. LSTM-predicted closing prices for BID, TCB, VCB, and CTG with T+1 to T+5 forecast horizon table.
     - **Bank Clustering (K-Means)**: PCA 2D scatter plot of 45 banks color-coded by cluster, grouped bar chart comparing average CAMELS ratios across clusters, and filterable bank member tables.
     - **Credit Risk Classifier (RF)**: Pie chart of risk distribution, horizontal bar chart of Random Forest feature importances, and a live searchable risk monitoring table with color-coded alert labels.
-    - **DWH System Status**: Real-time row counts and schema metadata for all 10 Star Schema tables.
+    - **DWH System Status**: Real-time row counts and schema metadata for all 7 Star Schema tables.
 - **Looker Studio Dashboards** (planned):
-    - **Market Movement**: Visualizes historical vs. LSTM-predicted prices alongside foreign and proprietary cash flow volume bars.
+    - **Market Movement**: Visualizes historical vs. LSTM-predicted prices alongside Dynamic Time Warping (DTW) similarities and rolling correlations.
     - **Bank Profiling**: Scatter plots and radar charts displaying K-Means clustering results.
     - **Risk Monitoring**: Risk classification matrix detailing which banks are approaching or exceeding the 3% NPL threshold based on Random Forest predictions.
 
@@ -82,7 +82,7 @@ graph TD
     A[Raw Data: Excel Files] -->|Extract| B(Python ETL Pipeline)
     B -->|Transform & Clean| C{Google BigQuery}
 
-    C -->|Star Schema| D[(DWH: 5 Dims, 5 Facts, 3 ML Tables)]
+    C -->|Star Schema| D[(DWH: 5 Dims, 2 Facts, 3 ML Tables)]
 
     D -->|Feature Query| E[ML Layer]
     E -->|1. LSTM: Predict Price| E1((Predictions))

@@ -40,8 +40,8 @@
 
 - `[x]` **B-02**: Create the 4 Dimension Tables (`dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`) using `bigquery_schema.sql`.
   - *Verification*: All 4 tables exist with correct schemas matching `docs/star-schema.md`.
-- `[x]` **B-03**: Create the 5 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
-  - *Verification*: All 5 tables exist. `fact_price_history` has DAY partitioning on `date_key`. Stock fact tables have clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
+- `[x]` **B-03**: Create the 2 Fact Tables with partitioning and clustering as specified in `docs/star-schema.md` Section 5.
+  - *Verification*: Both tables exist. `fact_stock_daily_metrics` has DAY partitioning on `date_key` and clustering on `stock_key`. Bank fact table has clustering on `bank_key`.
 
 ### B-2: Dimension Population (Trần Minh Khánh or Nguyễn Đặng Quốc Anh)
 
@@ -63,19 +63,13 @@
 
 ### B-3: Fact Table ETL — Stock Data (Trần Minh Khánh)
 
-- `[x]` **B-08**: Implement ETL for File F3 → `fact_price_history` (Consolidated daily history for BID, TCB, VCB, CTG - 11,835 rows).
-  - *File*: `src/etl/load_price_history.py`
+- `[x]` **B-08**: Implement ETL for stock daily price history → `fact_stock_daily_metrics` (Consolidated daily history for BID, TCB, VCB, CTG - 11,835 rows).
+  - *File*: `src/etl/load_price_history.py` & `src/etl/consolidate_stock_metrics.py`
   - *Rules*: `docs/etl-spec.md` Section 3.1.
   - *Verification*: 11,835 rows in table. No null `close_price`. Log confirms row count.
-- `[x]` **B-09**: Implement ETL for File F1 → `fact_foreign_trading` (22 rows for BID).
-  - *File*: `src/etl/load_foreign_trading.py`
-  - *Verification*: 22 rows. Log confirms load.
-- `[x]` **B-10**: Implement ETL for File F2 → `fact_proprietary_trading` (22 rows for BID).
-  - *File*: `src/etl/load_proprietary_trading.py`
-  - *Verification*: 22 rows. Log confirms load.
-- `[x]` **B-11**: Implement ETL for File F4 → `fact_order_stats` (22 rows for BID).
-  - *File*: `src/etl/load_order_stats.py`
-  - *Verification*: 22 rows. Log confirms load.
+- `[x]` **B-09**: [DEPRECATED] Consolidation of foreign trading flow (merged into B-08).
+- `[x]` **B-10**: [DEPRECATED] Consolidation of proprietary trading flow (merged into B-08).
+- `[x]` **B-11**: [DEPRECATED] Consolidation of order stats flow (merged into B-08).
 
 ### B-4: Fact Table ETL — Bank Data (Trần Minh Khánh)
 
@@ -93,7 +87,7 @@
 - `[x]` **B-14**: Run end-to-end referential integrity check — all `date_key` values in fact tables must exist in `dim_date`.
   - *File*: `src/etl/validate_integrity.py`
   - *Verification*: Script exits with 0 errors logged.
-- `[x]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-06.
+- `[x]` **B-15**: Run data quality checks per `docs/data-dictionary.md` Section 5 rules DQ-01 through DQ-05.
   - *Verification*: All DQ rules pass.
 
 ---
@@ -103,9 +97,9 @@
 
 ### C-1: Feature Engineering
 
-- `[x]` **C-01**: Query `fact_price_history`, `fact_foreign_trading`, `fact_proprietary_trading` from BigQuery. Merge into a single feature DataFrame for BID.
+- `[x]` **C-01**: Query `fact_stock_daily_metrics` from BigQuery for all focus bank stocks.
   - *File*: `src/models/feature_engineering_stock.py`
-  - *Verification*: DataFrame has 22 rows, all columns from `docs/data-dictionary.md` Section 4 (derived features included).
+  - *Verification*: DataFrame has 11,835 rows, containing OHLCV prices and derived features (price change pct, volume change pct).
 - `[x]` **C-02**: Query `fact_bank_performance` from BigQuery. Apply `StandardScaler` normalization to all CAMELS ratio features.
   - *File*: `src/models/feature_engineering_bank.py`
   - *Verification*: Scaled DataFrame has mean ≈ 0 and std ≈ 1 for all numeric columns.

@@ -46,7 +46,7 @@ and 3 Looker Studio dashboards.
 
 Memorize these facts. They appear in nearly every task.
 
-### 3.1 BigQuery Star Schema (10 core tables + 3 ML tables)
+### 3.1 BigQuery Star Schema (7 core tables + 3 ML tables)
 
 **Dimension Tables** (5):
 
@@ -60,14 +60,11 @@ Memorize these facts. They appear in nearly every task.
 
 *Note: All Dimension and Fact tables dynamically append the audit_key (INT64) and system auditing columns: _created_at (TIMESTAMP), _updated_at (TIMESTAMP), and _source_file (STRING).*
 
-**Fact Tables** (5):
+**Fact Tables** (2):
 
 | Table | Foreign Keys | Partitioned By | Clustered By |
 |-------|-------------|----------------|--------------|
-| `fact_price_history` | `date_key`, `stock_key` | `date_key` | `stock_key` |
-| `fact_foreign_trading` | `date_key`, `stock_key` | `date_key` | `stock_key` |
-| `fact_proprietary_trading` | `date_key`, `stock_key` | `date_key` | `stock_key` |
-| `fact_order_stats` | `date_key`, `stock_key` | `date_key` | `stock_key` |
+| `fact_stock_daily_metrics` | `date_key`, `stock_key` | `date_key` | `stock_key` |
 | `fact_bank_performance` | `date_key`, `bank_key` | `date_key` | `bank_key` |
 
 **Machine Learning Output Tables** (3):
@@ -91,10 +88,7 @@ Memorize these facts. They appear in nearly every task.
 
 | Data | Expected Rows |
 |------|--------------|
-| `fact_price_history` (BID, TCB, VCB, CTG) | 11,835 rows |
-| `fact_foreign_trading` (BID) | 22 rows |
-| `fact_proprietary_trading` (BID) | 22 rows |
-| `fact_order_stats` (BID) | 22 rows |
+| `fact_stock_daily_metrics` (BID, TCB, VCB, CTG) | 11,835 rows |
 | `fact_bank_performance` (45 banks × 20 years) | 667 rows |
 | `dim_date` (2002–2026) | 9,131 rows |
 | `dim_bank` | 45 rows (1 bank duplicate resolved) |
@@ -113,7 +107,7 @@ These thresholds are non-negotiable acceptance criteria. Never generate a model 
 
 ### 4.1 LSTM — Banking Stock Price Forecasting (BID, TCB, VCB, CTG)
 
-- **Target**: `close_price` in `fact_price_history`
+- **Target**: `close_price` in `fact_stock_daily_metrics`
 - **Horizon**: T+1 through T+5 closing price predictions
 - **Scaler**: `MinMaxScaler` on sliding window sequences
 - **Training constraint**: Valid HOSE trading days only. No weekend rows. No forward-fill to create artificial data.

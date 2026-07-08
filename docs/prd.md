@@ -54,7 +54,7 @@ Financial analysts and risk managers currently lack a centralized system to cros
 
 - **FR2.1**: The system must store data in a centralized Star Schema architecture on Google BigQuery.
 - **FR2.2**: The schema must include 5 Dimension tables: `dim_date`, `dim_stock`, `dim_bank`, `dim_trading_session`, and `dim_audit`.
-- **FR2.3**: The schema must include 5 Fact tables: `fact_foreign_trading`, `fact_proprietary_trading`, `fact_price_history`, `fact_order_stats`, and `fact_bank_performance`.
+- **FR2.3**: The schema must include 2 Fact tables: `fact_stock_daily_metrics` and `fact_bank_performance`.
 - **FR2.4**: The schema must support 3 Machine Learning output tables for model predictions: `bank_cluster_assignments`, `bank_risk_predictions`, and `fact_model_predictions`.
 
 ### FR3: Machine Learning Analytics
