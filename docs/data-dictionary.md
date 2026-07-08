@@ -30,6 +30,11 @@ This document defines all data entities, source fields, and derived variables us
 | Low | `low_price` | FLOAT64 | Lowest traded price of the session (VND) |
 | Close | `close_price` | FLOAT64 | **Primary LSTM target variable.** Closing price (VND) |
 | Volume | `trading_volume` | INT64 | Total matched volume in the session |
+| - | `price_change` | FLOAT64 | Absolute difference between close and open price |
+| - | `price_change_pct` | FLOAT64 | Percentage price change compared to previous trading day |
+| - | `price_amplitude` | FLOAT64 | Price volatility amplitude (high - low) / open |
+| - | `volume_change_pct` | FLOAT64 | Percentage volume change compared to previous trading day |
+| - | `trading_value` | FLOAT64 | Calculated trading value: close_price * trading_volume |
 
 
 
@@ -148,4 +153,4 @@ These fields are populated by the ML training and inference runs and stored in t
 | DQ-03 | `fact_stock_daily_metrics` | `close_price` must be > 0 | Reject record; log error |
 | DQ-04 | `fact_bank_performance` | Missing values for years 2002–2005 must be imputed using column median | Impute during ETL Transform step |
 | DQ-05 | All tables | `audit_key` must be present and not null | Reject record; log error |
-| DQ-06 | `fact_stock_daily_metrics` | `foreign_buy_volume` and `foreign_sell_volume` must be ≥ 0 (when present) | Reject negative values |
+| DQ-06 | `fact_stock_daily_metrics` | `price_amplitude` must be ≥ 0 | Reject record; log error |

@@ -60,6 +60,13 @@ def consolidate_stock_metrics(processed_dir: Path) -> bool:
     df_merged = df_merged.drop_duplicates(subset=["date_key", "stock_key"], keep="first")
     df_merged = df_merged.sort_values(["stock_key", "date_key"]).reset_index(drop=True)
 
+    # Calculate 5 new metrics
+    df_merged["price_change"] = df_merged["close_price"] - df_merged["open_price"]
+    df_merged["price_change_pct"] = df_merged.groupby("stock_key")["close_price"].pct_change().fillna(0.0)
+    df_merged["price_amplitude"] = (df_merged["high_price"] - df_merged["low_price"]) / df_merged["open_price"]
+    df_merged["volume_change_pct"] = df_merged.groupby("stock_key")["trading_volume"].pct_change().fillna(0.0)
+    df_merged["trading_value"] = df_merged["close_price"] * df_merged["trading_volume"]
+
     # Retain or populate system columns
     now_ts = datetime.datetime.utcnow()
     audit_key = int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
@@ -70,7 +77,8 @@ def consolidate_stock_metrics(processed_dir: Path) -> bool:
     df_merged["_source_file"] = "consolidated_price_history"
 
     # Select final columns in order
-    final_cols = required_cols + ["audit_key", "_created_at", "_updated_at", "_source_file"]
+    calculated_cols = ["price_change", "price_change_pct", "price_amplitude", "volume_change_pct", "trading_value"]
+    final_cols = required_cols + calculated_cols + ["audit_key", "_created_at", "_updated_at", "_source_file"]
     df_final = df_merged[final_cols]
 
     output_path = processed_dir / "fact_stock_daily_metrics_clean.csv"

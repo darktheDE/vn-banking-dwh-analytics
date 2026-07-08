@@ -79,20 +79,11 @@ Records the daily trading metrics, prices, and orders for stocks.
   - `low_price` of type FLOAT64
   - `close_price` of type FLOAT64
   - `trading_volume` of type INT64
-  - `foreign_buy_volume` of type INT64
-  - `foreign_sell_volume` of type INT64
-  - `foreign_net_volume` of type INT64
-  - `foreign_net_value` of type FLOAT64
-  - `foreign_ownership_ratio` of type FLOAT64
-  - `prop_buy_volume` of type INT64
-  - `prop_sell_volume` of type INT64
-  - `prop_net_volume` of type INT64
-  - `prop_net_value` of type FLOAT64
-  - `total_buy_orders` of type INT64
-  - `total_buy_volume` of type INT64
-  - `total_sell_orders` of type INT64
-  - `total_sell_volume` of type INT64
-  - `matched_volume` of type INT64
+  - `price_change` of type FLOAT64
+  - `price_change_pct` of type FLOAT64
+  - `price_amplitude` of type FLOAT64
+  - `volume_change_pct` of type FLOAT64
+  - `trading_value` of type FLOAT64
 
 
 ### 3.5 `fact_bank_performance`

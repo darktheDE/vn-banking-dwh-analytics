@@ -92,6 +92,28 @@ def fetch_actual_price_history(stock_key: int, limit: int = 60):
 
 
 @st.cache_data(ttl=10)
+def fetch_stock_q2_metrics():
+    client = get_bigquery_client()
+    price_table = get_full_table_id("fact_stock_daily_metrics")
+    stock_table = get_full_table_id("dim_stock")
+    date_table = get_full_table_id("dim_date")
+    query = f"""
+        SELECT
+            d.full_date,
+            s.ticker,
+            p.price_amplitude,
+            p.trading_value
+        FROM `{price_table}` p
+        JOIN `{stock_table}` s ON p.stock_key = s.stock_key
+        JOIN `{date_table}` d ON p.date_key = d.date_key
+        ORDER BY d.full_date
+    """
+    df = client.query(query).to_dataframe(create_bqstorage_client=False)
+    df["full_date"] = pd.to_datetime(df["full_date"])
+    return df
+
+
+@st.cache_data(ttl=10)
 def fetch_lstm_predictions(stock_key: int):
     client = get_bigquery_client()
     pred_table = get_full_table_id("fact_model_predictions")
@@ -721,7 +743,63 @@ def show_price_forecasting_section():
                 st.caption("Ý nghĩa: Hệ số tương quan Pearson > 0.85 chỉ ra xu hướng tăng/giảm tuyến tính đồng hướng cực kỳ rõ rệt.")
             else:
                 st.warning("Không tìm thấy dữ liệu phân tích dtw_correlation_report.json.")
+
+        # Add Q2 additional visualizations from fact-metrics-report.md
+        st.markdown("---")
+        st.subheader("📈 Phân Tích Chỉ Số Phái Sinh: Biên Độ Dao Động & Thị Phần Dòng Tiền (Q2)")
+        st.write("Phân tích định lượng sâu về mức độ rủi ro (Price Amplitude) và quy mô dòng tiền (Trading Value) thực tế từ DWH để làm rõ mức độ đồng pha và tính chất phân hóa của từng cổ phiếu ngân hàng.")
+        
+        q2_data = fetch_stock_q2_metrics()
+        if not q2_data.empty:
+            q2_col1, q2_col2 = st.columns([1, 1])
+            
+            with q2_col1:
+                st.markdown("#### 📦 Phân phối Biên độ Dao động Giá (Price Volatility Amplitude)")
+                # Calculate amplitude in % for better visualization
+                q2_data["price_amplitude_pct"] = q2_data["price_amplitude"] * 100
                 
+                fig_box = px.box(
+                    q2_data,
+                    x="ticker",
+                    y="price_amplitude_pct",
+                    color="ticker",
+                    points="outliers",
+                    title="Biểu Đồ Phân Phối Biên Độ Dao Động Nội Phiên (%)",
+                    labels={"ticker": "Mã Cổ Phiếu", "price_amplitude_pct": "Biên Độ Dao Động (%)"},
+                    color_discrete_map={"BID": "#3b82f6", "TCB": "#ef4444", "VCB": "#10b981", "CTG": "#f59e0b"}
+                )
+                st.plotly_chart(fig_box, use_container_width=True, theme="streamlit")
+                st.caption("Nhận xét: Hộp phân phối (Box Plot) chỉ ra mức độ rủi ro phân hóa rõ nét. VCB có biên độ dao động hẹp nhất và trung vị thấp nhất, phản ánh tính chất phòng thủ, biến động thấp và an toàn cực cao của cổ phiếu đầu ngành. Ngược lại, TCB và CTG có hộp phân phối rộng hơn với nhiều điểm ngoại lệ (outliers) biến động mạnh.")
+                
+            with q2_col2:
+                st.markdown("#### 💰 Thị phần Thanh khoản theo Giá trị Giao dịch ước tính")
+                # Group by month and ticker
+                q2_data["Tháng"] = q2_data["full_date"].dt.strftime("%Y-%m")
+                monthly_flow = q2_data.groupby(["Tháng", "ticker"])["trading_value"].sum().reset_index()
+                # Convert trading_value (close_price * volume) to billion VND
+                # Note: raw close_price is in VND and volume is in shares. So close_price * volume is in VND.
+                # To convert to billion VND, divide by 1e9.
+                monthly_flow["Giá trị giao dịch (Tỷ VND)"] = monthly_flow["trading_value"] / 1e9
+                
+                # Filter to show only the last 24 months for clean visualization
+                last_24_months = sorted(monthly_flow["Tháng"].unique())[-24:]
+                monthly_flow_filtered = monthly_flow[monthly_flow["Tháng"].isin(last_24_months)]
+                
+                fig_stack = px.bar(
+                    monthly_flow_filtered,
+                    x="Tháng",
+                    y="Giá trị giao dịch (Tỷ VND)",
+                    color="ticker",
+                    barmode="stack",
+                    title="Thị Phần Thanh Khoản Dòng Tiền Theo Tháng (24 Tháng Gần Nhất)",
+                    labels={"Tháng": "Tháng Giao Dịch", "Giá trị giao dịch (Tỷ VND)": "Tổng Giá Trị (Tỷ VND)", "ticker": "Mã Cổ Phiếu"},
+                    color_discrete_map={"BID": "#3b82f6", "TCB": "#ef4444", "VCB": "#10b981", "CTG": "#f59e0b"}
+                )
+                st.plotly_chart(fig_stack, use_container_width=True, theme="streamlit")
+                st.caption("Nhận xét: Biểu đồ cột chồng biểu diễn sự luân chuyển dòng tiền. TCB thường xuyên chiếm tỷ trọng lớn trong tổng thanh khoản của nhóm khảo sát do thu hút mạnh mẽ dòng tiền đầu cơ của nhà đầu tư cá nhân, trong khi VCB duy trì quy mô dòng tiền ổn định phục vụ các quỹ đầu tư tổ chức dài hạn.")
+        else:
+            st.warning("Không thể truy vấn dữ liệu chỉ số phái sinh từ bảng fact_stock_daily_metrics.")
+
     with tabs[2]:
         st.subheader("🧪 So Sánh Thực Nghiệm Hiệu Năng: LSTM Đơn biến vs LSTM Đa biến vs ARIMA")
         st.write("So sánh sai số dự báo giữa mô hình LSTM chỉ dùng giá đóng cửa (Univariate - Không biến), mô hình LSTM mở rộng (Multivariate - Có biến) và đường cơ sở ARIMA trên tập kiểm thử độc lập.")

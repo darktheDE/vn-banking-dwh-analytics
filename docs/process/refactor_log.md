@@ -127,4 +127,29 @@ Chúng tôi đã khởi chạy tuần tự các lệnh để kiểm thử luồn
 *   Các mô hình Machine Learning được huấn luyện tự động dựa trên dữ liệu lấy từ BigQuery và flush kết quả ngược lại DWH thành công.
 *   Streamlit app tải dữ liệu tức thời (< 3 giây), hiển thị trực quan các kết quả kiểm định thống kê Granger, phân tích DTW và dự báo chuỗi thời gian một cách khoa học.
 
+---
 
+## Ngày 09 tháng 07 năm 2026: Triển khai Giai đoạn 5 — Làm rõ Luồng Dữ liệu (Data Lineage) và Nâng cấp Chỉ số Tính toán (Calculated Metrics) trong bảng Fact
+
+### 1. Mục tiêu và Nội dung thay đổi
+*   **Mục tiêu**: Làm rõ toàn bộ luồng dữ liệu của dự án từ nguồn thô đến mô hình ML và Dashboard nhằm tối ưu hóa tính minh bạch. Đồng thời nâng cấp bảng Fact chứng khoán `fact_stock_daily_metrics` để chuyển từ nạp dữ liệu thô đơn thuần sang tính toán trước 5 chỉ số tài chính chứng khoán nâng cao (Calculated Metrics) đáp ứng yêu cầu học thuật của đồ án và đối chiếu với tiêu chuẩn chỉ số doanh nghiệp của VCBS và NetSuite.
+*   **Hành động**:
+    *   Xây dựng tài liệu đặc tả luồng dữ liệu chi tiết end-to-end [docs/data-lineage.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-lineage.md) kèm sơ đồ Mermaid chi tiết.
+    *   Nâng cấp bảng Fact `fact_stock_daily_metrics` bằng cách bổ sung 5 trường chỉ số tính toán mới: `price_change` (biến động tuyệt đối nội phiên), `price_change_pct` (biến động % đóng cửa), `price_amplitude` (biên độ dao động giá), `volume_change_pct` (biến động % khối lượng), và `trading_value` (giá trị giao dịch ước tính).
+    *   Tài liệu hóa chi tiết đặc tả chỉ số tại [docs/fact-metrics-report.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/fact-metrics-report.md) đối chiếu với các tiêu chuẩn VCBS và NetSuite KPI.
+
+### 2. Các tệp đã sửa đổi và tạo mới
+*   **Tạo mới**:
+    *   [docs/data-lineage.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-lineage.md): Đặc tả luồng dữ liệu end-to-end và ánh xạ cấp thuộc tính.
+    *   [docs/fact-metrics-report.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/fact-metrics-report.md): Đặc tả chi tiết các Calculated Metrics của 2 bảng Fact.
+*   **Sửa đổi**:
+    *   [sql/bigquery_schema.sql](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/sql/bigquery_schema.sql): Bổ sung định nghĩa DDL cho 5 trường mới của bảng `fact_stock_daily_metrics`.
+    *   [src/etl/consolidate_stock_metrics.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/consolidate_stock_metrics.py): Triển khai logic tính toán 5 chỉ số bằng pandas.
+    *   [src/etl/load_to_bigquery.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_to_bigquery.py): Cập nhật schema nạp dữ liệu.
+    *   [HUONG_DAN_DU_AN.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/HUONG_DAN_DU_AN.md): Bổ sung liên kết đến tài liệu luồng dữ liệu mới.
+    *   [docs/etl-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/etl-spec.md), [docs/data-dictionary.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-dictionary.md), [docs/star-schema.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/star-schema.md): Đồng bộ hóa các định nghĩa cột mới và quy tắc DQ-06.
+
+### 3. Kết quả chạy kiểm định và nghiệm thu Giai đoạn 5
+*   **Schema Provisioning**: Đã xóa bảng cũ và chạy lại thành công `provision_schema.py` để cập nhật cấu trúc bảng mới trên BigQuery.
+*   **ETL & Load**: Chạy lại thành công `consolidate_stock_metrics.py` và `load_to_bigquery.py`. Nạp thành công 11.835 dòng dữ liệu chứng khoán đã được tính toán sẵn chỉ số và 667 dòng hiệu năng ngân hàng lên BigQuery DWH.
+*   **Data Quality Validation**: Thực thi `validate_integrity.py` thành công với **`0 lỗi (TOTAL ERRORS FOUND: 0)`**, xác nhận tính toàn vẹn và hợp lệ tuyệt đối của dữ liệu.

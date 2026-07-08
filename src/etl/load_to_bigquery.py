@@ -86,6 +86,7 @@ TABLES_TO_CSV = {
         "keys": ["date_key", "stock_key"],
         "columns": [
             "date_key", "stock_key", "open_price", "high_price", "low_price", "close_price", "trading_volume",
+            "price_change", "price_change_pct", "price_amplitude", "volume_change_pct", "trading_value",
             "audit_key", "_created_at", "_updated_at", "_source_file"
         ],
         "types": {
@@ -96,6 +97,11 @@ TABLES_TO_CSV = {
             "low_price": "float64",
             "close_price": "float64",
             "trading_volume": "int64",
+            "price_change": "float64",
+            "price_change_pct": "float64",
+            "price_amplitude": "float64",
+            "volume_change_pct": "float64",
+            "trading_value": "float64",
             "audit_key": "int64",
         }
     },
