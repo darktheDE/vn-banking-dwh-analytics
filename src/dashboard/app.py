@@ -277,21 +277,20 @@ def show_intro_section():
         st.markdown("""
         ### 📋 Nguồn Dữ Liệu & Quy Mô Hệ Thống
         *   **Tích Hợp API Tài Chính (`vnstock` / VCI API)**: Toàn bộ dữ liệu giá giao dịch hàng ngày (OHLCV) và báo cáo tài chính (Cân đối kế toán, Kết quả kinh doanh, Lưu chuyển tiền tệ, Chỉ số tài chính) của 4 ngân hàng trọng điểm (**BID**, **TCB**, **VCB**, **CTG**) được tự động hóa trích xuất trực tiếp qua **API tài chính** tích hợp (đảm bảo tính cập nhật và tự động).
-        *   **Dữ liệu Báo Cáo Tài Chính CAMELS 20 năm**: Gồm **667 dòng** dữ liệu và **47+ cột** chỉ số hiệu năng cấu trúc tài chính, bao phủ toàn hệ thống **46 ngân hàng Việt Nam** trong suốt **2 thập kỷ (2002–2022)** được tổng hợp đồng bộ từ báo cáo kiểm toán lịch sử (phục vụ phân cụm và phân loại rủi ro dài hạn).
+        *   **Dữ liệu Báo Cáo Tài Chính CAMELS 20 năm**: Gồm **667 dòng** dữ liệu và **47+ cột** chỉ số hiệu năng cấu trúc tài chính, bao phủ toàn hệ thống **45 ngân hàng Việt Nam** trong suốt **2 thập kỷ (2002–2022)** được tổng hợp đồng bộ từ báo cáo kiểm toán lịch sử (phục vụ phân cụm và phân loại rủi ro dài hạn).
         
         ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
-        Dữ liệu được tổ chức dưới dạng Star Schema gồm **10 bảng** tối ưu cho OLAP:
+        Dữ liệu được tổ chức dưới dạng Star Schema tinh gọn gồm **7 bảng thực tế (5 Dimension tables & 2 Fact tables)** tối ưu cho OLAP:
         *   **Bảng Chiều (5 Dimension tables)**:
             *   `dim_date`: Quản lý thời gian, kiểm soát ngày giao dịch.
             *   `dim_stock`: Thông tin mã cổ phiếu, sàn giao dịch (HOSE).
-            *   `dim_bank`: SCD Type 2 quản lý lịch sử thông tin 46 ngân hàng.
+            *   `dim_bank`: SCD Type 2 quản lý lịch sử thông tin 45 ngân hàng thương mại Việt Nam.
             *   `dim_trading_session`: Phiên giao dịch trong ngày (ATO, ATC, Liên tục).
             *   `dim_audit`: Quản lý nhật ký thực thi ETL, kiểm toán hệ thống và lineage.
-        *   **Bảng Thực Thể (5 Fact tables)**:
-            *   `fact_price_history`: Lịch sử giá đóng/mở cửa, khối lượng giao dịch ngày.
-            *   `fact_foreign_trading` & `fact_proprietary_trading`: Giao dịch khối ngoại & tự doanh.
-            *   `fact_order_stats`: Thống kê khối lượng đặt mua/bán.
-            *   `fact_bank_performance`: 20 năm chỉ số tài chính CAMELS.
+        *   **Bảng Thực Thể (2 Fact tables)**:
+            *   `fact_stock_daily_metrics`: Lịch sử giá giao dịch (OHLCV) và các chỉ số biến động, thanh khoản được tính toán sẵn cho 4 ngân hàng (BID, TCB, VCB, CTG).
+            *   `fact_bank_performance`: 20 năm chỉ số tài chính CAMELS của 45 ngân hàng Việt Nam.
+        *   *Ghi chú*: Các bảng phụ giả lập (`fact_foreign_trading`, `fact_proprietary_trading`, `fact_order_stats`) được giữ nguyên cấu trúc thô với 22 dòng dữ liệu tĩnh phục vụ demo thiết kế mô hình star schema.
         """)
         
     with col2:
@@ -304,7 +303,7 @@ def show_intro_section():
                 *   *Tập tin*: `train_lstm.py` (Huấn luyện Stacked LSTM cho 4 mã BID, TCB, VCB, CTG dự đoán giá T+1 đến T+5).
                 *   *Tiền xử lý*: `feature_engineering_stock.py`.
             2.  **Phân Nhóm Ngân Hàng (K-Means)**:
-                *   *Tập tin*: `train_kmeans.py` (Áp dụng PCA giảm chiều và K-Means gom cụm 46 ngân hàng).
+                *   *Tập tin*: `train_kmeans.py` (Áp dụng PCA giảm chiều và K-Means gom cụm 45 ngân hàng).
                 *   *Tiền xử lý*: `feature_engineering_bank.py`.
             3.  **Phân Loại Rủi Ro Tín Dụng (Random Forest)**:
                 *   *Tập tin*: `train_random_forest.py` (Phân loại rủi ro nợ xấu NPL ≥ 3%).
@@ -330,7 +329,7 @@ def show_intro_section():
 
         raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
         etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
-        bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 5 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+        bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 2 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
         ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
         app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
 
