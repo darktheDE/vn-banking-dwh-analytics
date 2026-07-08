@@ -29,76 +29,48 @@ These rules apply universally before loading to BigQuery:
 
 ## 3. Per-File Transformation Specification
 
-### 3.1 File F3 — Consolidated Price History (BID, TCB, VCB, CTG) → `fact_price_history`
+### 3.1 Daily Stock Metrics Consolidation (Consolidated Market Data) → `fact_stock_daily_metrics`
 
-**Source**: Processed CSV files per bank in `data/processed/<ticker>/<ticker>_stock_history.csv`.
+**Source**: Cleaned CSV files of price history, foreign trading, proprietary trading, and order stats:
+- `fact_price_history_clean.csv` (Price base for BID, TCB, VCB, CTG - 11,835 rows)
+- `fact_foreign_trading_clean.csv` (Foreign trading flow for BID - 22 rows)
+- `fact_proprietary_trading_clean.csv` (Proprietary trading flow for BID - 22 rows)
+- `fact_order_stats_clean.csv` (Order statistics for BID - 22 rows)
 
-**Column Mappings**:
-
-| Raw Column Name | Canonical Field | Transform Rule |
-|-----------------|-----------------|----------------|
-| Date / Ngày | `date_key` | Parse as `datetime`, format to YYYYMMDD INT64 |
-| Open / Mở cửa | `open_price` | Cast to `float64`. Divide by 1000 if stored in units of đồng (verify unit). |
-| High / Cao nhất | `high_price` | Cast to `float64` |
-| Low / Thấp nhất | `low_price` | Cast to `float64` |
-| Close / Đóng cửa | `close_price` | Cast to `float64`. This is the **LSTM target variable**. |
-| Volume / Khối lượng | `trading_volume` | Cast to `Int64`. Remove commas before casting. |
-
-**Stock Key Assignment**: BID=1, TCB=2, VCB=3, CTG=4.
-
-**Missing Value Rule**: No forward-fill. If `close_price` is null for any row, reject the row and log a warning.
-
-**Validation**: Consolidated row count after load equals 11,835 across all 4 banks.
-
----
-
-### 3.2 File F1 — BID Foreign Trading → `fact_foreign_trading`
+**Consolidation Logic**:
+- Python ETL script `consolidate_stock_metrics.py` performs a Left Join with `fact_price_history_clean.csv` as the base table and joins the other three flow tables on `(date_key, stock_key)`.
+- For stocks and dates lacking flow metrics (TCB, VCB, CTG, and non-sample dates of BID), the respective flow/order fields are filled with `NULL`.
 
 **Column Mappings**:
 
-| Raw Column Name | Canonical Field | Transform Rule |
-|-----------------|-----------------|----------------|
-| Date | `date_key` | Parse as `datetime`, format to YYYYMMDD |
-| Foreign Buy Volume | `foreign_buy_volume` | Cast to `Int64` |
-| Foreign Sell Volume | `foreign_sell_volume` | Cast to `Int64` |
-| Foreign Net Volume | `foreign_net_volume` | Compute as `foreign_buy_volume - foreign_sell_volume` if not present directly |
-| Foreign Net Value | `foreign_net_value` | Cast to `float64`. Units: VND billions. |
-| Foreign Ownership | `foreign_ownership_ratio` | Cast to `float64`. Divide by 100 if stored as percentage integer. |
+| Canonical Field | Source Field / Column mapping | Transform Rule |
+|-----------------|-------------------------------|----------------|
+| `date_key` | Date / Ngày | Parse as `datetime`, format to YYYYMMDD INT64 |
+| `stock_key` | Ticker | Assigned based on ticker: BID=1, TCB=2, VCB=3, CTG=4 |
+| `open_price` | Open / Mở cửa | Cast to `float64`. |
+| `high_price` | High / Cao nhất | Cast to `float64` |
+| `low_price` | Low / Thấp nhất | Cast to `float64` |
+| `close_price` | Close / Đóng cửa | Cast to `float64`. This is the **LSTM target variable**. |
+| `trading_volume` | Volume / Khối lượng | Cast to `Int64`. Remove commas. |
+| `foreign_buy_volume` | Foreign Buy Volume | Cast to `Int64` |
+| `foreign_sell_volume` | Foreign Sell Volume | Cast to `Int64` |
+| `foreign_net_volume` | Foreign Net Volume | Compute as `foreign_buy_volume - foreign_sell_volume` |
+| `foreign_net_value` | Foreign Net Value | Cast to `float64` |
+| `foreign_ownership_ratio` | Foreign Ownership Ratio | Cast to `float64`. Divide by 100 if stored as percentage. |
+| `prop_buy_volume` | Prop Buy Volume | Cast to `Int64` |
+| `prop_sell_volume` | Prop Sell Volume | Cast to `Int64` |
+| `prop_net_volume` | Prop Net Volume | Compute as `prop_buy_volume - prop_sell_volume` |
+| `prop_net_value` | Prop Net Value | Cast to `float64` |
+| `total_buy_orders` | Total Buy Orders | Cast to `Int64` |
+| `total_buy_volume` | Total Buy Volume | Cast to `Int64` |
+| `total_sell_orders` | Total Sell Orders | Cast to `Int64` |
+| `total_sell_volume` | Total Sell Volume | Cast to `Int64` |
+| `matched_volume` | Matched Volume | Cast to `Int64` |
 
-**Missing Value Rule**: If any metric column is null, apply **forward-fill** (maximum 1 day) then log a warning.
-
----
-
-### 3.3 File F2 — BID Proprietary Trading → `fact_proprietary_trading`
-
-**Column Mappings**:
-
-| Raw Column Name | Canonical Field | Transform Rule |
-|-----------------|-----------------|----------------|
-| Date | `date_key` | Parse as `datetime`, format to YYYYMMDD |
-| Prop Buy Volume | `prop_buy_volume` | Cast to `Int64` |
-| Prop Sell Volume | `prop_sell_volume` | Cast to `Int64` |
-| Prop Net Volume | `prop_net_volume` | Compute as `prop_buy_volume - prop_sell_volume` if absent |
-| Prop Net Value | `prop_net_value` | Cast to `float64`. Units: VND billions. |
-
-**Missing Value Rule**: Forward-fill with maximum 1 day.
-
----
-
-### 3.4 File F4 — BID Order Statistics → `fact_order_stats`
-
-**Column Mappings**:
-
-| Raw Column Name | Canonical Field | Transform Rule |
-|-----------------|-----------------|----------------|
-| Date | `date_key` | Parse as `datetime`, format to YYYYMMDD |
-| Total Buy Orders | `total_buy_orders` | Cast to `Int64` |
-| Total Buy Volume | `total_buy_volume` | Cast to `Int64` |
-| Total Sell Orders | `total_sell_orders` | Cast to `Int64` |
-| Total Sell Volume | `total_sell_volume` | Cast to `Int64` |
-| Matched Volume | `matched_volume` | Cast to `Int64` |
-
-**Missing Value Rule**: No forward-fill. Null rows are rejected and logged.
+**Missing Value Rule**:
+- For price history metrics: If `close_price` is null, reject the row and log an ERROR.
+- For foreign and proprietary trading flow features (only populated on BID sample dates): forward-fill with maximum 1 day in the source clean step, else keep NULL.
+- For order statistics: No forward-fill. Keep NULL if not present.
 
 ---
 
@@ -177,8 +149,8 @@ To enable robust incremental loading (upserts) and guarantee idempotency without
 For daily fact tables (e.g. `fact_price_history`), the incremental loading logic should follow this template:
 
 ```sql
-MERGE INTO `{project_id}.{dataset_id}.fact_price_history` target
-USING `{project_id}.{dataset_id}.staging_fact_price_history` staging
+MERGE INTO `{project_id}.{dataset_id}.fact_stock_daily_metrics` target
+USING `{project_id}.{dataset_id}.staging_fact_stock_daily_metrics` staging
 ON target.date_key = staging.date_key AND target.stock_key = staging.stock_key
 WHEN MATCHED THEN
   UPDATE SET
@@ -187,10 +159,36 @@ WHEN MATCHED THEN
     target.low_price = staging.low_price,
     target.close_price = staging.close_price,
     target.trading_volume = staging.trading_volume,
+    target.foreign_buy_volume = staging.foreign_buy_volume,
+    target.foreign_sell_volume = staging.foreign_sell_volume,
+    target.foreign_net_volume = staging.foreign_net_volume,
+    target.foreign_net_value = staging.foreign_net_value,
+    target.foreign_ownership_ratio = staging.foreign_ownership_ratio,
+    target.prop_buy_volume = staging.prop_buy_volume,
+    target.prop_sell_volume = staging.prop_sell_volume,
+    target.prop_net_volume = staging.prop_net_volume,
+    target.prop_net_value = staging.prop_net_value,
+    target.total_buy_orders = staging.total_buy_orders,
+    target.total_buy_volume = staging.total_buy_volume,
+    target.total_sell_orders = staging.total_sell_orders,
+    target.total_sell_volume = staging.total_sell_volume,
+    target.matched_volume = staging.matched_volume,
     target._updated_at = CURRENT_TIMESTAMP()
 WHEN NOT MATCHED THEN
-  INSERT (date_key, stock_key, open_price, high_price, low_price, close_price, trading_volume, _created_at, _updated_at, _source_file)
-  VALUES (staging.date_key, staging.stock_key, staging.open_price, staging.high_price, staging.low_price, staging.close_price, staging.trading_volume, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), staging._source_file)
+  INSERT (
+    date_key, stock_key, open_price, high_price, low_price, close_price, trading_volume,
+    foreign_buy_volume, foreign_sell_volume, foreign_net_volume, foreign_net_value, foreign_ownership_ratio,
+    prop_buy_volume, prop_sell_volume, prop_net_volume, prop_net_value,
+    total_buy_orders, total_buy_volume, total_sell_orders, total_sell_volume, matched_volume,
+    _created_at, _updated_at, _source_file
+  )
+  VALUES (
+    staging.date_key, staging.stock_key, staging.open_price, staging.high_price, staging.low_price, staging.close_price, staging.trading_volume,
+    staging.foreign_buy_volume, staging.foreign_sell_volume, staging.foreign_net_volume, staging.foreign_net_value, staging.foreign_ownership_ratio,
+    staging.prop_buy_volume, staging.prop_sell_volume, staging.prop_net_volume, staging.prop_net_value,
+    staging.total_buy_orders, staging.total_buy_volume, staging.total_sell_orders, staging.total_sell_volume, staging.matched_volume,
+    CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), staging._source_file
+  )
 ```
 
 For dimension tables with SCD Type 2 tracking (`dim_bank`), updates must be performed using transactional SQL or multi-step MERGE queries that expire older rows and insert new rows with appropriate valid date windows.

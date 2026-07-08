@@ -309,6 +309,11 @@ def _write_clusters_to_bigquery(
         config: Application configuration.
     """
     output_df = df[["bank_key", "bank_code", "bank_name", "bank_type", "cluster_id"]].copy()
+    output_df["cluster_name"] = output_df["cluster_id"].map({
+        0: "TMCP Nhỏ",
+        1: "Trụ Cột Lớn",
+        2: "Ngân Hàng Ngoại"
+    })
     output_df["model_name"] = "KMeans_PCA"
 
     client = get_bigquery_client()

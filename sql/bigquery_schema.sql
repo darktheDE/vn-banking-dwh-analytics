@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.dim_audit` (
 -- 2. Fact Tables
 -- ------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_price_history` (
+CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_stock_daily_metrics` (
   date_key INT64 NOT NULL,
   stock_key INT64 NOT NULL,
   open_price FLOAT64,
@@ -89,52 +89,6 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_price_history` (
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY stock_key;
 
-CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_foreign_trading` (
-  date_key INT64 NOT NULL,
-  stock_key INT64 NOT NULL,
-  foreign_buy_volume INT64,
-  foreign_sell_volume INT64,
-  foreign_net_volume INT64,
-  foreign_net_value FLOAT64,
-  foreign_ownership_ratio FLOAT64,
-  audit_key INT64 NOT NULL,
-  _created_at TIMESTAMP,
-  _updated_at TIMESTAMP,
-  _source_file STRING
-)
-PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
-CLUSTER BY stock_key;
-
-CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_proprietary_trading` (
-  date_key INT64 NOT NULL,
-  stock_key INT64 NOT NULL,
-  prop_buy_volume INT64,
-  prop_sell_volume INT64,
-  prop_net_volume INT64,
-  prop_net_value FLOAT64,
-  audit_key INT64 NOT NULL,
-  _created_at TIMESTAMP,
-  _updated_at TIMESTAMP,
-  _source_file STRING
-)
-PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
-CLUSTER BY stock_key;
-
-CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_order_stats` (
-  date_key INT64 NOT NULL,
-  stock_key INT64 NOT NULL,
-  total_buy_orders INT64,
-  total_buy_volume INT64,
-  total_sell_orders INT64,
-  total_sell_volume INT64,
-  matched_volume INT64,
-  audit_key INT64 NOT NULL,
-  _created_at TIMESTAMP,
-  _updated_at TIMESTAMP,
-  _source_file STRING
-)
-PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
-CLUSTER BY stock_key;
 
 CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_bank_performance` (
   date_key INT64 NOT NULL,
