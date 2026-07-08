@@ -148,15 +148,15 @@ The following results were obtained from the latest production training run exec
 
 ### 8.1 LSTM Time Series Forecasting
 
-| Bank | Model File | Scaler File | LSTM RMSE | ARIMA RMSE | Acceptance |
-|------|-----------|-------------|-----------|------------|------------|
-| BID | `lstm_bid_price.keras` | `scaler_bid_price.pkl` | 0.9167 | 1.1696 | PASSED |
-| TCB | `lstm_tcb_price.keras` | `scaler_tcb_price.pkl` | 1.3725 | 9.4864 | PASSED |
-| VCB | `lstm_vcb_price.keras` | `scaler_vcb_price.pkl` | 2.9453 | 4.4900 | PASSED |
-| CTG | `lstm_ctg_price.keras` | `scaler_ctg_price.pkl` | 1.5025 | 11.3624 | PASSED |
+| Bank | Model File | Scaler File | Best Model Type | Best LSTM RMSE | ARIMA RMSE | Acceptance |
+|------|-----------|-------------|-----------------|----------------|------------|------------|
+| BID | `lstm_bid_best.keras` | `scaler_bid_best.pkl` | LSTM_Multivariate | 0.9634 | 1.1696 | PASSED |
+| TCB | `lstm_tcb_best.keras` | `scaler_tcb_best.pkl` | LSTM_Multivariate | 1.2589 | 9.4864 | PASSED |
+| VCB | `lstm_vcb_best.keras` | `scaler_vcb_best.pkl` | LSTM_Multivariate | 2.8278 | 4.4900 | PASSED |
+| CTG | `lstm_ctg_best.keras` | `scaler_ctg_best.pkl` | LSTM_Multivariate | 1.3733 | 11.3624 | PASSED |
 
-- **Feature Adaptation**: BID uses 12 features (OHLCV + foreign/proprietary trading signals). TCB, VCB, and CTG use 7 features (OHLCV + derived price/volume change) due to limited raw trading data availability for those banks.
-- **Output**: T+1 to T+5 predictions written to `fact_model_predictions` in BigQuery (exactly 20 rows).
+- **Comparison Findings**: For all 4 banking stocks, the Multivariate LSTM (enriched with Open, High, Low, Volume, price change, and volume change) consistently outperforms the Univariate baseline (price only), confirming that volume and volatility features improve short-term forecasting.
+- **Output**: T+1 to T+5 predictions of the best model written to `fact_model_predictions` in BigQuery (exactly 20 rows).
 
 ### 8.2 K-Means Clustering
 
@@ -169,7 +169,7 @@ The following results were obtained from the latest production training run exec
 | Cluster Distribution | Cụm 0 (TMCP Nhỏ): 13 banks, Cụm 1 (Trụ Cột Lớn): 24 banks, Cụm 2 (Ngân Hàng Ngoại): 2 banks |
 | Excluded Outliers | 6 banks (CB, VBSP, DAB, GPB, WEB, MDB) |
 | Model Files | `kmeans_model.pkl`, `pca_model.pkl`, `scaler_bank.pkl` |
-| Output | Cluster assignments written to `bank_cluster_assignments` in BigQuery (39 rows) |
+| Output | Cluster assignments written to `bank_cluster_assignments` in BigQuery including the new `cluster_name` column (39 rows) |
 
 ### 8.3 Random Forest Credit Risk Classification
 
@@ -181,6 +181,22 @@ The following results were obtained from the latest production training run exec
 | Model Files | `random_forest_credit_risk.pkl`, `rf_features.pkl` |
 | Output | Risk labels and probability written to `bank_risk_predictions` in BigQuery (661 rows) |
 
-### 8.4 All Model Artifacts Location
+### 8.4 Academic Statistical Refactoring Results
+
+#### A. Granger Causality & Panel Regression (llp_ratio -> npl_ratio)
+- **ADF Stationarity Test**: Level series are non-stationary. First differencing resolves non-stationarity for `llp_ratio` ($p < 0.001$).
+- **Granger Causality**: On the aggregated time series (first-differenced), Granger Causality at lag 1 year is weakly significant ($p = 0.0914$), showing a predictive tendency from loan loss provisions to non-performing loans.
+- **Lagged Panel Regression**: Evaluated on the full 39-bank panel with entity fixed effects (LSDV):
+  - Prior NPL ($NPL_{t-1}$) is a highly significant predictor of current NPL ($\beta = 0.605, p < 0.001$).
+  - Prior Provisions ($LLP_{t-1}$) coefficient is positive but not statistically significant at 5% ($\beta = 0.030, p = 0.413$).
+  - Overall adjusted R-squared is $48.95\%$.
+
+#### B. Dynamic Time Warping (DTW) Similarity Matrix
+Pairwise DTW distances on Z-score standardized closing prices (2018-06-04 to 2026-06-26):
+- **BIDV & VCB**: DTW Distance = $201.25$ (Pearson $r = 0.958$) -> Very high co-movement.
+- **CTG & TCB**: DTW Distance = $162.87$ (Pearson $r = 0.941$) -> High co-movement.
+- **TCB & VCB**: DTW Distance = $457.03$ (Pearson $r = 0.713$) -> Divergence.
+
+### 8.5 All Model Artifacts Location
 
 All model files are saved to `reports/models/` (gitignored for security). The directory is automatically created during training if it does not exist.

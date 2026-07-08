@@ -43,10 +43,7 @@ def validate_pipeline() -> bool:
     # 2. Load Fact Tables
     facts = {}
     fact_files = {
-        "fact_price_history": "fact_price_history_clean.csv",
-        "fact_foreign_trading": "fact_foreign_trading_clean.csv",
-        "fact_proprietary_trading": "fact_proprietary_trading_clean.csv",
-        "fact_order_stats": "fact_order_stats_clean.csv",
+        "fact_stock_daily_metrics": "fact_stock_daily_metrics_clean.csv",
         "fact_bank_performance": "fact_bank_performance_clean.csv",
     }
 
@@ -70,7 +67,7 @@ def validate_pipeline() -> bool:
             logger.info("[%s] All date_key values are valid in dim_date.", name)
 
     # Check 2: Stock Key reference
-    stock_facts = ["fact_price_history", "fact_foreign_trading", "fact_proprietary_trading", "fact_order_stats"]
+    stock_facts = ["fact_stock_daily_metrics"]
     for name in stock_facts:
         if name in facts:
             df = facts[name]
@@ -104,10 +101,10 @@ def validate_pipeline() -> bool:
             errors_count += 1
 
     # DQ-03: close_price not null
-    if "fact_price_history" in facts:
-        df = facts["fact_price_history"]
+    if "fact_stock_daily_metrics" in facts:
+        df = facts["fact_stock_daily_metrics"]
         if df["close_price"].isna().any():
-            logger.error("[fact_price_history] Found null values in close_price.")
+            logger.error("[fact_stock_daily_metrics] Found null values in close_price.")
             errors_count += 1
 
     # DQ-04: npl_ratio not null after imputation
@@ -123,10 +120,7 @@ def validate_pipeline() -> bool:
         "dim_stock": ["stock_key"],
         "dim_bank": ["bank_code", "valid_from"],
         "dim_trading_session": ["session_key"],
-        "fact_price_history": ["date_key", "stock_key"],
-        "fact_foreign_trading": ["date_key", "stock_key"],
-        "fact_proprietary_trading": ["date_key", "stock_key"],
-        "fact_order_stats": ["date_key", "stock_key"],
+        "fact_stock_daily_metrics": ["date_key", "stock_key"],
         "fact_bank_performance": ["date_key", "bank_key"],
     }
 

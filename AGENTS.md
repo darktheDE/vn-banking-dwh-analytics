@@ -310,7 +310,7 @@ All variables are defined in `.env.example`. Never access them by any other mean
 
 ## 11. Tone and Communication
 
-- **Language**: Formal English. No emojis in code comments or documentation.
+- **Language**: Formal Vietnamese. No emojis in code comments or documentation.
 - **Abbreviations**: Write "such as" instead of "e.g.", "including" instead of "etc.".
 - **Explanations**: Justify architectural decisions (why this design, not just what). Responses must be defensible before an academic review board.
 - **Ambiguity**: If a request conflicts with a spec document, flag the conflict explicitly and ask for clarification before proceeding.

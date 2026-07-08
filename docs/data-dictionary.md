@@ -12,40 +12,17 @@ This document defines all data entities, source fields, and derived variables us
 
 | File ID | Source File Description | Target Fact Table | Granularity |
 |---------|------------------------|-------------------|-------------|
-| `F1` | BID — Foreign Trading (Net Volume, Value) | `fact_foreign_trading` | Daily (22 sessions) |
-| `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_proprietary_trading` | Daily (22 sessions) |
-| `F3` | BID — Price History (OHLCV) | `fact_price_history` | Daily (22 sessions) |
-| `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_order_stats` | Daily (22 sessions) |
+| `F1` | BID — Foreign Trading (Net Volume, Value) | `fact_stock_daily_metrics` | Daily (22 sessions) |
+| `F2` | BID — Proprietary Trading (Net Volume, Value) | `fact_stock_daily_metrics` | Daily (22 sessions) |
+| `F3` | BID — Price History (OHLCV) | `fact_stock_daily_metrics` | Daily (22 sessions) |
+| `F4` | BID — Order Statistics (Buy/Sell Orders, Matched Vol) | `fact_stock_daily_metrics` | Daily (22 sessions) |
 | `F6–F7` | 45 Commercial Banks — CAMELS Financials (2002–2022) | `fact_bank_performance` | Annual / per bank |
 
 ---
 
 ## 2. Stock Market Variables (BID, TCB, VCB, CTG)
 
-### 2.1 Foreign Trading (`fact_foreign_trading`)
-
-| Raw Column | Canonical Field | BigQuery Type | Description |
-|------------|-----------------|---------------|-------------|
-| Date | `date_key` | INT64 (FK) | Trading date in YYYYMMDD format |
-| Ticker | `stock_key` | INT64 (FK) | References `dim_stock` |
-| Foreign Buy Volume | `foreign_buy_volume` | INT64 | Total shares purchased by foreign investors |
-| Foreign Sell Volume | `foreign_sell_volume` | INT64 | Total shares sold by foreign investors |
-| Foreign Net Volume | `foreign_net_volume` | INT64 | Buy Volume minus Sell Volume |
-| Foreign Net Value | `foreign_net_value` | FLOAT64 | Net transaction value in VND billions |
-| Foreign Ownership Ratio | `foreign_ownership_ratio` | FLOAT64 | Percentage of shares held by foreign investors |
-
-### 2.2 Proprietary Trading (`fact_proprietary_trading`)
-
-| Raw Column | Canonical Field | BigQuery Type | Description |
-|------------|-----------------|---------------|-------------|
-| Date | `date_key` | INT64 (FK) | Trading date in YYYYMMDD format |
-| Ticker | `stock_key` | INT64 (FK) | References `dim_stock` |
-| Prop Buy Volume | `prop_buy_volume` | INT64 | Total shares purchased by proprietary desks (Khối tự doanh) |
-| Prop Sell Volume | `prop_sell_volume` | INT64 | Total shares sold by proprietary desks |
-| Prop Net Volume | `prop_net_volume` | INT64 | Buy minus Sell volume |
-| Prop Net Value | `prop_net_value` | FLOAT64 | Net value in VND billions |
-
-### 2.3 Price History OHLCV (`fact_price_history`)
+### 2.1 Daily Stock Metrics (`fact_stock_daily_metrics`)
 
 | Raw Column | Canonical Field | BigQuery Type | Description |
 |------------|-----------------|---------------|-------------|
@@ -56,18 +33,20 @@ This document defines all data entities, source fields, and derived variables us
 | Low | `low_price` | FLOAT64 | Lowest traded price of the session (VND) |
 | Close | `close_price` | FLOAT64 | **Primary LSTM target variable.** Closing price (VND) |
 | Volume | `trading_volume` | INT64 | Total matched volume in the session |
-
-### 2.4 Order Statistics (`fact_order_stats`)
-
-| Raw Column | Canonical Field | BigQuery Type | Description |
-|------------|-----------------|---------------|-------------|
-| Date | `date_key` | INT64 (FK) | Trading date |
-| Ticker | `stock_key` | INT64 (FK) | References `dim_stock` |
-| Total Buy Orders | `total_buy_orders` | INT64 | Number of buy order placements |
-| Total Buy Volume | `total_buy_volume` | INT64 | Total volume in buy orders |
-| Total Sell Orders | `total_sell_orders` | INT64 | Number of sell order placements |
-| Total Sell Volume | `total_sell_volume` | INT64 | Total volume in sell orders |
-| Matched Volume | `matched_volume` | INT64 | Total volume successfully matched |
+| Foreign Buy Volume | `foreign_buy_volume` | INT64 | Total shares purchased by foreign investors (BID only) |
+| Foreign Sell Volume | `foreign_sell_volume` | INT64 | Total shares sold by foreign investors (BID only) |
+| Foreign Net Volume | `foreign_net_volume` | INT64 | Buy Volume minus Sell Volume (BID only) |
+| Foreign Net Value | `foreign_net_value` | FLOAT64 | Net transaction value in VND billions (BID only) |
+| Foreign Ownership Ratio | `foreign_ownership_ratio` | FLOAT64 | Percentage of shares held by foreign investors (BID only) |
+| Prop Buy Volume | `prop_buy_volume` | INT64 | Total shares purchased by proprietary desks (Khối tự doanh - BID only) |
+| Prop Sell Volume | `prop_sell_volume` | INT64 | Total shares sold by proprietary desks (BID only) |
+| Prop Net Volume | `prop_net_volume` | INT64 | Buy minus Sell volume (BID only) |
+| Prop Net Value | `prop_net_value` | FLOAT64 | Net value in VND billions (BID only) |
+| Total Buy Orders | `total_buy_orders` | INT64 | Number of buy order placements (BID only) |
+| Total Buy Volume | `total_buy_volume` | INT64 | Total volume in buy orders (BID only) |
+| Total Sell Orders | `total_sell_orders` | INT64 | Number of sell order placements (BID only) |
+| Total Sell Volume | `total_sell_volume` | INT64 | Total volume in sell orders (BID only) |
+| Matched Volume | `matched_volume` | INT64 | Total volume successfully matched (BID only) |
 
 
 
@@ -183,7 +162,7 @@ These fields are populated by the ML training and inference runs and stored in t
 |---------|-------|------|---------------------|
 | DQ-01 | All Fact tables | `date_key` must reference a valid row in `dim_date` | Reject record; log error |
 | DQ-02 | `fact_bank_performance` | `npl_ratio` must be in range [0.0, 1.0] | Flag for manual review |
-| DQ-03 | `fact_price_history` | `close_price` must be > 0 | Reject record; log error |
+| DQ-03 | `fact_stock_daily_metrics` | `close_price` must be > 0 | Reject record; log error |
 | DQ-04 | `fact_bank_performance` | Missing values for years 2002–2005 must be imputed using column median | Impute during ETL Transform step |
 | DQ-05 | All tables | `audit_key` must be present and not null | Reject record; log error |
-| DQ-06 | `fact_foreign_trading` | `foreign_buy_volume` and `foreign_sell_volume` must be ≥ 0 | Reject negative values |
+| DQ-06 | `fact_stock_daily_metrics` | `foreign_buy_volume` and `foreign_sell_volume` must be ≥ 0 (when present) | Reject negative values |

@@ -81,8 +81,8 @@ TABLES_TO_CSV = {
             "audit_key": "int64",
         }
     },
-    "fact_price_history": {
-        "file": "fact_price_history_clean.csv",
+    "fact_stock_daily_metrics": {
+        "file": "fact_stock_daily_metrics_clean.csv",
         "keys": ["date_key", "stock_key"],
         "columns": [
             "date_key", "stock_key", "open_price", "high_price", "low_price", "close_price", "trading_volume",
@@ -96,59 +96,6 @@ TABLES_TO_CSV = {
             "low_price": "float64",
             "close_price": "float64",
             "trading_volume": "int64",
-            "audit_key": "int64",
-        }
-    },
-    "fact_foreign_trading": {
-        "file": "fact_foreign_trading_clean.csv",
-        "keys": ["date_key", "stock_key"],
-        "columns": [
-            "date_key", "stock_key", "foreign_buy_volume", "foreign_sell_volume", "foreign_net_volume", "foreign_net_value", "foreign_ownership_ratio",
-            "audit_key", "_created_at", "_updated_at", "_source_file"
-        ],
-        "types": {
-            "date_key": "int64",
-            "stock_key": "int64",
-            "foreign_buy_volume": "int64",
-            "foreign_sell_volume": "int64",
-            "foreign_net_volume": "int64",
-            "foreign_net_value": "float64",
-            "foreign_ownership_ratio": "float64",
-            "audit_key": "int64",
-        }
-    },
-    "fact_proprietary_trading": {
-        "file": "fact_proprietary_trading_clean.csv",
-        "keys": ["date_key", "stock_key"],
-        "columns": [
-            "date_key", "stock_key", "prop_buy_volume", "prop_sell_volume", "prop_net_volume", "prop_net_value",
-            "audit_key", "_created_at", "_updated_at", "_source_file"
-        ],
-        "types": {
-            "date_key": "int64",
-            "stock_key": "int64",
-            "prop_buy_volume": "int64",
-            "prop_sell_volume": "int64",
-            "prop_net_volume": "int64",
-            "prop_net_value": "float64",
-            "audit_key": "int64",
-        }
-    },
-    "fact_order_stats": {
-        "file": "fact_order_stats_clean.csv",
-        "keys": ["date_key", "stock_key"],
-        "columns": [
-            "date_key", "stock_key", "total_buy_orders", "total_buy_volume", "total_sell_orders", "total_sell_volume", "matched_volume",
-            "audit_key", "_created_at", "_updated_at", "_source_file"
-        ],
-        "types": {
-            "date_key": "int64",
-            "stock_key": "int64",
-            "total_buy_orders": "int64",
-            "total_buy_volume": "int64",
-            "total_sell_orders": "int64",
-            "total_sell_volume": "int64",
-            "matched_volume": "int64",
             "audit_key": "int64",
         }
     },

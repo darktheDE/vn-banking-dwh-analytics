@@ -17,10 +17,7 @@ def main():
     client = get_bigquery_client()
     
     tables = [
-        "fact_price_history",
-        "fact_foreign_trading",
-        "fact_proprietary_trading",
-        "fact_order_stats",
+        "fact_stock_daily_metrics",
         "fact_bank_performance",
         "dim_date",
         "dim_stock",
