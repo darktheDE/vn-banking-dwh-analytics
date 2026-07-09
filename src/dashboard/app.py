@@ -480,6 +480,148 @@ def show_eda_section():
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
         st.caption("Tình hình: Mối tương quan cực kỳ mạnh mẽ (hệ số > 0.8) giữa ROA và ROE phản ánh cấu trúc lợi nhuận đồng thuận. Ngược lại, CIR tương quan âm rõ rệt với ROA/ROE, chứng minh tối ưu hóa chi phí hoạt động trực tiếp quyết định khả năng sinh lời của các ngân hàng.")
 
+        st.markdown("---")
+        st.subheader("🔍 Phân Tích Cặp Chỉ Số Tương Quan Đặc Biệt")
+        st.write("Lựa chọn các cặp biến tài chính có mối quan hệ nghiệp vụ đặc thù để xem biểu đồ phân tán (Scatter Plot) kèm đường xu hướng (OLS Trendline):")
+        
+        pair_option = st.selectbox(
+            "Chọn cặp biến tài chính để phân tích tương quan",
+            [
+                "Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA) - Quan hệ Hiệu quả & Sinh lời",
+                "Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM) - Quan hệ Phân bổ tài sản & Biên lợi nhuận",
+                "Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD) - Quan hệ Thanh khoản & Đệm vốn an toàn"
+            ],
+            key="corr_pair_selectbox"
+        )
+        
+        # Multiply features by 100 to show in %
+        plot_df = df.copy()
+        for col in feature_cols:
+            plot_df[col] = plot_df[col] * 100
+            
+        if "CIR" in pair_option:
+            # Filter outliers: CIR <= 150%, ROA between -5% and 5% for clean visualization
+            sub_df = plot_df[(plot_df["cir"] >= 0) & (plot_df["cir"] <= 150) & (plot_df["roa"] >= -5) & (plot_df["roa"] <= 5)].copy()
+            sub_df = sub_df.dropna(subset=["cir", "roa"])
+            
+            fig_scatter = px.scatter(
+                sub_df,
+                x="cir",
+                y="roa",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                title="Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA)",
+                labels={"cir": "CIR (%)", "roa": "ROA (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
+            )
+            
+            # Add overall trendline
+            if len(sub_df) > 1:
+                x_vals = sub_df["cir"].values
+                y_vals = sub_df["roa"].values
+                idx = np.argsort(x_vals)
+                a, b = np.polyfit(x_vals, y_vals, 1)
+                fig_scatter.add_trace(
+                    go.Scatter(
+                        x=x_vals[idx],
+                        y=a * x_vals[idx] + b,
+                        mode="lines",
+                        name="Xu hướng chung hệ thống",
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
+                    )
+                )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            
+            st.markdown("""
+            ### 💡 Phân Tích Nghiệp Vụ (Hiệu quả vs Sinh lời):
+            *   **Mối quan hệ xu hướng (Đường nét đứt màu đen)**: Xu hướng dốc xuống thể hiện **tương quan nghịch**. Khi tỷ lệ chi phí trên thu nhập (CIR) tăng lên $\rightarrow$ Tỷ suất sinh lời trên tài sản (ROA) giảm đi.
+            *   **Ý nghĩa tài chính**: CIR đo lường mức độ tiêu tốn chi phí vận hành để tạo ra thu nhập. CIR càng cao chứng tỏ quản trị chi phí kém hiệu quả, làm xói mòn lợi nhuận ròng cuối cùng của ngân hàng.
+            *   **Phân hóa nhóm**: 
+                *   *Nhóm quốc doanh (SOCB - màu xanh dương)*: Tập trung ở góc dưới bên trái (CIR thấp, ROA ổn định) nhờ lợi thế quy mô lớn giúp tối ưu chi phí hoạt động.
+                *   *Nhóm cổ phần tư nhân (JSCB - màu đỏ)*: Phân tán rộng thể hiện sự phân cực lớn về năng lực quản lý hiệu quả giữa các ngân hàng.
+            """)
+            
+        elif "LTA" in pair_option:
+            # Filter outliers: LTA <= 100%, NIM between 0% and 10%
+            sub_df = plot_df[(plot_df["lta"] <= 100) & (plot_df["nim"] >= 0) & (plot_df["nim"] <= 10)].copy()
+            sub_df = sub_df.dropna(subset=["lta", "nim"])
+            
+            fig_scatter = px.scatter(
+                sub_df,
+                x="lta",
+                y="nim",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                title="Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM)",
+                labels={"lta": "LTA (%)", "nim": "NIM (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
+            )
+            
+            # Add overall trendline
+            if len(sub_df) > 1:
+                x_vals = sub_df["lta"].values
+                y_vals = sub_df["nim"].values
+                idx = np.argsort(x_vals)
+                a, b = np.polyfit(x_vals, y_vals, 1)
+                fig_scatter.add_trace(
+                    go.Scatter(
+                        x=x_vals[idx],
+                        y=a * x_vals[idx] + b,
+                        mode="lines",
+                        name="Xu hướng chung hệ thống",
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
+                    )
+                )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            
+            st.markdown("""
+            ### 💡 Phân Tích Nghiệp Vụ (Tập trung tài sản vs Lợi nhuận):
+            *   **Mối quan hệ xu hướng (Đường nét đứt màu đen)**: Xu hướng dốc lên thể hiện **tương quan thuận**. Ngân hàng nào phân bổ nhiều tài sản vào cho vay tín dụng (LTA tăng) $\rightarrow$ Biên lãi thuần (NIM) có xu hướng tăng theo.
+            *   **Ý nghĩa tài chính**: Trong cấu trúc tài sản của ngân hàng thương mại, cho vay khách hàng là tài sản sinh lời có mức sinh suất lợi nhuận cao nhất (so với đầu tư trái phiếu hay gửi tiền liên ngân hàng). Càng tăng tỷ trọng cho vay, ngân hàng càng thu về nhiều thu nhập lãi thuần trên quy mô tài sản.
+            *   **Phân hóa nhóm**:
+                *   *Nhóm ngân hàng ngoại (FOCB - màu xanh lá)*: Tập trung ở góc dưới bên trái (LTA thấp, NIM thấp) do chiến lược hoạt động thận trọng, không chạy theo tín dụng bán lẻ đại trà.
+                *   *Nhóm thương mại cổ phần (JSCB - màu đỏ)*: Tập trung nhiều ở vùng LTA và NIM cao, phản ánh định hướng tăng trưởng nóng thông qua cho vay tiêu dùng và doanh nghiệp.
+            """)
+            
+        else:
+            # Filter outliers: LTD <= 150%, ETD <= 100%
+            sub_df = plot_df[(plot_df["ltd"] <= 150) & (plot_df["etd"] <= 100)].copy()
+            sub_df = sub_df.dropna(subset=["ltd", "etd"])
+            
+            fig_scatter = px.scatter(
+                sub_df,
+                x="ltd",
+                y="etd",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                title="Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD)",
+                labels={"ltd": "LTD (%)", "etd": "ETD (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
+            )
+            
+            # Add overall trendline
+            if len(sub_df) > 1:
+                x_vals = sub_df["ltd"].values
+                y_vals = sub_df["etd"].values
+                idx = np.argsort(x_vals)
+                a, b = np.polyfit(x_vals, y_vals, 1)
+                fig_scatter.add_trace(
+                    go.Scatter(
+                        x=x_vals[idx],
+                        y=a * x_vals[idx] + b,
+                        mode="lines",
+                        name="Xu hướng chung hệ thống",
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
+                    )
+                )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            
+            st.markdown("""
+            ### 💡 Phân Tích Nghiệp Vụ (Thanh khoản vs Bộ đệm vốn an toàn):
+            *   **Mối quan hệ xu hướng (Đường nét đứt màu đen)**: Xu hướng dốc lên thể hiện **tương quan thuận rất mạnh**. Khi tỷ lệ LTD (Cho vay trên Tiền gửi) tăng lên $\rightarrow$ Tỷ lệ ETD (Vốn chủ sở hữu trên Tiền gửi) bắt buộc phải tăng theo tương xứng.
+            *   **Ý nghĩa tài chính**: LTD đo lường mức độ chuyển hóa nguồn vốn huy động thành cho vay. LTD càng cao, rủi ro thanh khoản của ngân hàng càng lớn (do cho vay là tài sản kỳ hạn dài và khó thu hồi ngay lập tức). Để phòng vệ, ngân hàng buộc phải tích lũy nguồn vốn chủ sở hữu dày hơn (ETD tăng) để làm đệm giảm xóc tài chính, bảo vệ người gửi tiền trước nguy cơ rút tiền hàng loạt.
+            *   *Lưu ý*: Biểu đồ đã lọc bỏ các thực thể đặc thù phi thương mại như Ngân hàng chính sách VBSP (LTD > 6000%) do nhóm này hoạt động hoàn toàn bằng nguồn cấp vốn từ ngân sách nhà nước, không huy động tiền gửi dân cư thông thường.
+            """)
     elif eda_mode == "Xu Hướng Theo Thời Gian":
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
         trend_col = st.selectbox(
@@ -992,18 +1134,18 @@ def show_bank_clustering_section():
     df_clean["PC1"] = pca_data[:, 0]
     df_clean["PC2"] = pca_data[:, 1]
     
-    # Define cluster names and color map
+    # Define cluster names and color map using raw names first
     cluster_names = {
-        0: "Cụm 0 (TMCP Nhỏ)",
-        1: "Cụm 1 (Trụ Cột Lớn)",
-        2: "Cụm 2 (Ngân Hàng Ngoại)"
+        0: "Cụm 0",
+        1: "Cụm 1",
+        2: "Cụm 2"
     }
     df_clean["Phân Nhóm (Cluster)"] = df_clean["cluster_id"].map(cluster_names)
     
     color_map = {
-        "Cụm 0 (TMCP Nhỏ)": "#3b82f6",      # blue
-        "Cụm 1 (Trụ Cột Lớn)": "#ec4899",    # pink/rose
-        "Cụm 2 (Ngân Hàng Ngoại)": "#10b981" # green
+        "Cụm 0": "#3b82f6",      # blue
+        "Cụm 1": "#ec4899",    # pink/rose
+        "Cụm 2": "#10b981" # green
     }
     
     # Scatter plot
@@ -1020,7 +1162,7 @@ def show_bank_clustering_section():
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
     fig.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân cụm rõ rệt thành 3 nhóm chiến lược: Cụm 0 (13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản), Cụm 1 (24 ngân hàng thương mại lớn và trung bình đóng vai trò trụ cột hệ thống), và Cụm 2 (2 chi nhánh ngân hàng nước ngoài có an toàn vốn vượt trội).")
+    st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân chia rõ rệt thành 3 cụm riêng biệt: Cụm 0 (màu xanh dương), Cụm 1 (màu hồng), và Cụm 2 (màu xanh lá). Bước tiếp theo dưới đây sẽ đi vào so sánh đặc trưng tài chính của từng cụm để giải mã phong cách hoạt động của chúng.")
     
     # Show radar comparison
     st.subheader("So Sánh Đặc Trưng Chỉ Số Tài Chính Giữa Các Nhóm")
@@ -1056,7 +1198,7 @@ def show_bank_clustering_section():
         color_discrete_map=color_map
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: So sánh đặc trưng CAMELS chỉ ra sự phân hóa: Cụm 2 (Ngân hàng ngoại) có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 (Trụ cột lớn) giữ tỷ suất sinh lời ROE/ROA lành mạnh và tỷ lệ cho vay ở mức cao nhất; Cụm 0 (TMCP nhỏ) có biên NIM và hiệu quả kinh doanh khiêm tốn hơn.")
+    st.caption("Tình hình: Biểu đồ cột so sánh trung bình các chỉ số CAMELS cho thấy: Cụm 2 có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 duy trì tỷ suất sinh lời ROE/ROA lành mạnh và tỷ trọng cho vay ở mức cao nhất; Cụm 0 có các chỉ số biên NIM và khả năng sinh lời ở mức khiêm tốn hơn.")
     
     # Searchable list of banks in each cluster
     st.subheader("Danh Sách Thành Viên Phân Theo Nhóm")
@@ -1086,6 +1228,42 @@ def show_bank_clustering_section():
     }
     cluster_banks = cluster_banks.rename(columns=column_renames)
     st.dataframe(cluster_banks, use_container_width=True)
+
+    # ─────────────────────────────────────────────────────────────
+    # Bước 3: Định Danh Ý Nghĩa Cụm (Strategic Cluster Identification)
+    # ─────────────────────────────────────────────────────────────
+    st.markdown("---")
+    st.subheader("💡 Định Danh Ý Nghĩa Các Cụm Chiến Lược")
+    st.write("Từ các kết quả trực quan không gian phân cụm và đặc trưng chỉ số CAMELS ở các bước trên, nhóm nghiên cứu đưa ra định danh chính thức về chiến lược hoạt động của mỗi nhóm ngân hàng thương mại Việt Nam:")
+    
+    col_c0, col_c1, col_c2 = st.columns(3)
+    
+    with col_c0:
+        st.info("""
+        ### 🏦 Cụm 0
+        **Định danh: Nhóm TMCP Quy Mô Nhỏ**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Biên lãi ròng (NIM) mỏng, đệm vốn chủ sở hữu (ETA) ở mức trung bình và tỷ lệ chi phí trên thu nhập (CIR) cao nhất hệ thống (trung bình > 45%).
+        *   **Hành vi kinh doanh**: Đây là các ngân hàng cổ phần quy mô nhỏ hơn đang tích lũy quy mô tài sản. Do thiếu lợi thế quy mô, họ phải chịu chi phí vốn cao và chi phí vận hành chưa được tối ưu.
+        """)
+        
+    with col_c1:
+        st.error("""
+        ### 🏛️ Cụm 1
+        **Định danh: Nhóm Trụ Cột Hệ Thống**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Quy mô tài sản vượt trội, tỷ lệ sinh lời (ROE/ROA) cao và ổn định, đặc biệt hệ số hiệu quả vận hành (CIR) thấp nhất hệ thống (tối ưu hóa chi phí theo quy mô tốt).
+        *   **Hành vi kinh doanh**: Bao gồm 24 ngân hàng lớn nhất (như VCB, BID, CTG, TCB, MBB...). Đây là các định chế cột trụ dẫn dắt dòng vốn tín dụng và chi phối thị trường tài chính quốc gia.
+        """)
+        
+    with col_c2:
+        st.success("""
+        ### 🌐 Cụm 2
+        **Định danh: Khối Ngoại & Đặc Thù**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Đệm an toàn vốn (ETA, ETD) cực cao, tỷ lệ nợ xấu (NPL) gần như bằng không, tuy nhiên tỷ lệ cho vay (LTA, LTD) duy trì ở mức rất thấp.
+        *   **Hành vi kinh doanh**: Gồm các ngân hàng liên doanh hoặc chi nhánh nước ngoài hoạt động theo cơ chế quản trị rủi ro toàn cầu cực kỳ thận trọng, ưu tiên tính an toàn vốn và bảo toàn thanh khoản hơn là tăng trưởng tín dụng bán lẻ.
+        """)
 
 
 # ─────────────────────────────────────────────────────────────
