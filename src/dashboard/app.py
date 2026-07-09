@@ -500,49 +500,55 @@ def show_eda_section():
             plot_df[col] = plot_df[col] * 100
             
         if "CIR vs ROA" in pair_option:
+            # Filter outliers: CIR <= 150%, ROA between -5% and 5% for clean visualization
+            sub_df = plot_df[(plot_df["cir"] <= 150) & (plot_df["roa"] >= -5) & (plot_df["roa"] <= 5)]
             fig_scatter = px.scatter(
-                plot_df,
+                sub_df,
                 x="cir",
                 y="roa",
                 color="bank_type",
                 hover_data=["bank_code", "year"],
                 trendline="ols",
-                title="Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA)",
+                title="Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA) (Đã loại bỏ ngoại lệ)",
                 labels={"cir": "CIR (%)", "roa": "ROA (%)", "bank_type": "Phân loại Ngân hàng"},
-                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
             )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
-            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan âm rõ nét chứng minh CIR càng tăng (kém tối ưu chi phí vận hành), ROA càng giảm. Nhóm ngân hàng JSCB (màu đỏ) phân tán rộng phản ánh sự phân hóa về khả năng quản lý chi phí, trong khi SOCB (màu xanh dương) tập trung chặt chẽ hơn.")
+            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan âm rõ nét chứng minh CIR càng tăng (kém tối ưu chi phí vận hành), ROA càng giảm. Nhóm ngân hàng JSCB (màu đỏ) phân tán rộng phản ánh sự phân hóa về khả năng quản lý chi phí, trong khi SOCB (màu xanh dương) tập trung chặt chẽ hơn. *(Biểu đồ đã được lọc các giá trị dị biệt CIR > 150% hoặc ROA quá thấp để tối ưu hiển thị)*")
             
         elif "LTA vs NIM" in pair_option:
+            # Filter outliers: LTA <= 100%, NIM between 0% and 10%
+            sub_df = plot_df[(plot_df["lta"] <= 100) & (plot_df["nim"] >= 0) & (plot_df["nim"] <= 10)]
             fig_scatter = px.scatter(
-                plot_df,
+                sub_df,
                 x="lta",
                 y="nim",
                 color="bank_type",
                 hover_data=["bank_code", "year"],
                 trendline="ols",
-                title="Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM)",
+                title="Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM) (Đã loại bỏ ngoại lệ)",
                 labels={"lta": "LTA (%)", "nim": "NIM (%)", "bank_type": "Phân loại Ngân hàng"},
-                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
             )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
-            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan dương rõ rệt. Khi ngân hàng phân bổ nhiều tài sản hơn vào hoạt động cho vay (LTA cao), biên lãi ròng (NIM) có xu hướng tăng lên do cho vay là tài sản sinh lời có lợi suất cao nhất. Nhóm FOCB (màu xanh lá) duy trì LTA thấp và NIM khiêm tốn phản ánh tính phòng thủ.")
+            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan dương rõ rệt. Khi ngân hàng phân bổ nhiều tài sản hơn vào hoạt động cho vay (LTA cao), biên lãi ròng (NIM) có xu hướng tăng lên do cho vay là tài sản sinh lời có lợi suất cao nhất. Nhóm FOCB (màu xanh lá) duy trì LTA thấp và NIM khiêm tốn phản ánh tính phòng thủ. *(Biểu đồ đã giới hạn LTA <= 100% để hiển thị trực quan)*")
             
         else:
+            # Filter outliers: LTD <= 150%, ETD <= 100% (eliminates VBSP with LTD > 6000%)
+            sub_df = plot_df[(plot_df["ltd"] <= 150) & (plot_df["etd"] <= 100)]
             fig_scatter = px.scatter(
-                plot_df,
+                sub_df,
                 x="ltd",
                 y="etd",
                 color="bank_type",
                 hover_data=["bank_code", "year"],
                 trendline="ols",
-                title="Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD)",
+                title="Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD) (Đã loại bỏ ngoại lệ)",
                 labels={"ltd": "LTD (%)", "etd": "ETD (%)", "bank_type": "Phân loại Ngân hàng"},
-                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981", "PB": "#f59e0b"}
             )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
-            st.info("💡 **Phân tích nghiệp vụ**: Tương quan dương rất mạnh (0.87). Các ngân hàng cho vay nhiều so với nguồn tiền gửi huy động (LTD cao) bắt buộc phải tích lũy đệm vốn chủ sở hữu lớn so với tiền gửi (ETD cao) nhằm phòng ngừa rủi ro thanh khoản và đảm bảo tỷ lệ an toàn vốn theo quy định.")
+            st.info("💡 **Phân tích nghiệp vụ**: Tương quan dương rất mạnh (0.87). Các ngân hàng cho vay nhiều so với nguồn tiền gửi huy động (LTD cao) bắt buộc phải tích lũy đệm vốn chủ sở hữu lớn so với tiền gửi (ETD cao) nhằm phòng ngừa rủi ro thanh khoản và đảm bảo tỷ lệ an toàn vốn theo quy định. *(Biểu đồ đã lọc bỏ các điểm ngoại lệ cực hạn như Ngân hàng chính sách VBSP có LTD > 6000% do đặc thù không huy động tiền gửi dân cư)*")
 
     elif eda_mode == "Xu Hướng Theo Thời Gian":
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
