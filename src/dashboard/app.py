@@ -1134,18 +1134,18 @@ def show_bank_clustering_section():
     df_clean["PC1"] = pca_data[:, 0]
     df_clean["PC2"] = pca_data[:, 1]
     
-    # Define cluster names and color map
+    # Define cluster names and color map using raw names first
     cluster_names = {
-        0: "Cụm 0 (TMCP Nhỏ)",
-        1: "Cụm 1 (Trụ Cột Lớn)",
-        2: "Cụm 2 (Ngân Hàng Ngoại)"
+        0: "Cụm 0",
+        1: "Cụm 1",
+        2: "Cụm 2"
     }
     df_clean["Phân Nhóm (Cluster)"] = df_clean["cluster_id"].map(cluster_names)
     
     color_map = {
-        "Cụm 0 (TMCP Nhỏ)": "#3b82f6",      # blue
-        "Cụm 1 (Trụ Cột Lớn)": "#ec4899",    # pink/rose
-        "Cụm 2 (Ngân Hàng Ngoại)": "#10b981" # green
+        "Cụm 0": "#3b82f6",      # blue
+        "Cụm 1": "#ec4899",    # pink/rose
+        "Cụm 2": "#10b981" # green
     }
     
     # Scatter plot
@@ -1162,7 +1162,7 @@ def show_bank_clustering_section():
     fig.update_traces(textposition="top center", marker=dict(size=12, line=dict(color="white", width=1)))
     fig.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân cụm rõ rệt thành 3 nhóm chiến lược: Cụm 0 (13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản), Cụm 1 (24 ngân hàng thương mại lớn và trung bình đóng vai trò trụ cột hệ thống), và Cụm 2 (2 chi nhánh ngân hàng nước ngoài có an toàn vốn vượt trội).")
+    st.caption("Tình hình: Sau khi loại bỏ 6 ngân hàng ngoại lệ cực hạn và sáp nhập (DAB, CB, GPB, WEB, VBSP, MDB), hệ tọa độ 2D PCA phân chia rõ rệt thành 3 cụm riêng biệt: Cụm 0 (màu xanh dương), Cụm 1 (màu hồng), và Cụm 2 (màu xanh lá). Bước tiếp theo dưới đây sẽ đi vào so sánh đặc trưng tài chính của từng cụm để giải mã phong cách hoạt động của chúng.")
     
     # Show radar comparison
     st.subheader("So Sánh Đặc Trưng Chỉ Số Tài Chính Giữa Các Nhóm")
@@ -1198,7 +1198,7 @@ def show_bank_clustering_section():
         color_discrete_map=color_map
     )
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
-    st.caption("Tình hình: So sánh đặc trưng CAMELS chỉ ra sự phân hóa: Cụm 2 (Ngân hàng ngoại) có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 (Trụ cột lớn) giữ tỷ suất sinh lời ROE/ROA lành mạnh và tỷ lệ cho vay ở mức cao nhất; Cụm 0 (TMCP nhỏ) có biên NIM và hiệu quả kinh doanh khiêm tốn hơn.")
+    st.caption("Tình hình: Biểu đồ cột so sánh trung bình các chỉ số CAMELS cho thấy: Cụm 2 có an toàn vốn ETA rất cao và nợ xấu NPL cực thấp; Cụm 1 duy trì tỷ suất sinh lời ROE/ROA lành mạnh và tỷ trọng cho vay ở mức cao nhất; Cụm 0 có các chỉ số biên NIM và khả năng sinh lời ở mức khiêm tốn hơn.")
     
     # Searchable list of banks in each cluster
     st.subheader("Danh Sách Thành Viên Phân Theo Nhóm")
@@ -1228,6 +1228,42 @@ def show_bank_clustering_section():
     }
     cluster_banks = cluster_banks.rename(columns=column_renames)
     st.dataframe(cluster_banks, use_container_width=True)
+
+    # ─────────────────────────────────────────────────────────────
+    # Bước 3: Định Danh Ý Nghĩa Cụm (Strategic Cluster Identification)
+    # ─────────────────────────────────────────────────────────────
+    st.markdown("---")
+    st.subheader("💡 Định Danh Ý Nghĩa Các Cụm Chiến Lược")
+    st.write("Từ các kết quả trực quan không gian phân cụm và đặc trưng chỉ số CAMELS ở các bước trên, nhóm nghiên cứu đưa ra định danh chính thức về chiến lược hoạt động của mỗi nhóm ngân hàng thương mại Việt Nam:")
+    
+    col_c0, col_c1, col_c2 = st.columns(3)
+    
+    with col_c0:
+        st.info("""
+        ### 🏦 Cụm 0
+        **Định danh: Nhóm TMCP Quy Mô Nhỏ**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Biên lãi ròng (NIM) mỏng, đệm vốn chủ sở hữu (ETA) ở mức trung bình và tỷ lệ chi phí trên thu nhập (CIR) cao nhất hệ thống (trung bình > 45%).
+        *   **Hành vi kinh doanh**: Đây là các ngân hàng cổ phần quy mô nhỏ hơn đang tích lũy quy mô tài sản. Do thiếu lợi thế quy mô, họ phải chịu chi phí vốn cao và chi phí vận hành chưa được tối ưu.
+        """)
+        
+    with col_c1:
+        st.error("""
+        ### 🏛️ Cụm 1
+        **Định danh: Nhóm Trụ Cột Hệ Thống**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Quy mô tài sản vượt trội, tỷ lệ sinh lời (ROE/ROA) cao và ổn định, đặc biệt hệ số hiệu quả vận hành (CIR) thấp nhất hệ thống (tối ưu hóa chi phí theo quy mô tốt).
+        *   **Hành vi kinh doanh**: Bao gồm 24 ngân hàng lớn nhất (như VCB, BID, CTG, TCB, MBB...). Đây là các định chế cột trụ dẫn dắt dòng vốn tín dụng và chi phối thị trường tài chính quốc gia.
+        """)
+        
+    with col_c2:
+        st.success("""
+        ### 🌐 Cụm 2
+        **Định danh: Khối Ngoại & Đặc Thù**
+        
+        *   **Đặc trưng CAMELS nổi bật**: Đệm an toàn vốn (ETA, ETD) cực cao, tỷ lệ nợ xấu (NPL) gần như bằng không, tuy nhiên tỷ lệ cho vay (LTA, LTD) duy trì ở mức rất thấp.
+        *   **Hành vi kinh doanh**: Gồm các ngân hàng liên doanh hoặc chi nhánh nước ngoài hoạt động theo cơ chế quản trị rủi ro toàn cầu cực kỳ thận trọng, ưu tiên tính an toàn vốn và bảo toàn thanh khoản hơn là tăng trưởng tín dụng bán lẻ.
+        """)
 
 
 # ─────────────────────────────────────────────────────────────
