@@ -122,7 +122,7 @@ vn-banking-dwh-analytics/
 data/raw/*.xlsx
     │
     ▼  (src/etl/ using BigQuery MERGE/load with SCD Type 2)
-Google BigQuery (Star Schema: 5 Dims + 5 Facts + 3 ML Tables + Audit Metadata)
+Google BigQuery (Star Schema: 5 Dims + 2 Facts + 3 ML Tables + Audit Metadata)
     │
     ├─▶ (src/models/) ──▶ ML Predictions (written back to BQ)
     │
@@ -143,7 +143,7 @@ All code in `src/` must adhere to these standards, as defined in `AGENTS.md`.
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
-logger.info("Loaded %d rows into fact_price_history.", row_count)
+logger.info("Loaded %d rows into fact_stock_daily_metrics.", row_count)
 logger.warning("Missing close_price for date %s — row rejected.", date_str)
 logger.error("BigQuery load failed: %s", str(e))
 

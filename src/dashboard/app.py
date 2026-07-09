@@ -348,11 +348,11 @@ def show_intro_section():
 # ─────────────────────────────────────────────────────────────
 def show_eda_section():
     st.header("📊 Phân Tích Khám Phá Dữ Liệu (EDA) CAMELS")
-    st.write("Khám phá phân phối, mối tương quan và xu hướng lịch sử của 46 ngân hàng thương mại dựa trên dữ liệu hiệu quả hoạt động CAMELS.")
+    st.write("Khám phá phân phối, mối tương quan và xu hướng lịch sử của 45 ngân hàng thương mại dựa trên dữ liệu hiệu quả hoạt động CAMELS.")
     
     with st.expander("💡 Câu Chuyện Dữ Liệu: Mối Tương Quan & Phân Phối CAMELS", expanded=True):
         st.markdown("""
-        Khi phân tích dữ liệu CAMELS của 46 ngân hàng Việt Nam giai đoạn 2002–2022, chúng ta thấy một câu chuyện rõ rệt về **sự đánh đổi giữa lợi nhuận và an toàn vốn**:
+        Khi phân tích dữ liệu CAMELS của 45 ngân hàng Việt Nam giai đoạn 2002–2022, chúng ta thấy một câu chuyện rõ rệt về **sự đánh đổi giữa lợi nhuận và an toàn vốn**:
         1. **Tương quan sinh lời**: ROA và ROE có mối tương quan thuận mạnh mẽ, phản ánh hiệu quả sử dụng tài sản chuyển hóa trực tiếp thành giá trị cổ đông. Tuy nhiên, các ngân hàng có ROE quá cao đôi khi đi kèm với tỷ lệ an toàn vốn ETA (Vốn chủ sở hữu / Tổng tài sản) thấp, cho thấy đòn bẩy tài chính đang được sử dụng ở mức cao.
         2. **Tỷ lệ chi phí và Lợi nhuận**: Hệ số CIR (Chi phí hoạt động / Thu nhập hoạt động) tỷ lệ nghịch với hiệu quả sinh lời. Những ngân hàng tối ưu hóa quy trình vận hành tốt (CIR thấp) thường duy trì được mức NIM và ROA vượt trội.
         3. **Xu hướng phân hóa dài hạn**: Nhóm ngân hàng Nhà nước nắm quyền chi phối (SOCB) thường chấp nhận biên lãi ròng NIM thấp hơn để hỗ trợ nền kinh tế, bù lại họ có quy mô tài sản vượt trội. Ngược lại, nhóm ngân hàng thương mại cổ phần tư nhân (JSCB) năng động hơn trong việc tối ưu NIM nhưng biến động nợ xấu (NPL) cũng nhạy cảm hơn với chu kỳ kinh tế.
@@ -381,7 +381,7 @@ def show_eda_section():
     
     with tab1:
         st.subheader("Phân Phối & Giới Hạn Của Các Chỉ Số Tài Chính")
-        st.write("Biểu đồ phân phối thống kê toàn bộ **661 bản ghi báo cáo tài chính hàng năm** của 46 ngân hàng Việt Nam giai đoạn 2002–2022 (mỗi ngân hàng đóng góp tối đa 20 năm dữ liệu lịch sử trong hệ thống DWH, nên tổng số lượng bản ghi `count` lớn hơn số lượng 46 ngân hàng).")
+        st.write("Biểu đồ phân phối thống kê toàn bộ **661 bản ghi báo cáo tài chính hàng năm** của 45 ngân hàng Việt Nam giai đoạn 2002–2022 (mỗi ngân hàng đóng góp tối đa 20 năm dữ liệu lịch sử trong hệ thống DWH, nên tổng số lượng bản ghi `count` lớn hơn số lượng 45 ngân hàng).")
         selected_col = st.selectbox(
             "Chọn chỉ số tài chính cần quan sát",
             list(ratio_vn_map.keys()),
@@ -820,7 +820,7 @@ def show_price_forecasting_section():
                 })
             
             st.dataframe(pd.DataFrame(comp_table), use_container_width=True)
-            st.info("Kết luận khoa học: Mô hình LSTM Đa biến (Multivariate) tích hợp thêm khối lượng giao dịch và các độ trễ biến động cho sai số RMSE thấp hơn rõ rệt so với LSTM Đơn biến và ARIMA trên 3/4 ngân hàng thương mại (BID, TCB, VCB). Với CTG, mô hình đơn biến lại tỏ ra nhạy bén hơn do biến động giá cực kỳ ổn định trong giai đoạn vừa qua.")
+            st.info("Kết luận khoa học: Mô hình LSTM Đa biến (Multivariate) tích hợp thêm khối lượng giao dịch và các độ trễ biến động cho sai số RMSE thấp hơn rõ rệt so với LSTM Đơn biến và ARIMA trên 3/4 ngân hàng thương mại (BID, VCB, CTG). Với TCB, mô hình đơn biến lại tỏ ra hiệu quả hơn (RMSE 1.5390 so với 1.7081 của đa biến).")
         else:
             st.warning("Không tìm thấy dữ liệu đối chiếu hiệu năng lstm_model_comparison.json.")
 
@@ -831,7 +831,7 @@ def show_price_forecasting_section():
 # ─────────────────────────────────────────────────────────────
 def show_bank_clustering_section():
     st.header("📊 Phân Nhóm & Phác Họa Đặc Trưng Ngân Hàng (K-Means)")
-    st.write("Phân nhóm 46 ngân hàng thương mại Việt Nam dựa trên 10 tỷ số tài chính CAMELS đã được chuẩn hóa và giảm chiều bằng PCA.")
+    st.write("Phân nhóm 45 ngân hàng thương mại Việt Nam dựa trên 10 tỷ số tài chính CAMELS đã được chuẩn hóa và giảm chiều bằng PCA.")
     
     with st.expander("💡 Câu Chuyện Dữ Liệu: Phân Cụm Chiến Lược Hoạt Động Ngân Hàng", expanded=True):
         st.markdown("""
@@ -1222,7 +1222,7 @@ def show_conclusion_section():
         
         st.markdown("""
         #### 🏦 Phát hiện 2: Hệ thống ngân hàng phân cụm chiến lược rõ rệt
-        Thuật toán K-Means + PCA đã tách biệt rõ ràng 46 ngân hàng thương mại Việt Nam (sau khi loại bỏ 6 ngoại lệ cực đoan) thành các cụm chiến lược hoạt động có ý nghĩa kinh tế cao:
+        Thuật toán K-Means + PCA đã tách biệt rõ ràng 45 ngân hàng thương mại Việt Nam (sau khi loại bỏ 6 ngoại lệ cực đoan) thành các cụm chiến lược hoạt động có ý nghĩa kinh tế cao:
         *   **Hệ số dáng điệu (Silhouette Score)** = **`0.4431`** (chỉ số chất lượng phân cụm rất tốt sau khi loại bỏ nhiễu).
         *   **Cụm 1 — Nhóm Trụ Cột Lớn**: Gồm 24 ngân hàng lớn và trung bình (như VCB, TCB, BID, CTG...), đặc trưng bởi ROE/ROA lành mạnh, và tỷ lệ dư nợ cho vay (LTA) cao nhất hệ thống.
         *   **Cụm 0 — Nhóm TMCP Quy Mô Nhỏ**: Gồm 13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản, biên NIM còn khiêm tốn.

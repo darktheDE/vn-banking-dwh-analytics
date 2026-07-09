@@ -256,7 +256,7 @@ Chạy lần lượt các lệnh sau trong môi trường terminal của Python 
    ```bash
    python -m src.etl.provision_schema
    ```
-   *Chức năng:* Lệnh này sẽ kết nối với BigQuery và tạo ra toàn bộ 10 bảng (5 bảng Dim và 5 bảng Fact) với cấu trúc phân vùng và phân cụm chuẩn hóa.
+   *Chức năng:* Lệnh này sẽ kết nối với BigQuery và tạo ra toàn bộ 10 bảng (5 bảng Dim, 2 bảng Fact chính thức và 3 bảng ML Output) với cấu trúc phân vùng và phân cụm chuẩn hóa.
 
 2. **Nạp dữ liệu cho các bảng chiều:**
    ```bash
@@ -269,13 +269,10 @@ Chạy lần lượt các lệnh sau trong môi trường terminal của Python 
 
 3. **Chạy biến đổi dữ liệu thực tế (Fact):**
    ```bash
-   python -m src.etl.load_price_history
-   python -m src.etl.load_foreign_trading
-   python -m src.etl.load_proprietary_trading
-   python -m src.etl.load_order_stats
+   python -m src.etl.consolidate_stock_metrics
    python -m src.etl.load_bank_performance
    ```
-   *Chức năng:* Các tệp này sẽ đọc dữ liệu thô từ thư mục `data/raw/`, thực hiện các bước làm sạch, ép kiểu và nội suy các giá trị thiếu theo quy tắc nghiệp vụ, sau đó ghi các tệp kết quả sạch dạng CSV vào thư mục `data/processed/`.
+   *Chức năng:* Các tệp này sẽ đọc dữ liệu thô từ thư mục `data/raw/`, thực hiện các bước làm sạch, ép kiểu, tính toán các chỉ số phái sinh và nội suy các giá trị thiếu theo quy tắc nghiệp vụ, sau đó ghi các tệp kết quả sạch dạng CSV vào thư mục `data/processed/`.
 
 4. **Nạp dữ liệu thực tế lên BigQuery:**
    ```bash

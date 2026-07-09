@@ -79,13 +79,13 @@ LSTM của đồ án được triển khai cho cả 4 cổ phiếu ngân hàng (
 
 | Chỉ số đánh giá | Giá trị | Cách đọc |
 |------------------|---------|----------|
-| **RMSE — Root Mean Squared Error** | BID: **0.9634**, TCB: **1.2589**, VCB: **2.8278**, CTG: **1.3733** | Đơn vị tính giống đơn vị giá (nghìn VND). RMSE 0.9634 nghĩa là trung bình mỗi dự báo lệch khoảng 963 VND so với giá thực tế. RMSE càng thấp càng tốt. |
-| **ARIMA RMSE** (Baseline) | BID: **1.1696**, TCB: **9.4864**, VCB: **4.4900**, CTG: **11.3624** | Sai số của mô hình thống kê truyền thống ARIMA. Dùng để so sánh — nếu LSTM thấp hơn ARIMA thì LSTM vượt trội. |
-| **Mức cải thiện** | BID: giảm 17.6% sai số, TCB: giảm 86.7%, VCB: giảm 37.0%, CTG: giảm 87.9% | LSTM đa biến vượt trội hoàn toàn so với ARIMA trên cả 4 mã. Đặc biệt, TCB và CTG cải thiện trên 86%. |
+| **LSTM Đơn biến RMSE** | BID: **2.7781**, TCB: **1.5390**, VCB: **2.8600**, CTG: **1.6568** | Sai số của mô hình LSTM chỉ sử dụng giá đóng cửa `Close`. Dùng làm trung gian so sánh giữa ARIMA và LSTM Đa biến. |
+| **LSTM Đa biến RMSE** | BID: **2.7402**, TCB: **1.7081**, VCB: **2.8278**, CTG: **1.3733** | Sai số của mô hình LSTM đa biến tích hợp thêm OHLCV và tốc độ biến động %. |
+| **ARIMA RMSE** (Baseline) | BID: **5.5419**, TCB: **9.4864**, VCB: **4.4900**, CTG: **11.3624** | Sai số của mô hình thống kê tự hồi quy tuyến tính cổ điển ARIMA dùng làm baseline thống kê đơn biến. |
 
 **Ý nghĩa cho bài toán:**
-- Kết quả chứng minh rằng mạng học sâu LSTM có khả năng nắm bắt các mẫu hình phi tuyến trong biến động giá cổ phiếu ngân hàng mà phương pháp thống kê truyền thống ARIMA không thể làm được.
-- Việc so sánh cho thấy mô hình LSTM đa biến (kết hợp các thông tin OHLCV và biến động khối lượng) đạt hiệu năng cao hơn so với LSTM đơn biến (ví dụ như ở BID: RMSE đa biến 0.9634 tốt hơn đơn biến 1.4500), chứng minh các tín hiệu bổ trợ như thanh khoản và dao động biên độ có giá trị dự báo cao trong ngắn hạn đối với thị trường chứng khoán Việt Nam.
+- So sánh bước 1 (ARIMA vs LSTM Đơn biến): Trên cả 4 ngân hàng, LSTM Đơn biến đều cho sai số thấp hơn đáng kể so với ARIMA trên cùng một nguồn thông tin đơn biến (giá Close), chứng minh ưu thế vượt trội của học sâu phi tuyến.
+- So sánh bước 2 (LSTM Đơn biến vs LSTM Đa biến): Đối với BID, VCB và CTG, mô hình đa biến tiếp tục tối ưu hóa và giảm sai số đáng kể, chứng minh việc bổ sung đặc trưng OHLCV và động lượng giúp mô hình học thêm các tín hiệu dòng tiền bổ trợ. Riêng TCB, mô hình đơn biến cho kết quả tốt nhất.
 
 ---
 
@@ -238,10 +238,10 @@ Random Forest sử dụng **14 biến** kết hợp cả tỷ số CAMELS lẫn 
 
 | Câu hỏi nghiên cứu | Mô hình ML | Kết luận chính |
 |---------------------|------------|----------------|
-| **Q1:** LSTM đa biến (OHLCV và biến động) có vượt trội hơn LSTM đơn biến và ARIMA trong dự báo giá ngắn hạn? | LSTM | Có — LSTM đa biến đạt RMSE thấp nhất trên cả 4 cổ phiếu (BID: 0.9634, TCB: 1.2589, VCB: 2.8278, CTG: 1.3733), vượt trội hoàn toàn so với ARIMA baseline và LSTM đơn biến. |
+| **Q1:** LSTM đơn biến và đa biến có vượt trội hơn ARIMA trong dự báo giá ngắn hạn? Việc thêm OHLCV có cải thiện không? | LSTM | LSTM Đơn biến vượt trội ARIMA trên cả 4 cổ phiếu. Bổ sung OHLCV (LSTM Đa biến) tiếp tục cải thiện RMSE cho BID (2.7402), VCB (2.8278) và CTG (1.3733). Với TCB, mô hình đơn biến đạt RMSE tốt nhất (1.5390). |
 | **Q2:** 4 cổ phiếu đồng pha hay phân hóa? | LSTM | Nhóm quốc doanh BID, VCB, CTG có tương quan trên 0.85 — biến động đồng pha mạnh. TCB biến động độc lập, RMSE khác biệt rõ so với nhóm còn lại. |
-| **Q3:** Chỉ số nào quyết định nợ xấu cao? | Random Forest | `llp_ratio` (21.05%), `roe` (11.49%), `cir` (11.03%) là ba biến quan trọng nhất. AUC-ROC đạt 0.9370, Recall đạt 85.71%. |
-| **Q4:** Chiến lược ngân hàng có phân nhóm rõ không? | K-Means + PCA | Có — 3 cụm rõ rệt: 24 trụ cột lớn, 13 TMCP nhỏ, 2 ngân hàng ngoại. Silhouette Score 0.3222, PCA giữ lại 85.92% phương sai. |
+| **Q3:** Chỉ số nào quyết định nợ xấu cao? | Random Forest | `llp_ratio` (21.05%), `roe` (11.49%), `cir` (11.03%) là ba biến quan trọng nhất. AUC-ROC đạt 0.9752, Recall đạt 91.67% tại ngưỡng 0.2327. |
+| **Q4:** Chiến lược ngân hàng có phân nhóm rõ không? | K-Means + PCA | Có — 3 cụm rõ rệt: 24 trụ cột lớn, 13 TMCP nhỏ, 2 ngân hàng ngoại (tổng 39 ngân hàng sau loại nhiễu). Silhouette Score 0.3222, PCA giải thích 85.92% phương sai. |
 
 ---
 

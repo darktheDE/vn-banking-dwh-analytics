@@ -19,20 +19,19 @@ All BigQuery credentials are loaded from environment variables. See [`docs/env-c
 ## Running ETL
 
 ```bash
-# Populate dimension tables first (one-time setup)
+# Provision schema and populate dimension tables first (one-time setup)
+python -m src.etl.provision_schema
 python -m src.etl.populate_dim_date
 python -m src.etl.populate_dim_stock
 python -m src.etl.populate_dim_bank
 python -m src.etl.populate_dim_trading_session
 
-# Load fact tables
-python -m src.etl.load_price_history
-python -m src.etl.load_foreign_trading
-python -m src.etl.load_proprietary_trading
-python -m src.etl.load_order_stats
+# Transform fact tables locally
+python -m src.etl.consolidate_stock_metrics
 python -m src.etl.load_bank_performance
 
-# Validate integrity
+# Load to BigQuery and validate integrity
+python -m src.etl.load_to_bigquery
 python -m src.etl.validate_integrity
 ```
 

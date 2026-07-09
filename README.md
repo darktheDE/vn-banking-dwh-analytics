@@ -40,22 +40,22 @@
 Here is a summary of the key quantitative results achieved by the deployed models on live DWH data:
 
 ### 1. LSTM Time Series Forecasting (Stock Price Forecasting)
-*   **BID**: LSTM RMSE: **0.9167** vs ARIMA Baseline: **1.1696** (Passed)
-*   **TCB**: LSTM RMSE: **1.3725** vs ARIMA Baseline: **9.4864** (Passed)
-*   **VCB**: LSTM RMSE: **2.9453** vs ARIMA Baseline: **4.4900** (Passed)
-*   **CTG**: LSTM RMSE: **1.5025** vs ARIMA Baseline: **11.3624** (Passed)
+*   **BID**: ARIMA: **5.5419** | LSTM Univariate: **2.7781** | LSTM Multivariate: **2.7402** (Multivariate is optimal)
+*   **TCB**: ARIMA: **9.4864** | LSTM Univariate: **1.5390** | LSTM Multivariate: **1.7081** (Univariate is optimal)
+*   **VCB**: ARIMA: **4.4900** | LSTM Univariate: **2.8600** | LSTM Multivariate: **2.8278** (Multivariate is optimal)
+*   **CTG**: ARIMA: **11.3624** | LSTM Univariate: **1.6568** | LSTM Multivariate: **1.3733** (Multivariate is optimal)
 
 ### 2. K-Means Clustering (Bank Profiling)
 *   **Optimal Clusters (k)**: 3
 *   **Silhouette Score**: **0.3222**
 *   **Davies-Bouldin Index**: **0.9746**
 *   **PCA Variance Explained**: **85.92%** (with 3 main components retained)
-*   **Distribution**: Cluster 0 (Small-to-medium retail banks): 13 banks, Cluster 1 (Large system pillars): 24 banks, Cluster 2 (Foreign-owned banks): 2 banks (6 outliers excluded: CB, VBSP, DAB, GPB, WEB, MDB).
+*   **Distribution**: Cluster 0 (Small-to-medium retail banks): 13 banks, Cluster 1 (Large system pillars): 24 banks, Cluster 2 (Foreign-owned banks): 2 banks (6 outliers excluded: CB, VBSP, DAB, GPB, WEB, MDB. Total 39 banks clustered).
 
 ### 3. Random Forest Classifier (Credit Risk Warning NPL ≥ 3%)
-*   **AUC-ROC**: **0.9370** (Threshold: > 0.80)
-*   **Recall (High-Risk Class)**: **85.71%** (Threshold: ≥ 85%)
-*   **Optimal decision threshold**: **0.2822**
+*   **AUC-ROC**: **0.9752** (Threshold: > 0.80)
+*   **Recall (High-Risk Class)**: **91.67%** (Threshold: ≥ 85%)
+*   **Optimal decision threshold**: **0.2327**
 *   **Top Feature Importance**: `llp_ratio` (Loan Loss Provision ratio - **21.05%**), `roe` (**11.49%**), `cir` (**11.03%**), `roa` (**9.85%**).
 
 ---
@@ -266,58 +266,43 @@ vn-banking-dwh-analytics/
 │
 ├── AGENTS.md                    # AI agent constitution (coding standards, constraints)
 ├── DEVELOPMENT.md               # Developer onboarding and contribution guide
+├── HUONG_DAN_DU_AN.md           # Vietnamese user setup & running guide
 ├── README.md                    # This file
+├── RESULT.md                    # Scientific research answers & performance summary
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/                     # Original source Excel files (6 files, git-ignored)
+│   ├── raw/                     # Original source Excel files (git-ignored)
 │   ├── processed/               # Cleaned intermediate DataFrames (git-ignored)
-│   └── external/                # Reference data (holiday calendars, etc.)
+│   ├── external/                # Reference data (HOSE holiday calendar, etc.)
+│   └── data_ml/                 # Machine learning train/test datasets (input & output)
 │
 ├── docs/
-│   ├── proposal.md              # Academic research proposal (Vietnamese)
-│   ├── prd.md                   # Product Requirements Document
-│   ├── star-schema.md           # Data Warehouse schema specification
-│   ├── ml-spec.md               # ML model specifications and acceptance criteria
-│   ├── system-arch.md           # System architecture design
-│   ├── etl-spec.md              # Per-file ETL transformation rules
-│   ├── data-dictionary.md       # Variable definitions and data contracts
-│   ├── dashboard-spec.md        # Looker Studio acceptance criteria
-│   ├── tasks.md                 # Atomic SDD implementation task checklist
-│   ├── master-plan.md           # Project execution tracks and team roles
-│   ├── env-config.md            # Environment setup guide
-│   ├── product-brief.md         # Executive summary and document index
-│   ├── project-overview.md      # Vietnamese project context document
 │   ├── pipeline/                # Architecture diagram images
-│   └── ref/                     # Reference materials and source links
+│   ├── ref/                     # Reference papers and documentation (METRICS.docx)
+│   ├── refactor/                # Refactoring process plans and reports
+│   ├── report/                  # Academic final data analysis reports
+│   └── (core specifications: star-schema.md, etl-spec.md, ml-spec.md, data-dictionary.md, data-lineage.md, fact-metrics-report.md...)
 │
 ├── notebooks/
 │   ├── 01_EDA.ipynb             # Exploratory Data Analysis
 │   ├── 02_ETL_BigQuery.ipynb    # ETL pipeline prototyping
-│   ├── 03_ML_TimeSeries.ipynb   # LSTM and ARIMA experiments
-│   ├── 04_ML_Clustering.ipynb   # K-Means + PCA experiments
-│   ├── 05_ML_Classification.ipynb  # Random Forest experiments
-│   └── 06_PCA_Visualization.ipynb  # Cluster and feature visualization
+│   └── 03_ML_TimeSeries.ipynb   # ML model training notebooks
+│
+├── scripts/                     # Developer utility/DevOps scripts
+│   └── test_bq_connection.py    # Database connection validation utility
 │
 ├── src/
-│   ├── etl/                     # Production ETL batch scripts
-│   │   ├── populate_dim_*.py    # Dimension table loaders (4 scripts)
-│   │   ├── load_*.py            # Fact table ETL (5 scripts)
-│   │   └── validate_integrity.py
+│   ├── etl/                     # Production ETL scripts (E-T-L pipeline)
+│   │   ├── extract_data.py      # Data extraction/crawling step (Extract)
+│   │   ├── consolidate_stock_metrics.py # Derived metric calculations (Transform)
+│   │   ├── load_to_bigquery.py  # Loading cleaned data to BigQuery (Load)
+│   │   └── validate_integrity.py# Schema & data quality verification
 │   ├── models/                  # Production ML training and inference scripts
-│   │   ├── feature_engineering_*.py
-│   │   ├── baseline_*.py        # ARIMA and Logistic Regression baselines
-│   │   └── train_*.py           # LSTM, K-Means, Random Forest
-│   └── utils/                   # Shared utilities
-│       ├── bigquery_client.py
-│       ├── logger.py
-│       └── config.py
-│
-├── reports/
-│   ├── figures/                 # Generated charts and evaluation plots
-│   └── models/                  # Saved model artifacts (git-ignored)
+│   ├── dashboard/               # Streamlit application entry point (app.py)
+│   └── utils/                   # Shared utilities (logger.py, config.py)
 │
 └── sql/
     └── bigquery_schema.sql      # BigQuery DDL for all tables
@@ -349,7 +334,7 @@ The project is executed under a **concurrent, role-based strategy** across 4 par
 ### Step 1 — Clone and Set Up Environment
 
 ```bash
-git clone <repository_url>
+git clone https://github.com/darktheDE/vn-banking-dwh-analytics
 cd vn-banking-dwh-analytics
 
 # Create and activate virtual environment
@@ -380,21 +365,37 @@ For detailed setup instructions, see [`docs/env-config.md`](docs/env-config.md).
 
 ### Step 3 — Initialize the Data Warehouse
 
+You can initialize the entire pipeline (Extract -> DWH Provision -> Dimension Load -> Local Transform -> BigQuery Load -> ML Training) automatically using the provided automation scripts:
+
 ```bash
-# Provision all 10 BigQuery tables (run once)
+# On Windows (PowerShell/CMD):
+.\run_setup.bat
+
+# On Unix/macOS:
+chmod +x run_setup.sh
+./run_setup.sh
+```
+
+Alternatively, you can run the pipeline stages manually and sequentially:
+
+```bash
+# 1. Provision DWH Tables (Run once to create schema)
+python -m src.etl.provision_schema
+
+# 2. Populate Dimensions
 python -m src.etl.populate_dim_date
 python -m src.etl.populate_dim_stock
 python -m src.etl.populate_dim_bank
 python -m src.etl.populate_dim_trading_session
 
-# Load fact tables incrementally via MERGE (place raw Excel/CSV files in data/raw/ first)
-python -m src.etl.load_price_history
-python -m src.etl.load_foreign_trading
-python -m src.etl.load_proprietary_trading
-python -m src.etl.load_order_stats
+# 3. Transform Fact Tables Locally
+python -m src.etl.consolidate_stock_metrics
 python -m src.etl.load_bank_performance
 
-# Validate data integrity
+# 4. Load Cleaned CSV Data into BigQuery DWH
+python -m src.etl.load_to_bigquery
+
+# 5. Validate DWH Integrity and Quality Rules
 python -m src.etl.validate_integrity
 ```
 
