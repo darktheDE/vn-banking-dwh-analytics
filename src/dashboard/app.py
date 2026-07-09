@@ -501,7 +501,7 @@ def show_eda_section():
             
         if "CIR" in pair_option:
             # Filter outliers: CIR <= 150%, ROA between -5% and 5% for clean visualization
-            sub_df = plot_df[(plot_df["cir"] <= 150) & (plot_df["roa"] >= -5) & (plot_df["roa"] <= 5)].copy()
+            sub_df = plot_df[(plot_df["cir"] >= 0) & (plot_df["cir"] <= 150) & (plot_df["roa"] >= -5) & (plot_df["roa"] <= 5)].copy()
             sub_df = sub_df.dropna(subset=["cir", "roa"])
             
             fig_scatter = px.scatter(
