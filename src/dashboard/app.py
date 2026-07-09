@@ -254,14 +254,14 @@ def load_lstm_comparison() -> dict:
 # Phân hệ 0.1: Tổng quan dự án
 # ─────────────────────────────────────────────────────────────
 def show_intro_section():
-    st.header("🎯 Tổng Quan Dự Án & Kiến Trúc Hệ Thống")
+    st.header("Tổng Quan Dự Án Và Kiến Trúc Hệ Thống")
     st.markdown("""
     Chào mừng bạn đến với **Hệ thống Phân Tích Dữ Liệu Lịch Sử & Dự Báo ML Ngành Ngân Hàng Việt Nam**. 
     Hệ thống này tích hợp kho dữ liệu đám mây Google BigQuery và các mô hình Học Máy tiên tiến nhằm cung cấp các góc nhìn phân tích sâu rộng cho các nhà quản lý rủi ro và các nhà đầu tư tài chính.
     """)
     
     st.markdown("""
-    ### ❓ 4 Câu Hỏi Nghiên Cứu Cốt Lõi (Core Research Questions)
+    ### Bốn Câu Hỏi Nghiên Cứu Cốt Lõi (Core Research Questions)
     Hệ thống phân tích này được xây dựng nhằm giải quyết triệt để **4 bài toán thực tiễn quan trọng** của ngành ngân hàng Việt Nam:
     *   **Q1 (Dự báo ngắn hạn)**: *Mô hình LSTM đơn biến và đa biến có vượt trội hơn ARIMA Baseline không? Việc bổ sung đặc trưng ohlcv và biến động có giúp cải thiện sai số dự báo giá đóng cửa ngắn hạn không?*
     *   **Q2 (Đồng pha & Phân hóa)**: *Đà biến động giá của nhóm ngân hàng quốc doanh (BID, VCB, CTG) có đồng pha với nhau và phân hóa thế nào với ngân hàng tư nhân (TCB)?*
@@ -275,11 +275,11 @@ def show_intro_section():
     
     with col1:
         st.markdown("""
-        ### 📋 Nguồn Dữ Liệu & Quy Mô Hệ Thống
+        ### Nguồn Dữ Liệu & Quy Mô Hệ Thống
         *   **Tích Hợp API Tài Chính (`vnstock` / VCI API)**: Toàn bộ dữ liệu giá giao dịch hàng ngày (OHLCV) và báo cáo tài chính (Cân đối kế toán, Kết quả kinh doanh, Lưu chuyển tiền tệ, Chỉ số tài chính) của 4 ngân hàng trọng điểm (**BID**, **TCB**, **VCB**, **CTG**) được tự động hóa trích xuất trực tiếp qua **API tài chính** tích hợp (đảm bảo tính cập nhật và tự động).
         *   **Dữ liệu Báo Cáo Tài Chính CAMELS 20 năm**: Gồm **667 dòng** dữ liệu và **47+ cột** chỉ số hiệu năng cấu trúc tài chính, bao phủ toàn hệ thống **45 ngân hàng Việt Nam** trong suốt **2 thập kỷ (2002–2022)** được tổng hợp đồng bộ từ báo cáo kiểm toán lịch sử (phục vụ phân cụm và phân loại rủi ro dài hạn).
         
-        ### 🏗️ Kho Dữ Liệu Star Schema (BigQuery)
+        ### Kho Dữ Liệu Star Schema (BigQuery)
         Dữ liệu được tổ chức dưới dạng Star Schema tinh gọn gồm **7 bảng thực tế (5 Dimension tables & 2 Fact tables)** tối ưu cho OLAP:
         *   **Bảng Chiều (5 Dimension tables)**:
             *   `dim_date`: Quản lý thời gian, kiểm soát ngày giao dịch.
@@ -295,7 +295,7 @@ def show_intro_section():
         
     with col2:
         st.markdown("""
-        ### 🧠 Cấu Trúc Các Mô Hình Học Máy (ML)
+        ### Cấu Trúc Các Mô Hinh Học Máy (ML)
         Tầng Học Máy được thiết kế module hóa trong thư mục **`src/models/`**:
         
         *   **Các Mô Hình Huấn Luyện Chính (`src/models/`)**:
@@ -318,39 +318,71 @@ def show_intro_section():
         """)
         
     st.markdown("---")
-    st.subheader("🔗 Sơ Đồ Luồng Dữ Liệu Hệ Thống (Data Flow)")
-    
-    # Render native vector SVG Graphviz diagram instead of raw mermaid code blocks
-    dot_code = """
-    digraph G {
-        graph [bgcolor="transparent", rankdir=TB, pad=0.3]
-        node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=3.0, height=0.5]
-        edge [color="#60a5fa", arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#4b5563"]
+    # Render flow diagrams side-by-side using columns
+    flow_col1, flow_col2 = st.columns([1, 1])
 
-        raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
-        etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
-        bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 2 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
-        ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
-        app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
+    with flow_col1:
+        st.subheader("Sơ Đồ Luồng Dữ Liệu Hệ Thống (Data Flow)")
+        dot_code_flow = """
+        digraph G {
+            graph [bgcolor="transparent", rankdir=TB, pad=0.3]
+            node [shape=box, style="filled,rounded", color="#3b82f6", fontname="Arial", fontsize=10, fillcolor="#eff6ff", fontcolor="#1e3a8a", width=3.0, height=0.5]
+            edge [color="#60a5fa", arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#4b5563"]
 
-        raw -> etl [label="Trích xuất"]
-        etl -> bq [label="Làm sạch & Nạp"]
-        bq -> ml [label="Truy vấn thuộc tính"]
-        ml -> bq [label="Lưu dự báo DWH"]
-        bq -> app [label="Kết nối trực tiếp"]
-    }
-    """
-    st.graphviz_chart(dot_code)
+            raw [label="Nguồn Dữ Liệu Thô\\n(Files Excel/CSV)"]
+            etl [label="Đường Ống ETL\\n(Python / Pandas)", fillcolor="#ecfdf5", color="#10b981", fontcolor="#064e3b"]
+            bq [label="Kho Dữ Liệu DWH\\n(BigQuery Star Schema: 5 Dims & 2 Facts)", fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+            ml [label="Tầng Học Máy (ML)\\n(LSTM / K-Means / RF)", fillcolor="#faf5ff", color="#8b5cf6", fontcolor="#4c1d95"]
+            app [label="Giao Diện Báo Cáo\\n(Streamlit Dashboard)", fillcolor="#fdf2f8", color="#ec4899", fontcolor="#700b3e"]
+
+            raw -> etl [label="Trích xuất"]
+            etl -> bq [label="Làm sạch & Nạp"]
+            bq -> ml [label="Truy vấn thuộc tính"]
+            ml -> bq [label="Lưu dự báo DWH"]
+            bq -> app [label="Kết nối trực tiếp"]
+        }
+        """
+        st.graphviz_chart(dot_code_flow)
+
+    with flow_col2:
+        st.subheader("Kiến Trúc Kho Dữ Liệu Star Schema (Data Schema)")
+        dot_code_schema = """
+        digraph StarSchema {
+            graph [bgcolor="transparent", rankdir=LR, pad=0.3]
+            node [shape=box, style="filled,rounded", fontname="Arial", fontsize=9]
+            edge [color="#60a5fa", arrowsize=0.6, fontname="Arial", fontsize=8]
+
+            node [fillcolor="#eff6ff", color="#3b82f6", fontcolor="#1e3a8a"]
+            dim_date [label="dim_date\\n(date_key, full_date...)"]
+            dim_stock [label="dim_stock\\n(stock_key, ticker...)"]
+            dim_bank [label="dim_bank\\n(bank_key, bank_code...)"]
+            dim_trading_session [label="dim_trading_session\\n(session_key...)"]
+            dim_audit [label="dim_audit\\n(audit_key, run_id...)"]
+
+            node [fillcolor="#fffbeb", color="#f59e0b", fontcolor="#78350f"]
+            fact_stock_daily_metrics [label="fact_stock_daily_metrics\\n(date_key, stock_key...)"]
+            fact_bank_performance [label="fact_bank_performance\\n(date_key, bank_key...)"]
+
+            dim_date -> fact_stock_daily_metrics [label="date_key"]
+            dim_stock -> fact_stock_daily_metrics [label="stock_key"]
+            dim_date -> fact_bank_performance [label="date_key"]
+            dim_bank -> fact_bank_performance [label="bank_key"]
+            dim_audit -> fact_stock_daily_metrics [label="audit_key"]
+            dim_audit -> fact_bank_performance [label="audit_key"]
+            dim_trading_session -> fact_stock_daily_metrics [label="session_key"]
+        }
+        """
+        st.graphviz_chart(dot_code_schema)
 
 
 # ─────────────────────────────────────────────────────────────
 # Phân hệ 0.2: Phân tích khám phá dữ liệu (EDA)
 # ─────────────────────────────────────────────────────────────
 def show_eda_section():
-    st.header("📊 Phân Tích Khám Phá Dữ Liệu (EDA) CAMELS")
+    st.header("Phân Tích Khám Phá Dữ Liệu (EDA) CAMELS")
     st.write("Khám phá phân phối, mối tương quan và xu hướng lịch sử của 45 ngân hàng thương mại dựa trên dữ liệu hiệu quả hoạt động CAMELS.")
     
-    with st.expander("💡 Câu Chuyện Dữ Liệu: Mối Tương Quan & Phân Phối CAMELS", expanded=True):
+    with st.expander("Chi tiết phân tích khám phá dữ liệu CAMELS", expanded=False):
         st.markdown("""
         Khi phân tích dữ liệu CAMELS của 45 ngân hàng Việt Nam giai đoạn 2002–2022, chúng ta thấy một câu chuyện rõ rệt về **sự đánh đổi giữa lợi nhuận và an toàn vốn**:
         1. **Tương quan sinh lời**: ROA và ROE có mối tương quan thuận mạnh mẽ, phản ánh hiệu quả sử dụng tài sản chuyển hóa trực tiếp thành giá trị cổ đông. Tuy nhiên, các ngân hàng có ROE quá cao đôi khi đi kèm với tỷ lệ an toàn vốn ETA (Vốn chủ sở hữu / Tổng tài sản) thấp, cho thấy đòn bẩy tài chính đang được sử dụng ở mức cao.
@@ -363,7 +395,12 @@ def show_eda_section():
         st.error("Không tìm thấy dữ liệu phân tích CAMELS.")
         return
         
-    tab1, tab2, tab3 = st.tabs(["📊 Phân Phối Chỉ Số", "🌡️ Ma Trận Tương Quan", "📈 Xu Hướng Theo Thời Gian"])
+    eda_mode = st.radio(
+        "Chọn chế độ phân tích EDA",
+        ["Phân Phối Chỉ Số", "Ma Trận Tương Quan", "Xu Hướng Theo Thời Gian", "Phân Tích Theo Từng Ngân Hàng"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
     
     feature_cols = ["npl_ratio", "roa", "roe", "nim", "cir", "eta", "etd", "lta", "ltd", "gta"]
     ratio_vn_map = {
@@ -379,7 +416,7 @@ def show_eda_section():
         "gta": "Cho vay gộp/Tổng tài sản (GTA)"
     }
     
-    with tab1:
+    if eda_mode == "Phân Phối Chỉ Số":
         st.subheader("Phân Phối & Giới Hạn Của Các Chỉ Số Tài Chính")
         st.write("Biểu đồ phân phối thống kê toàn bộ **661 bản ghi báo cáo tài chính hàng năm** của 45 ngân hàng Việt Nam giai đoạn 2002–2022 (mỗi ngân hàng đóng góp tối đa 20 năm dữ liệu lịch sử trong hệ thống DWH, nên tổng số lượng bản ghi `count` lớn hơn số lượng 45 ngân hàng).")
         selected_col = st.selectbox(
@@ -423,7 +460,7 @@ def show_eda_section():
         stats.index = [f"Chỉ số: {ratio_vn_map[selected_col]}"]
         st.dataframe(stats, use_container_width=True)
 
-    with tab2:
+    elif eda_mode == "Ma Trận Tương Quan":
         st.subheader("Ma Trận Tương Quan Tuyến Tính Giữa Các Chỉ Số CAMELS")
         st.write("Giúp phân tích xem các biến tài chính có xu hướng đồng biến hay nghịch biến với nhau.")
         
@@ -443,7 +480,7 @@ def show_eda_section():
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
         st.caption("Tình hình: Mối tương quan cực kỳ mạnh mẽ (hệ số > 0.8) giữa ROA và ROE phản ánh cấu trúc lợi nhuận đồng thuận. Ngược lại, CIR tương quan âm rõ rệt với ROA/ROE, chứng minh tối ưu hóa chi phí hoạt động trực tiếp quyết định khả năng sinh lời của các ngân hàng.")
 
-    with tab3:
+    elif eda_mode == "Xu Hướng Theo Thời Gian":
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
         trend_col = st.selectbox(
             "Chọn chỉ số tài chính theo dõi theo thời gian",
@@ -469,6 +506,61 @@ def show_eda_section():
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
         st.caption("Tình hình: Xu hướng dài hạn phản ánh sự vươn lên mạnh mẽ của nhóm TMCP tư nhân (JSCB) từ sau năm 2015 với NIM và tỷ lệ sinh lời gia tăng đáng kể. Nhóm ngân hàng quốc doanh (SOCB) duy trì sự ổn định cao nhưng NIM chịu áp lực điều tiết lãi suất hỗ trợ nền kinh tế.")
 
+    else:
+        st.subheader("Phân Tích Chi Tiết Hiệu Năng Của Từng Ngân Hàng")
+        st.write("Chọn một ngân hàng thương mại để phân tích và so sánh các chỉ số tài chính CAMELS qua các năm.")
+
+        bank_list = sorted(df["bank_code"].unique())
+        selected_bank = st.selectbox("Chọn ngân hàng cần phân tích", bank_list, key="eda_bank_select")
+
+        bank_df = df[df["bank_code"] == selected_bank].sort_values("year")
+        bank_name_str = bank_df["bank_name"].iloc[0] if not bank_df.empty else selected_bank
+        bank_type_str = bank_df["bank_type"].iloc[0] if not bank_df.empty else "N/A"
+
+        st.markdown(f"**Tên ngân hàng:** {bank_name_str} | **Phân loại nhóm:** {bank_type_str}")
+
+        if not bank_df.empty:
+            avg_npl = bank_df["npl_ratio"].mean() * 100
+            avg_roa = bank_df["roa"].mean() * 100
+            avg_roe = bank_df["roe"].mean() * 100
+            avg_nim = bank_df["nim"].mean() * 100
+
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("NPL TB (20 năm)", f"{avg_npl:.2f}%")
+            m2.metric("ROA TB (20 năm)", f"{avg_roa:.2f}%")
+            m3.metric("ROE TB (20 năm)", f"{avg_roe:.2f}%")
+            m4.metric("NIM TB (20 năm)", f"{avg_nim:.2f}%")
+
+            eda_bank_metric = st.selectbox(
+                "Chọn chỉ số tài chính để vẽ biểu đồ xu hướng",
+                list(ratio_vn_map.keys()),
+                key="eda_bank_metric_select",
+                format_func=lambda x: ratio_vn_map[x]
+            )
+
+            system_yearly = df.groupby("year")[eda_bank_metric].mean().reset_index().rename(columns={eda_bank_metric: "Trung bình toàn hệ thống"})
+            type_yearly = df[df["bank_type"] == bank_type_str].groupby("year")[eda_bank_metric].mean().reset_index().rename(columns={eda_bank_metric: f"Trung bình nhóm {bank_type_str}"})
+
+            this_bank_yearly = bank_df[["year", eda_bank_metric]].copy().rename(columns={eda_bank_metric: f"Ngân hàng {selected_bank}"})
+
+            plot_df = this_bank_yearly.merge(system_yearly, on="year", how="outer").merge(type_yearly, on="year", how="outer")
+            plot_melted = plot_df.melt(id_vars="year", var_name="Đối tượng so sánh", value_name="Giá trị")
+            plot_melted["Giá trị"] = plot_melted["Giá trị"] * 100
+
+            fig = px.line(
+                plot_melted,
+                x="year",
+                y="Giá trị",
+                color="Đối tượng so sánh",
+                title=f"So sánh xu hướng {ratio_vn_map[eda_bank_metric]} (%) giai đoạn 2002–2022",
+                labels={"year": "Năm Báo Cáo", "Giá trị": f"{ratio_vn_map[eda_bank_metric]} (%)", "Đối tượng so sánh": "Chỉ Số So Sánh"},
+                markers=True
+            )
+            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+            st.caption(f"Biểu đồ so sánh trực quan chỉ số {ratio_vn_map[eda_bank_metric]} của ngân hàng {selected_bank} với mức trung bình của nhóm phân loại {bank_type_str} và trung bình của toàn bộ hệ thống ngân hàng Việt Nam.")
+        else:
+            st.warning("Không tìm thấy dữ liệu lịch sử cho ngân hàng này.")
+
 
 # ─────────────────────────────────────────────────────────────
 # Giao diện chính của Dashboard
@@ -476,7 +568,7 @@ def show_eda_section():
 def main():
     load_dotenv()
     
-    st.title("🏦 Phân Tích Dữ Liệu Lịch Sử & Dự Báo ML Ngành Ngân Hàng")
+    st.title("Phân Tích Dữ Liệu Lịch Sử Và Dự Báo Học Máy Ngành Ngân Hàng")
     st.markdown("---")
     
     st.sidebar.title("Điều Hướng")
@@ -489,10 +581,19 @@ def main():
             "Phân Nhóm Ngân Hàng (K-Means)",
             "Phân Loại Rủi Ro Tín Dụng (Random Forest)",
             "Trạng Thái Hệ Thống DWH",
-            "Kết Luận & Nghiệm Thu"
+            "Kết Luận & Nghiệm Thu",
+            "Thông Tin Thêm (About)"
         ]
     )
     
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("""
+    **Nhóm Thực Hiện:** Nhóm 2 - HCMUTE
+    *   **Trần Minh Khánh**
+    *   **Nguyễn Đặng Quốc Anh**
+    *   **Phạm Minh Quân**
+    *   **Đỗ Kiến Hưng**
+    """)
     st.sidebar.markdown("---")
     st.sidebar.info("Nguồn dữ liệu: Google BigQuery Star Schema Data Warehouse")
     
@@ -508,15 +609,17 @@ def main():
         show_credit_risk_section()
     elif app_mode == "Trạng Thái Hệ Thống DWH":
         show_dwh_status_section()
-    else:
+    elif app_mode == "Kết Luận & Nghiệm Thu":
         show_conclusion_section()
+    else:
+        show_about_section()
 
 
 def show_price_forecasting_section():
-    st.header("📈 Dự Báo Giá Cổ Phiếu Trọng Điểm (LSTM)")
+    st.header("Dự Báo Giá Cổ Phiếu Trọng Điểm (LSTM)")
     st.write("Mô hình học sâu LSTM thực hiện dự báo giá đóng cửa của các cổ phiếu ngân hàng trong 5 ngày giao dịch tiếp theo (T+1 đến T+5).")
     
-    with st.expander("💡 Câu Chuyện Dữ Liệu: Dự Báo Xu Hướng Giá Cổ Phiếu Ngân Hàng", expanded=True):
+    with st.expander("Chi tiết phương pháp luận dự báo giá cổ phiếu ngân hàng", expanded=False):
         st.markdown("""
         Giá cổ phiếu ngân hàng trên sàn HOSE không chỉ vận động theo quy luật ngẫu nhiên mà chịu ảnh hưởng lớn bởi **động lượng giá ngắn hạn và khối lượng giao dịch thực tế**:
         1. **Khối lượng giao dịch & Động lượng**: Lịch sử giao dịch chứng minh sự kết hợp giữa khối lượng giao dịch (`trading_volume`) và tỷ lệ thay đổi giá ngày hôm trước (`price_change_pct`) là các chỉ số dẫn dắt xu hướng giá ngắn hạn vô cùng mạnh mẽ.
@@ -534,14 +637,14 @@ def show_price_forecasting_section():
     stock_key = stock_options[selected_ticker]
     
     # LSTM Parameters and Metrics
-    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô hình")
+    st.markdown("### Thông Số Kỹ Thuật Và Hiệu Năng Mô Hình")
     meta_col1, meta_col2 = st.columns([1, 1])
     
     rmse_map = {
-        "BID": ("3.1123", "3.2247", "5.5419", "+43.8%"),
-        "TCB": ("1.4890", "2.0547", "9.4864", "+84.3%"),
-        "VCB": ("2.6567", "2.8392", "4.4900", "+40.8%"),
-        "CTG": ("1.5061", "1.4912", "11.3624", "+86.7%")
+        "BID": ("2.7402", "2.7781", "5.5419", "+50.55%"),
+        "TCB": ("1.7081", "1.5390", "9.4864", "+83.78%"),
+        "VCB": ("2.8278", "2.8600", "4.4900", "+37.02%"),
+        "CTG": ("1.3733", "1.6568", "11.3624", "+87.91%")
     }
     m_rmse, u_rmse, a_rmse, gain_val = rmse_map.get(selected_ticker, ("N/A", "N/A", "N/A", "N/A"))
     hp_info = {
@@ -579,7 +682,7 @@ def show_price_forecasting_section():
     st.markdown("---")
     
     # Define tabs for Price Forecasting
-    tabs = st.tabs(["🔮 Dự báo LSTM Đơn biến vs Đa biến", "🔗 Tương quan & Đồng pha (DTW)", "🧪 So sánh Đơn biến vs Đa biến"])
+    tabs = st.tabs(["Dự Báo LSTM Đơn Biến Và Đa Biến", "Tương Quan Và Đồng Pha (DTW)", "So Sánh Đơn Biến Và Đa Biến"])
     
     with tabs[0]:
         col1, col2 = st.columns([3, 1])
@@ -709,7 +812,7 @@ def show_price_forecasting_section():
                     st.info("Không tìm thấy kết quả dự báo trong DWH.")
 
     with tabs[1]:
-        st.subheader("🔗 Phân Tích Đồng Pha & Tương Quan Bằng Dynamic Time Warping (DTW)")
+        st.subheader("Phân Tích Đồng Pha Và Tương Quan Bằng Dynamic Time Warping (DTW)")
         st.write("Đo lường mức độ đồng pha và khoảng cách phi tuyến tính giữa chuỗi thời gian giá đóng cửa của các ngân hàng thương mại Việt Nam sau khi chuẩn hóa Z-score.")
         
         col_img, col_txt = st.columns([1.2, 1])
@@ -745,7 +848,7 @@ def show_price_forecasting_section():
 
         # Add Q2 additional visualizations from fact-metrics-report.md
         st.markdown("---")
-        st.subheader("📈 Phân Tích Chỉ Số Phái Sinh: Biên Độ Dao Động & Thị Phần Dòng Tiền (Q2)")
+        st.subheader("Phân Tích Chỉ Số Phái Sinh: Biên Độ Dao Động Và Thị Phần Dòng Tiền (Q2)")
         st.write("Phân tích định lượng sâu về mức độ rủi ro (Price Amplitude) và quy mô dòng tiền (Trading Value) thực tế từ DWH để làm rõ mức độ đồng pha và tính chất phân hóa của từng cổ phiếu ngân hàng.")
         
         q2_data = fetch_stock_q2_metrics()
@@ -753,7 +856,7 @@ def show_price_forecasting_section():
             q2_col1, q2_col2 = st.columns([1, 1])
             
             with q2_col1:
-                st.markdown("#### 📦 Phân phối Biên độ Dao động Giá (Price Volatility Amplitude)")
+                st.markdown("#### Phân Phối Biên Độ Dao Động Giá (Price Volatility Amplitude)")
                 # Calculate amplitude in % for better visualization
                 q2_data["price_amplitude_pct"] = q2_data["price_amplitude"] * 100
                 
@@ -771,7 +874,7 @@ def show_price_forecasting_section():
                 st.caption("Nhận xét: Hộp phân phối (Box Plot) chỉ ra mức độ rủi ro phân hóa rõ nét. VCB có biên độ dao động hẹp nhất và trung vị thấp nhất, phản ánh tính chất phòng thủ, biến động thấp và an toàn cực cao của cổ phiếu đầu ngành. Ngược lại, TCB và CTG có hộp phân phối rộng hơn với nhiều điểm ngoại lệ (outliers) biến động mạnh.")
                 
             with q2_col2:
-                st.markdown("#### 💰 Thị phần Thanh khoản theo Giá trị Giao dịch ước tính")
+                st.markdown("#### Thị Phần Thanh Khoản Theo Giá Trị Giao Dịch Ước Tính")
                 # Group by month and ticker
                 q2_data["Tháng"] = q2_data["full_date"].dt.strftime("%Y-%m")
                 monthly_flow = q2_data.groupby(["Tháng", "ticker"])["trading_value"].sum().reset_index()
@@ -800,7 +903,7 @@ def show_price_forecasting_section():
             st.warning("Không thể truy vấn dữ liệu chỉ số phái sinh từ bảng fact_stock_daily_metrics.")
 
     with tabs[2]:
-        st.subheader("🧪 So Sánh Thực Nghiệm Hiệu Năng: LSTM Đơn biến vs LSTM Đa biến vs ARIMA")
+        st.subheader("So Sánh Thực Nghiệm Hiệu Năng: LSTM Đơn Biến Và Đa Biến Và ARIMA")
         st.write("So sánh sai số dự báo giữa mô hình LSTM chỉ dùng giá đóng cửa (Univariate - Không biến), mô hình LSTM mở rộng (Multivariate - Có biến) và đường cơ sở ARIMA trên tập kiểm thử độc lập.")
         
         lstm_comparison = load_lstm_comparison()
@@ -830,10 +933,10 @@ def show_price_forecasting_section():
 # Phân hệ 2: Phân nhóm ngân hàng (K-Means)
 # ─────────────────────────────────────────────────────────────
 def show_bank_clustering_section():
-    st.header("📊 Phân Nhóm & Phác Họa Đặc Trưng Ngân Hàng (K-Means)")
+    st.header("Phân Nhóm Và Phác Họa Đặc Trưng Ngân Hàng (K-Means)")
     st.write("Phân nhóm 45 ngân hàng thương mại Việt Nam dựa trên 10 tỷ số tài chính CAMELS đã được chuẩn hóa và giảm chiều bằng PCA.")
     
-    with st.expander("💡 Câu Chuyện Dữ Liệu: Phân Cụm Chiến Lược Hoạt Động Ngân Hàng", expanded=True):
+    with st.expander("Chi tiết phân cụm chiến lược hoạt động ngân hàng", expanded=False):
         st.markdown("""
         Sử dụng PCA để giảm từ 10 biến CAMELS về 2 không gian tọa độ chính đã bộc lộ **3 phong cách hoạt động kinh doanh ngân hàng rõ rệt tại Việt Nam**:
         1. **Cụm Quy Mô & Vận Hành (Thường là SOCB)**: Sở hữu quy mô tổng tài sản khổng lồ nhưng biên NIM ở mức vừa phải và hệ số ETA mỏng do đòn bẩy cao.
@@ -848,12 +951,12 @@ def show_bank_clustering_section():
         return
         
     # K-Means Parameters and Metrics
-    st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+    st.markdown("### Thông Số Kỹ Thuật Và Hiệu Năng Mô Hình")
     meta_col1, meta_col2 = st.columns([1, 1])
     
     with meta_col1:
         st.markdown("""
-        **⚙️ PCA & K-Means Hyperparameters (Tham số mô hình):**
+        **PCA & K-Means Hyperparameters (Tham số mô hình):**
         *   **Thuật toán**: K-Means Clustering kết hợp Giảm chiều PCA
         *   **Số thành phần chính (PCA Components)**: $n=2$ (phục vụ vẽ đồ thị 2D. Mô hình gốc giữ lại 3 thành phần chính để giải thích **85.92%** phương sai gốc).
         *   **Số cụm tối ưu (k)**: $k=3$ (Được lựa chọn qua Phương pháp Khuỷu tay - Elbow Method và Phân tích Hệ số Dáng điệu - Silhouette Analysis).
@@ -863,9 +966,9 @@ def show_bank_clustering_section():
         
     with meta_col2:
         st.markdown("""
-        **📊 Clustering Metrics (Chỉ số chất lượng phân cụm):**
-        *   **Hệ số Dáng điệu (Silhouette Score)**: **`0.4431`** (chứng minh các cụm có ranh giới rõ ràng và độ tách biệt tốt sau khi loại bỏ nhiễu).
-        *   **Chỉ số Davies-Bouldin Index**: **`0.8122`** (giá trị thấp thể hiện các cụm có độ co cụm nội bộ cao và phân tách ngoại bộ tốt).
+        **Clustering Metrics (Chỉ số chất lượng phân cụm):**
+        *   **Hệ số Dáng điệu (Silhouette Score)**: **`0.3222`** (chứng minh các cụm có ranh giới rõ ràng và độ tách biệt tốt sau khi loại bỏ nhiễu).
+        *   **Chỉ số Davies-Bouldin Index**: **`0.9746`** (giá trị thấp thể hiện các cụm có độ co cụm nội bộ cao và phân tách ngoại bộ tốt).
         *   **Danh sách biến CAMELS đầu vào**: 10 chỉ số (`npl_ratio`, `roa`, `roe`, `nim`, `cir`, `eta`, `etd`, `lta`, `ltd`, `gta`).
         *   **Phương pháp chuẩn hóa**: `StandardScaler` (đưa tất cả các biến về phân phối chuẩn trước khi tính khoảng cách Euclidean).
         """)
@@ -989,13 +1092,13 @@ def show_bank_clustering_section():
 # Phân hệ 3: Phân loại rủi ro tín dụng (Random Forest)
 # ─────────────────────────────────────────────────────────────
 def show_credit_risk_section():
-    st.header("🛡️ Phân Loại & Giám Sát Rủi Ro Tín Dụng (Random Forest)")
+    st.header("Phân Loại Và Giám Sát Rủi Ro Tín Dụng (Random Forest)")
     st.write("Nhận diện các ngân hàng có rủi ro tín dụng cao (tỷ lệ nợ xấu NPL thực tế hoặc dự báo vượt ngưỡng kiểm soát 3%).")
     
-    tabs = st.tabs(["🛡️ Phân loại rủi ro Random Forest", "🔎 Kiểm định nhân quả Granger (LLP -> NPL)"])
+    tabs = st.tabs(["Phân Loại Rủi Ro Random Forest", "Kiểm Định Nhân Quả Granger (LLP -> NPL)"])
     
     with tabs[0]:
-        with st.expander("💡 Câu Chuyện Dữ Liệu: Cảnh Báo Sớm Rủi Ro Nợ Xấu Ngân Hàng", expanded=True):
+        with st.expander("Chi tiết hệ thống cảnh báo sớm rủi ro nợ xấu ngân hàng", expanded=False):
             st.markdown("""
             Trong quản trị rủi ro tín dụng ngân hàng, **phòng bệnh luôn tốt hơn chữa bệnh**. Mốc tỷ lệ nợ xấu 3% là ranh giới pháp lý quan trọng được Ngân hàng Nhà nước giám sát chặt chẽ.
             1. **Khả năng dự báo sớm**: Thay vì đợi nợ xấu thực tế bùng phát trên báo cáo tài chính cuối năm, mô hình Random Forest phân tích các tín hiệu dẫn đường như Tỷ lệ trích lập dự phòng (llp_ratio), hệ số ETA, CIR để phát hiện các dấu hiệu suy yếu sức khỏe tài chính trước 1 đến 2 chu kỳ báo cáo.
@@ -1012,12 +1115,12 @@ def show_credit_risk_section():
         latest_date_key = pred_df["date_key"].max()
         latest_preds = pred_df[pred_df["date_key"] == latest_date_key].copy()
         # Random Forest Parameters and Metrics
-        st.markdown("### ⚙️ Thông Số Kỹ Thuật & Hiệu Năng Mô Hình")
+        st.markdown("### Thông Số Kỹ Thuật Và Hiệu Năng Mô Hình")
         meta_col1, meta_col2 = st.columns([1, 1])
         
         with meta_col1:
             st.markdown("""
-            **⚙️ Random Forest Hyperparameters (Tham số huấn luyện):**
+            **Random Forest Hyperparameters (Tham số huấn luyện):**
             *   **Thuật toán**: Random Forest Classifier (Scikit-Learn)
             *   **Số cây quyết định (Estimators)**: `100` | **Chiều sâu tối đa (Max Depth)**: `5`
             *   **Cân bằng trọng số lớp (Class Weight)**: `balanced` (do tỷ lệ mẫu rủi ro nợ xấu $\ge$ 3% chỉ chiếm khoảng 5.36% hệ thống).
@@ -1027,7 +1130,7 @@ def show_credit_risk_section():
             
         with meta_col2:
             st.markdown("""
-            **📊 Performance Metrics (Chỉ số kiểm thử trên Test Set):**
+            **Performance Metrics (Chỉ số kiểm thử trên Test Set):**
             *   **Độ chính xác toàn cục (Accuracy)**: **`94.44%`**
             *   **AUC-ROC Score**: **`0.9752`** (Baseline Logistic Regression đối chứng: `0.7811`).
             *   **Tỷ lệ bắt trúng nợ xấu (Recall Class 1)**: **`91.67%`** (vượt xa ngưỡng cam kết nghiệm thu $\ge 85\%$; Logistic Regression: `66.67%`).
@@ -1069,7 +1172,7 @@ def show_credit_risk_section():
                     "Tổng tài sản (total_assets)", 
                     "Tổng Vốn CSH (total_equity)"
                 ],
-                "Độ Quan Trọng": [0.2045, 0.1156, 0.1054, 0.0943, 0.0528, 0.0496, 0.0496, 0.0492]
+                "Độ Quan Trọng": [0.2105, 0.1149, 0.1103, 0.0985, 0.0528, 0.0496, 0.0496, 0.0492]
             }).sort_values("Độ Quan Trọng", ascending=True)
             
             fig_imp = px.bar(
@@ -1087,7 +1190,7 @@ def show_credit_risk_section():
         st.markdown("---")
         st.subheader(f"Bảng Giám Sát Rủi Ro Các Ngân Hàng Thương Mại (Năm: {str(latest_date_key)[:4]})")
         
-        latest_preds["Phân Loại Rủi Ro"] = latest_preds["risk_label"].map({0: "An Toàn", 1: "🚨 Nguy Cơ Cao"})
+        latest_preds["Phân Loại Rủi Ro"] = latest_preds["risk_label"].map({0: "An Toàn", 1: "Nguy Cơ Cao"})
         latest_preds["Xác Suất Rủi Ro"] = (latest_preds["risk_probability"] * 100).map("{:.2f}%".format)
         latest_preds["Tỷ Lệ Nợ Xấu (NPL)"] = (latest_preds["actual_npl_ratio"] * 100).map("{:.2f}%".format)
         
@@ -1102,7 +1205,7 @@ def show_credit_risk_section():
         st.dataframe(display_df, use_container_width=True, height=500)
 
     with tabs[1]:
-        st.subheader("🔎 Phân Tích Nhân Quả Granger & Hồi Quy Bảng Trễ (Fixed Effects)")
+        st.subheader("Phân Tích Nhân Quả Granger Và Hồi Quy Bảng Trễ (Fixed Effects)")
         st.write("Kiểm định mối quan hệ nhân quả thực sự và tác động trễ giữa Tỷ lệ trích lập dự phòng (`llp_ratio`) và Tỷ lệ nợ xấu (`npl_ratio`).")
         
         col_img, col_txt = st.columns([1.2, 1])
@@ -1115,7 +1218,7 @@ def show_credit_risk_section():
                 
         with col_txt:
             # 1. ADF Table
-            st.markdown("### 📊 1. Kiểm định tính dừng ADF")
+            st.markdown("### 1. Kiểm định tính dừng ADF")
             adf_df = pd.DataFrame([
                 {"Biến số": "Tỷ lệ Nợ xấu (NPL)", "Chuỗi": "Gốc (Mức)", "ADF": -0.4572, "p-value": 0.9001, "Kết luận": "Không dừng"},
                 {"Biến số": "Tỷ lệ Dự phòng (LLP)", "Chuỗi": "Gốc (Mức)", "ADF": -0.6569, "p-value": 0.8576, "Kết luận": "Không dừng"},
@@ -1125,7 +1228,7 @@ def show_credit_risk_section():
             st.dataframe(adf_df, use_container_width=True)
             
             # 2. Granger Table
-            st.markdown("### 🔗 2. Kiểm định Nhân quả Granger (LLP -> NPL)")
+            st.markdown("### 2. Kiểm định Nhân quả Granger (LLP -> NPL)")
             granger_df = pd.DataFrame([
                 {"Độ trễ": "1 năm", "F p-value": 0.0914, "Chi2 p-value": 0.0503, "Kết luận (5%)": "Không có ý nghĩa", "Ý nghĩa (10%)": "Có ý nghĩa"},
                 {"Độ trễ": "2 năm", "F p-value": 0.2068, "Chi2 p-value": 0.0846, "Kết luận (5%)": "Không có ý nghĩa", "Ý nghĩa (10%)": "Không có ý nghĩa"},
@@ -1134,7 +1237,7 @@ def show_credit_risk_section():
             st.dataframe(granger_df, use_container_width=True)
             
             # 3. OLS Fixed Effects
-            st.markdown("### 🧪 3. Hồi quy Bảng trễ (Entity Fixed Effects)")
+            st.markdown("### 3. Hồi quy Bảng trễ (Entity Fixed Effects)")
             # Metrics
             met1, met2, met3 = st.columns(3)
             met1.metric("R-squared", "53.03%")
@@ -1143,10 +1246,10 @@ def show_credit_risk_section():
             
             # Coefficients Table
             coef_df = pd.DataFrame([
-                {"Biến độc lập": "Nợ xấu trễ 1 năm (npl_ratio_lag1)", "Hệ số (coef)": 0.6050, "Sai số chuẩn": 0.030, "t-stat": 19.856, "p-value": 0.000, "Ý nghĩa (5%)": "🚨 Có ý nghĩa"},
+                {"Biến độc lập": "Nợ xấu trễ 1 năm (npl_ratio_lag1)", "Hệ số (coef)": 0.6050, "Sai số chuẩn": 0.030, "t-stat": 19.856, "p-value": 0.000, "Ý nghĩa (5%)": "Có ý nghĩa"},
                 {"Biến độc lập": "Dự phòng trễ 1 năm (llp_ratio_lag1)", "Hệ số (coef)": 0.0299, "Sai số chuẩn": 0.037, "t-stat": 0.820, "p-value": 0.413, "Ý nghĩa (5%)": "Không có ý nghĩa"},
                 {"Biến độc lập": "Dự phòng trễ 2 năm (llp_ratio_lag2)", "Hệ số (coef)": 0.0258, "Sai số chuẩn": 0.036, "t-stat": 0.711, "p-value": 0.478, "Ý nghĩa (5%)": "Không có ý nghĩa"},
-                {"Biến độc lập": "Hằng số (const)", "Hệ số (coef)": 0.0089, "Sai số chuẩn": 0.004, "t-stat": 2.184, "p-value": 0.029, "Ý nghĩa (5%)": "🚨 Có ý nghĩa"}
+                {"Biến độc lập": "Hằng số (const)", "Hệ số (coef)": 0.0089, "Sai số chuẩn": 0.004, "t-stat": 2.184, "p-value": 0.029, "Ý nghĩa (5%)": "Có ý nghĩa"}
             ])
             st.dataframe(coef_df, use_container_width=True)
             st.caption("Ý nghĩa: Hệ số của `npl_ratio_lag1` (0.6050, p < 0.001) cực kỳ có ý nghĩa thống kê, chứng minh nợ xấu có tính tự tương quan rất mạnh (nợ xấu kỳ trước quyết định nợ xấu kỳ sau). Dự phòng trễ 1 năm (`llp_ratio_lag1`) có hệ số dương nhưng chưa đủ ý nghĩa thống kê ở mức 5% trên tập dữ liệu tổng hợp.")
@@ -1154,7 +1257,7 @@ def show_credit_risk_section():
             # Collapsible raw report
             report_text = load_causal_report()
             if report_text:
-                with st.expander("📄 Xem báo cáo văn bản đầy đủ từ mô hình"):
+                with st.expander("Chi tiết báo cáo phân tích nhân quả từ mô hình", expanded=False):
                     st.text(report_text)
             else:
                 st.warning("Không tìm thấy báo cáo nhân quả causal_analysis_report.txt.")
@@ -1164,7 +1267,7 @@ def show_credit_risk_section():
 # Phân hệ 4: Trạng thái hệ thống DWH
 # ─────────────────────────────────────────────────────────────
 def show_dwh_status_section():
-    st.header("⚙️ Trạng Thái Tích Hợp Kho Dữ Liệu BigQuery DWH")
+    st.header("Trạng Thái Tích Hợp Kho Dữ Liệu BigQuery DWH")
     st.write("Hệ thống kiểm tra số lượng bản ghi và dung lượng lưu trữ thực tế của các bảng thuộc mô hình Star Schema trên Cloud.")
     
     client = get_bigquery_client()
@@ -1197,11 +1300,11 @@ def show_dwh_status_section():
 
 
 def show_conclusion_section():
-    st.header("🎯 KẾT LUẬN & ĐÁNH GIÁ CHỈ SỐ NGHIỆM THU (METRICS)")
+    st.header("KẾT LUẬN VÀ ĐÁNH GIÁ CHỈ SỐ NGHIỆM THU (METRICS)")
     st.write("Tổng hợp kết quả nghiên cứu tài chính thực tiễn, đánh giá hiệu năng mô hình học máy và đề xuất hành động cụ thể cho doanh nghiệp.")
     
     st.markdown("---")
-    st.subheader("📊 PHẦN 1: TƯỜNG THUẬT CÁC PHÁT HIỆN TỪ DỮ LIỆU & MÔ HÌNH")
+    st.subheader("PHẦN 1: TƯỜNG THUẬT CÁC PHÁT HIỆN TỪ DỮ LIỆU VÀ MÔ HÌNH")
     
     col1, col2 = st.columns([1, 1])
     
@@ -1212,10 +1315,10 @@ def show_conclusion_section():
         
         | Mã CK | LSTM RMSE | ARIMA RMSE | Mức cải thiện |
         | :--- | :--- | :--- | :--- |
-        | **BID** | `3.4037` | `5.5419` | **Giảm 38.6% sai số** |
-        | **TCB** | `1.7009` | `9.4864` | **Giảm 82.1% sai số** |
-        | **VCB** | `2.9988` | `4.4900` | **Giảm 33.2% sai số** |
-        | **CTG** | `1.3975` | `11.3624` | **Giảm 87.7% sai số** |
+        | **BID** | `2.7402` | `5.5419` | **Giảm 50.6% sai số** |
+        | **TCB** | `1.5390` | `9.4864` | **Giảm 83.8% sai số** |
+        | **VCB** | `2.8278` | `4.4900` | **Giảm 37.0% sai số** |
+        | **CTG** | `1.3733` | `11.3624` | **Giảm 87.9% sai số** |
         
         Đặc biệt ấn tượng là đối với TCB và CTG, sai số dự báo của LSTM thấp hơn tới 82% – 87% so với phương pháp thống kê cổ điển ARIMA. Kết quả này xác nhận giả thuyết rằng mạng học sâu có khả năng nắm bắt xuất sắc các mẫu hình phi tuyến tính ngắn hạn và động lượng giá của thị trường chứng khoán Việt Nam mà ARIMA hoàn toàn bỏ sót.
         """)
@@ -1223,7 +1326,7 @@ def show_conclusion_section():
         st.markdown("""
         #### 🏦 Phát hiện 2: Hệ thống ngân hàng phân cụm chiến lược rõ rệt
         Thuật toán K-Means + PCA đã tách biệt rõ ràng 45 ngân hàng thương mại Việt Nam (sau khi loại bỏ 6 ngoại lệ cực đoan) thành các cụm chiến lược hoạt động có ý nghĩa kinh tế cao:
-        *   **Hệ số dáng điệu (Silhouette Score)** = **`0.4431`** (chỉ số chất lượng phân cụm rất tốt sau khi loại bỏ nhiễu).
+        *   **Hệ số dáng điệu (Silhouette Score)** = **`0.3222`** (chỉ số chất lượng phân cụm rất tốt sau khi loại bỏ nhiễu).
         *   **Cụm 1 — Nhóm Trụ Cột Lớn**: Gồm 24 ngân hàng lớn và trung bình (như VCB, TCB, BID, CTG...), đặc trưng bởi ROE/ROA lành mạnh, và tỷ lệ dư nợ cho vay (LTA) cao nhất hệ thống.
         *   **Cụm 0 — Nhóm TMCP Quy Mô Nhỏ**: Gồm 13 ngân hàng TMCP nhỏ đang tích lũy đệm tài sản, biên NIM còn khiêm tốn.
         *   **Cụm 2 — Nhóm Ngân Hàng Ngoại**: Gồm 2 chi nhánh ngân hàng nước ngoài, duy trì an toàn vốn ETA cực kỳ cao và tỷ lệ nợ xấu NPL gần như bằng không.
@@ -1241,19 +1344,19 @@ def show_conclusion_section():
         st.markdown("""
         #### 🔍 Phát hiện 4: Nguyên nhân gốc rễ gây nợ xấu đã được xác định
         Biểu đồ độ quan trọng đặc trưng (Feature Importance) từ Random Forest chỉ ra Top 3 biến quyết định sức khỏe tín dụng:
-        1.  **llp_ratio** (Tỷ lệ trích lập dự phòng): **`20.45%`** (Biến quan trọng nhất). Ngân hàng cố tình trích lập dự phòng mỏng để 'làm đẹp' lợi nhuận ngắn hạn chính là nhóm dễ bùng phát nợ xấu nhất.
-        2.  **roe** (Tỷ suất sinh lời/Vốn CSH): **`11.56%`**. ROE cao bất thường đi kèm đòn bẩy quá lớn là tín hiệu cảnh báo nguy cơ tiềm ẩn.
-        3.  **cir** (Tỷ lệ chi phí/Thu nhập): **`10.54%`**. Vận hành kém hiệu quả trực tiếp ăn mòn khả năng phòng thủ chất lượng tài sản.
+        1.  **llp_ratio** (Tỷ lệ trích lập dự phòng): **`21.05%`** (Biến quan trọng nhất). Ngân hàng cố tình trích lập dự phòng mỏng để 'làm đẹp' lợi nhuận ngắn hạn chính là nhóm dễ bùng phát nợ xấu nhất.
+        2.  **roe** (Tỷ suất sinh lời/Vốn CSH): **`11.49%`**. ROE cao bất thường đi kèm đòn bẩy quá lớn là tín hiệu cảnh báo nguy cơ tiềm ẩn.
+        3.  **cir** (Tỷ lệ chi phí/Thu nhập): **`11.03%`**. Vận hành kém hiệu quả trực tiếp ăn mòn khả năng phòng thủ chất lượng tài sản.
         """)
 
     st.markdown("---")
-    st.subheader("🏢 PHẦN 2: DIỄN GIẢI Ý NGHĨA KINH DOANH (TẠI SAO ĐIỀU NÀY QUAN TRỌNG?)")
+    st.subheader("PHẦN 2: DIỄN GIẢI Ý NGHĨA KINH DOANH (TẠI SAO ĐIỀU NÀY QUAN TRỌNG?)")
     
     col_p1, col_p2, col_p3 = st.columns([1, 1, 1])
     
     with col_p1:
         st.info("""
-        ### 📈 Đối với Nhà đầu tư
+        ### Đối với Nhà đầu tư
         **(Persona B — Tối ưu hóa lợi nhuận)**
         
         Dự báo giá LSTM từ T+1 đến T+5 cung cấp lợi thế thông tin vượt trội so với phân tích kỹ thuật thủ công truyền thống:
@@ -1264,7 +1367,7 @@ def show_conclusion_section():
         
     with col_p2:
         st.warning("""
-        ### 🛡️ Đối với Nhà quản trị rủi ro
+        ### Đối với Nhà quản trị rủi ro
         **(Persona A — Bảo toàn dòng vốn)**
         
         Hệ thống cảnh báo sớm Random Forest với Recall 91.67% mang ý nghĩa thực tiễn vô cùng sâu sắc:
@@ -1274,7 +1377,7 @@ def show_conclusion_section():
         
     with col_p3:
         st.success("""
-        ### 💻 Đối với Ban điều hành
+        ### Đối với Ban điều hành
         **(Toàn hệ thống doanh nghiệp)**
         
         *   Nền tảng tích hợp tự động hóa giúp **giảm 80% thời gian** trích xuất và lập báo cáo thủ công.
@@ -1282,9 +1385,9 @@ def show_conclusion_section():
         """)
 
     st.markdown("---")
-    st.subheader("📋 PHẦN 3: ĐỀ XUẤT HÀNH ĐỘNG CỤ THỂ CHO DOANH NGHIỆP")
+    st.subheader("PHẦN 3: ĐỀ XUẤT HÀNH ĐỘNG CỤ THỂ CHO DOANH NGHIỆP")
     
-    st.markdown("#### 💡 Đề xuất 1: Giám sát dòng tiền lớn hàng ngày")
+    st.markdown("#### Đề xuất 1: Giám sát dòng tiền lớn hàng ngày")
     st.table(pd.DataFrame({
         "Hạng mục": ["Hành động", "Đối tượng chịu trách nhiệm", "Thời hạn", "Tác động kỳ vọng"],
         "Chi tiết": [
@@ -1295,7 +1398,7 @@ def show_conclusion_section():
         ]
     }))
     
-    st.markdown("#### 💡 Đề xuất 2: Phân bổ nguồn vốn dài hạn theo cụm chiến lược")
+    st.markdown("#### Đề xuất 2: Phân bổ nguồn vốn dài hạn theo cụm chiến lược")
     st.table(pd.DataFrame({
         "Hạng mục": ["Hành động", "Đối tượng chịu trách nhiệm", "Thời hạn", "Tác động kỳ vọng"],
         "Chi tiết": [
@@ -1306,11 +1409,11 @@ def show_conclusion_section():
         ]
     }))
     
-    st.markdown("#### 💡 Đề xuất 3: Bảng giám sát rủi ro tín dụng liên ngân hàng")
+    st.markdown("#### Đề xuất 3: Bảng giám sát rủi ro tín dụng liên ngân hàng")
     st.table(pd.DataFrame({
         "Hạng mục": ["Hành động", "Đối tượng chịu trách nhiệm", "Thời hạn", "Tác động kỳ vọng"],
         "Chi tiết": [
-            "Triển khai Dashboard giám sát rủi ro liên ngân hàng, theo dõi liên tục nhóm ngân hàng bị mô hình gắn nhãn '🚨 Nguy Cơ Cao'. Yêu cầu kiểm toán và thanh tra đặc biệt đối với các đơn vị có tỷ lệ dự phòng llp_ratio thấp bất thường.",
+            "Triển khai Dashboard giám sát rủi ro liên ngân hàng, theo dõi liên tục nhóm ngân hàng bị mô hình gắn nhãn 'Nguy Cơ Cao'. Yêu cầu kiểm toán và thanh tra đặc biệt đối với các đơn vị có tỷ lệ dự phòng llp_ratio thấp bất thường.",
             "Bộ phận quản trị rủi ro, Phòng kiểm toán nội bộ",
             "Cập nhật định kỳ sau mỗi chu kỳ tái huấn luyện mô hình (hàng quý)",
             "Giảm thiểu tỷ lệ bỏ sót ngân hàng có rủi ro thực tế (False Negative) xuống dưới mức 10%"
@@ -1318,10 +1421,10 @@ def show_conclusion_section():
     }))
 
     st.markdown("---")
-    st.subheader("💡 PHẦN 4: HỎI & ĐÁP (Q&A) CHẤT VẤN PHẢN BIỆN CỐT LÕI")
-    st.write("Giải quyết 4 câu hỏi nghiên cứu cốt lõi (Q1 - Q4) và các câu hỏi kỹ thuật thường gặp của Hội đồng chấm.")
+    st.subheader("PHẦN 4: HỎI VÀ ĐÁP (Q&A)")
+    st.write("Giải đáp một số nội dung và câu hỏi thường gặp về dữ liệu và mô hình.")
     
-    with st.expander("❓ Câu hỏi 1 (Tương ứng Q1): Mô hình LSTM đơn biến và đa biến có vượt trội hơn ARIMA Baseline không? Việc bổ sung đặc trưng OHLCV và biến động phái sinh có giúp cải thiện sai số dự báo giá đóng cửa ngắn hạn không?"):
+    with st.expander("Câu hỏi 1: Đánh giá hiệu năng dự báo giá đóng cửa ngắn hạn giữa mô hình LSTM và ARIMA Baseline"):
         st.markdown("""
         **Trả lời**:
         *   **Phương pháp luận 3 bước**: Nhóm nghiên cứu thiết lập so sánh khoa học:
@@ -1333,14 +1436,14 @@ def show_conclusion_section():
             - Việc bổ sung đặc trưng thanh khoản và biến động (LSTM Đa biến) tiếp tục cải thiện rõ rệt sai số cho **BID** (RMSE giảm xuống **`2.7402`**), **VCB** (RMSE giảm xuống **`2.8278`**), và **CTG** (RMSE giảm xuống **`1.3733`**). Riêng **TCB**, mô hình đơn biến lại tối ưu nhất (RMSE **`1.5390`**).
         """)
 
-    with st.expander("❓ Câu hỏi 2 (Tương ứng Q2): Đà biến động giá của nhóm ngân hàng quốc doanh (BID, VCB, CTG) có đồng pha với nhau và phân hóa thế nào với ngân hàng tư nhân (TCB)?"):
+    with st.expander("Câu hỏi 2: Sự đồng pha và phân hóa giá giữa nhóm ngân hàng quốc doanh và ngân hàng thương mại tư nhân"): 
         st.markdown("""
         **Trả lời**:
         *   **Nhóm quốc doanh (BID, VCB, CTG) đồng pha rất cao**: Hệ số tương quan Pearson giữa 3 mã này đều vượt `0.85` và khoảng cách Dynamic Time Warping (DTW) rất ngắn (ví dụ: BID - VCB = `201.25`). Do họ cùng chịu sự điều tiết tín dụng trực tiếp của Ngân hàng Nhà nước, có cấu trúc tài sản và đối tượng khách hàng tương đồng.
         *   **TCB (Tư nhân) thể hiện sự phân hóa rõ nét**: Hệ số tương quan của TCB với VCB thấp hơn hẳn (chỉ quanh `0.54`) và khoảng cách DTW rất lớn (TCB - VCB = `457.03`). Mô hình hồi quy LSDV Fixed Effects ($R^2 = 53.03\%$) cũng xác nhận TCB có hệ số ảnh hưởng cố định độc lập, biến động nhạy bén theo thị trường trái phiếu và bất động sản thay vì xu hướng quốc doanh.
         """)
 
-    with st.expander("❓ Câu hỏi 3 (Tương ứng Q3): Chỉ số tài chính nào theo khung CAMELS quyết định việc một ngân hàng bị rơi vào nhóm rủi ro nợ xấu vượt mức 3%?"):
+    with st.expander("Câu hỏi 3: Các chỉ số tài chính CAMELS quyết định việc ngân hàng bị phân vào nhóm nguy cơ nợ xấu cao"): 
         st.markdown("""
         **Trả lời**:
         *   Mô hình Random Forest Classifier đạt hiệu năng phân loại vượt trội (**AUC-ROC = 0.9752**, **Recall lớp High Risk = 91.67%** tại ngưỡng quyết định tối ưu là **0.2327**).
@@ -1351,7 +1454,7 @@ def show_conclusion_section():
         *   **Kiểm định Granger Causality**: Để chứng minh mối quan hệ nhân quả, nhóm thực hiện kiểm định Granger ở độ trễ 1 năm cho kết quả $p\\text{-}value = 0.0914$ (ở mức ý nghĩa 10%), chứng minh sự tăng lên của tỷ lệ trích lập dự phòng năm trước thực sự là chỉ báo dẫn dắt nhân quả đối với sự bùng phát nợ xấu ở năm sau.
         """)
 
-    with st.expander("❓ Câu hỏi 4 (Tương ứng Q4): Dữ liệu có thể giúp chúng ta phân cụm chính xác các ngân hàng Việt Nam thành các nhóm chiến lược hoạt động khác nhau hay không?"):
+    with st.expander("Câu hỏi 4: Khả năng phân cụm định hướng chiến lược hoạt động các ngân hàng thương mại Việt Nam"): 
         st.markdown("""
         **Trả lời**:
         **Hoàn toàn có thể**. Sử dụng thuật toán K-Means kết hợp giảm chiều dữ liệu PCA (giữ lại 85.92% biến động gốc), mô hình đạt Silhouette Score = **`0.3222`** và Davies-Bouldin = **`0.9746`**, phân cụm thành công 39 ngân hàng thương mại (sau loại nhiễu) thành 3 nhóm rõ nét:
@@ -1360,13 +1463,13 @@ def show_conclusion_section():
         3.  **Cụm 2 (Ngân Hàng Ngoại - 2 Ngân hàng)**: Đệm an toàn ETA cực cao, cho vay LTD rất thấp và tỷ lệ nợ xấu gần như bằng không.
         """)
 
-    with st.expander("❓ Câu hỏi 5: Tại sao nhóm chọn mốc 3% làm ngưỡng phân loại rủi ro nợ xấu cho các ngân hàng?"):
+    with st.expander("Câu hỏi 5: Tại sao nhóm chọn mốc 3% làm ngưỡng phân loại rủi ro nợ xấu cho các ngân hàng?"):
         st.markdown("""
         **Trả lời**:
         Mốc 3% là **ngưỡng an toàn pháp lý tối đa do Ngân hàng Nhà nước Việt Nam (SBV) quy định**. Theo các thông tư và chỉ thị giám sát của SBV, các ngân hàng thương mại bắt buộc phải duy trì tỷ lệ nợ xấu dưới 3%. Nếu vượt mốc này, ngân hàng sẽ bị hạn chế room tăng trưởng tín dụng, không được chia cổ tức bằng tiền mặt, và phải chịu sự giám sát đặc biệt. Do đó, đây là ranh giới quản trị rủi ro sống còn trong hệ thống tài chính Việt Nam.
         """)
 
-    with st.expander("❓ Câu hỏi 6: Tại sao nhóm lại loại bỏ 6 ngân hàng (DAB, VBSP, CB, GPB, WEB, MDB) khỏi mô hình phân cụm? Điều này có ảnh hưởng đến tính tổng quát của báo cáo không?"):
+    with st.expander("Câu hỏi 6: Tại sao nhóm lại loại bỏ 6 ngân hàng (DAB, VBSP, CB, GPB, WEB, MDB) khỏi mô hình phân cụm? Điều này có ảnh hưởng đến tính tổng quát của báo cáo không?"):
         st.markdown("""
         **Trả lời**:
         Việc loại bỏ này là **hoàn toàn bắt buộc để bảo vệ chất lượng mô hình phân cụm** dưới góc nhìn nghiệp vụ:
@@ -1375,7 +1478,7 @@ def show_conclusion_section():
         *   Việc loại bỏ 6 thực thể này giúp chúng em phác họa chính xác bản đồ cạnh tranh và định hướng chiến lược của **39 ngân hàng thương mại hoạt động bình thường** trên thị trường.
         """)
 
-    with st.expander("❓ Câu hỏi 7: Làm thế nào nhóm đảm bảo dữ liệu trong Kho dữ liệu BigQuery là sạch, đáng tin cậy và không bị sai lệch?"):
+    with st.expander("Câu hỏi 7: Làm thế nào nhóm đảm bảo dữ liệu trong Kho dữ liệu BigQuery là sạch, đáng tin cậy và không bị sai lệch?"):
         st.markdown("""
         **Trả lời**:
         Nhóm đã thiết kế một quy trình Kiểm soát Chất lượng Dữ liệu (Data Quality - DQ) 3 tầng chặt chẽ:
@@ -1384,7 +1487,7 @@ def show_conclusion_section():
         *   **Tầng 3 (Validate)**: Chạy script kiểm tra toàn vẹn độc lập (`validate_integrity.py`) sau mỗi chu kỳ ETL để kiểm soát số lượng bản ghi và logic dòng thời gian trước khi nạp vào BigQuery.
         """)
 
-    with st.expander("❓ Câu hỏi 8: Tại sao tỷ lệ chi phí trên thu nhập (CIR) trên đồ thị phân phối của nhóm lại tập trung ở mức rất cao từ 90% - 95%, trong khi lý thuyết thông thường chỉ khoảng 35% - 45%?"):
+    with st.expander("Câu hỏi 8: Tại sao tỷ lệ chi phí trên thu nhập (CIR) trên đồ thị phân phối của nhóm lại tập trung ở mức rất cao từ 90% - 95%, trong khi lý thuyết thông thường chỉ khoảng 35% - 45%?"):
         st.markdown("""
         **Trả lời**:
         Đây là điểm đặc thù của bộ dữ liệu thô đầu vào mà nhóm đã phát hiện và xử lý:
@@ -1392,6 +1495,44 @@ def show_conclusion_section():
         *   Tuy nhiên, trong bộ dữ liệu gốc này, phần chi phí (Cost) được tính toán gộp cả **Chi phí trả lãi tiền gửi đầu vào** (Interest Expenses). Vì trả lãi tiền gửi luôn là chi phí lớn nhất của một ngân hàng thương mại để huy động vốn, tỷ lệ CIR trong mô hình bị đẩy lên sát mức 90% - 95%.
         *   Nhóm đã ghi nhận điểm đặc thù này để mô hình phân loại Random Forest và phân cụm K-Means học đúng bản chất phân phối của dữ liệu gốc.
         """)
+
+
+
+
+
+def show_about_section():
+    st.header("Thông Tin Dự Án Và Nhóm Thực Hiện")
+    
+    st.subheader("Thông Tin Đề Tài")
+    st.markdown("""
+    *   **Tên đề tài:** Phân tích dữ liệu tài chính và dự báo học máy hệ thống ngân hàng Việt Nam.
+    *   **Môn học:** Phân tích dữ liệu (Data Analysis) - Học kỳ 6 - HCMUTE.
+    *   **Nhóm thực hiện:** Nhóm 2.
+    """)
+    
+    st.subheader("Danh Sách Thành Viên & Phân Công Vai Trò")
+    st.markdown("""
+    1.  **Trần Minh Khánh**: Phân tích dữ liệu, Thiết kế Kho dữ liệu, Thử nghiệm mô hình.
+    2.  **Nguyễn Đặng Quốc Anh**: Xử lý dữ liệu, Quản lý dự án, Phát triển học máy.
+    3.  **Phạm Minh Quân**: Phát triển học máy, Phân tích nghiệp vụ tài chính.
+    4.  **Đỗ Kiến Hưng**: Thiết kế Kho dữ liệu Star Schema, Giám sát tính toàn vẹn, Xây dựng Dashboard.
+    """)
+    
+    st.subheader("Công Nghệ Sử Dụng (Technology Stack)")
+    st.markdown("""
+    *   **Hệ điều hành & Nền tảng:** Windows, Python 3.9+ (TensorFlow tương thích)
+    *   **Thu thập & Xử lý dữ liệu:** Pandas, openpyxl, vnstock API
+    *   **Kho dữ liệu (DWH):** Google BigQuery (thiết kế Star Schema tối ưu hóa cho OLAP)
+    *   **Mô hình học máy:** TensorFlow Keras (LSTM), scikit-learn (K-Means, Random Forest), statsmodels (ARIMA baseline)
+    *   **Giao diện & Báo cáo trực quan:** Streamlit, Plotly, Graphviz, Looker Studio
+    """)
+    
+    st.subheader("Nguồn Dữ Liệu & Tài Liệu Tham Khảo (References)")
+    st.markdown("""
+    *   **Dữ liệu giá giao dịch cổ phiếu hàng ngày (BID, TCB, VCB, CTG):** Được thu thập lịch sử thông qua thư viện API `vnstock` và các cổng thông tin tài chính uy tín như CafeF.
+    *   **Dữ liệu báo cáo tài chính CAMELS của 45 ngân hàng thương mại Việt Nam (20 năm):** Được trích xuất và tham chiếu từ cơ sở dữ liệu nghiên cứu công khai trên **Harvard Dataverse** (DOI: [10.7910/DVN/RIWA3B](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RIWA3B)).
+    *   **Quy chế an toàn hệ thống:** Dựa trên các thông tư, quy định và chỉ thị trực tiếp của Ngân hàng Nhà nước Việt Nam (SBV) đối với việc duy trì tỷ lệ nợ xấu dưới ngưỡng 3%.
+    """)
 
 
 if __name__ == "__main__":

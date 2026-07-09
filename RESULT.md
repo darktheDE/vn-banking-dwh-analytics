@@ -8,7 +8,7 @@ Tài liệu này tổng hợp toàn bộ các kết quả đạt được từ q
 
 ## 1. MỤC TIÊU & CÂU HỎI NGHIÊN CỨU CHI TIẾT (RESEARCH QUESTIONS & DESIGN)
 
-Đề tài tập trung giải quyết 4 câu hỏi nghiên cứu (Research Questions - RQ) mang tính liên ngành giữa Công nghệ thông tin và Phân tích tài chính:
+Đề tài tập trung giải quyết 4 câu hỏi nghiên cứu (Research Questions - RQ) mang tính liên ngành giữa Công nghệ thông tin và Phân tích tài chính, cụ thể như sau:
 
 ### 💡 Q1: Mô hình mạng học sâu LSTM Đơn biến (Univariate LSTM) và LSTM Đa biến (Multivariate LSTM) có mang lại hiệu năng dự báo giá đóng cửa ngắn hạn vượt trội so với baseline thống kê ARIMA không? Việc bổ sung các đặc trưng động lực học OHLCV và biến động có giúp cải thiện sai số không?
 *   **Mục tiêu:** Chứng minh năng lực dự báo chuỗi thời gian của mạng nơ-ron hồi quy phi tuyến tính (LSTM) so với mô hình tuyến tính tự hồi quy cổ điển (ARIMA). Đồng thời đánh giá giá trị thông tin bổ trợ của các biến động dòng tiền thanh khoản đối với xu hướng giá ngắn hạn.
@@ -16,31 +16,64 @@ Tài liệu này tổng hợp toàn bộ các kết quả đạt được từ q
     *   *Bước 1 (Thiết lập Baseline):* Huấn luyện mô hình thống kê đơn biến **ARIMA** chỉ sử dụng chuỗi giá đóng cửa `close_price`.
     *   *Bước 2 (So sánh mô hình học sâu đơn biến):* Huấn luyện mô hình **LSTM Đơn biến (Univariate LSTM)** trên cùng dữ liệu đầu vào là chuỗi giá đóng cửa `close_price` để đối chiếu trực tiếp với ARIMA.
     *   *Bước 3 (Đánh giá đặc trưng đa chiều):* Huấn luyện mô hình **LSTM Đa biến (Multivariate LSTM)** tích hợp thêm các đặc trưng động lượng giá và thanh khoản để đánh giá mức độ giảm sai số RMSE so với mô hình đơn biến.
-*   **Dữ liệu đầu vào (Input):** Lịch sử giao dịch hàng ngày của 4 cổ phiếu ngân hàng mục tiêu (BID, TCB, VCB, CTG) từ ngày 01-01-2014 đến nay (11.835 dòng dữ liệu thực tế).
-*   **Phương pháp & Công cụ:** Thư viện `statsmodels` (ARIMA), `TensorFlow/Keras` (LSTM), scaler `MinMaxScaler` trên các cửa sổ trượt (sliding window) kích thước 5 phiên.
-*   **Đầu ra (Output):** Dự báo giá đóng cửa từ T+1 đến T+5 ghi nhận vào bảng `fact_model_predictions`. Sai số RMSE và MAE trên tập kiểm thử độc lập (Test Set).
+*   **Dữ liệu đầu vào (Input):**
+    *   *Mô hình Đơn biến (ARIMA & LSTM Uni):* Chuỗi giá đóng cửa lịch sử hàng ngày (`close_price`) truy vấn từ bảng Data Warehouse: **`GCP_PROJECT_ID.financial_dwh.fact_stock_daily_metrics`**.
+    *   *Mô hình Đa biến (LSTM Multi):* 7 đặc trưng giao dịch hàng ngày bao gồm: Giá mở cửa (`open_price`), Giá cao nhất (`high_price`), Giá thấp nhất (`low_price`), Giá đóng cửa (`close_price`), Khối lượng giao dịch (`trading_volume`), Biến động giá trễ (`price_change_pct`), Biến động khối lượng trễ (`volume_change_pct`), và Biên độ dao động nội phiên (`price_amplitude`) truy vấn từ bảng: **`GCP_PROJECT_ID.financial_dwh.fact_stock_daily_metrics`**.
+*   **Kết quả đầu ra (Output):**
+    *   *BigQuery DWH:* Lưu kết quả dự báo giá đóng cửa từ T+1 đến T+5 tại bảng: **`GCP_PROJECT_ID.financial_dwh.fact_model_predictions`**.
+    *   *Tệp tin cục bộ:* Tệp [data/processed/lstm_model_comparison.json](./data/processed/lstm_model_comparison.json) lưu trữ sai số RMSE và MAE của cả 3 mô hình trên tập kiểm thử (Test Set).
+*   **Chỉ số đánh giá (Evaluation Metrics):**
+    *   **RMSE (Root Mean Squared Error):** Đo lường độ lệch trung bình bình phương giữa giá dự báo và giá thực tế (đơn vị: nghìn VND).
+    *   **MAE (Mean Absolute Error):** Đo lường độ lệch tuyệt đối trung bình.
+*   **Biểu đồ hiển thị trên Streamlit (Visualizations):**
+    *   *Tab 3 (So sánh thực nghiệm - Phân hệ LSTM):* Biểu đồ đường (Line Chart) so sánh chuỗi giá đóng cửa thực tế vs dự báo của ARIMA, LSTM Đơn biến và LSTM Đa biến.
+    *   Bảng số liệu tương tác (Interactive Data Table) so sánh RMSE và MAE chéo giữa 3 mô hình của 4 ngân hàng (BID, TCB, VCB, CTG).
 
 ### 💡 Q2: Biến động giá đóng cửa ngắn hạn của 4 cổ phiếu ngân hàng trọng điểm (BID, TCB, VCB, CTG) là đồng pha hay phân hóa?
 *   **Mục tiêu:** Xác định cấu trúc tương quan chuỗi thời gian phi tuyến giữa các cổ phiếu đại diện cho khối Ngân hàng thương mại nhà nước (SOCB) và Ngân hàng thương mại cổ phần tư nhân (JSCB).
-*   **Dữ liệu đầu vào (Input):** Chuỗi giá đóng cửa lịch sử hàng ngày (`close_price`) của 4 mã cổ phiếu.
-*   **Phương pháp & Công cụ:** Hệ số tương quan Pearson, thuật toán So khớp thời gian động (Dynamic Time Warping - DTW) đo khoảng cách phi tuyến giữa các chuỗi thời gian biến đổi, mô hình hồi quy OLS Fixed Effects (Least Squares Dummy Variable - LSDV).
-*   **Đầu ra (Output):** Ma trận hệ số tương quan, khoảng cách DTW và các hệ số tác động đặc thù ngân hàng.
+*   **Dữ liệu đầu vào (Input):** Chuỗi giá đóng cửa lịch sử hàng ngày (`close_price`) của 4 mã cổ phiếu truy vấn từ bảng: **`GCP_PROJECT_ID.financial_dwh.fact_stock_daily_metrics`** (11.835 phiên giao dịch thực tế).
+*   **Kết quả đầu ra (Output):**
+    *   *Tệp tin cục bộ:* Tệp [data/processed/dtw_correlation_report.json](./data/processed/dtw_correlation_report.json) lưu các chỉ số khoảng cách DTW và hệ số tương quan chéo.
+    *   Biểu đồ phân tích tương quan và khoảng cách được kết xuất và lưu thành ảnh tại [data/processed/dtw_correlation_plots.png](./data/processed/dtw_correlation_plots.png).
+    *   Hệ số hồi quy LSDV Fixed Effects được ghi nhận tại [data/processed/causal_analysis_report.txt](./data/processed/causal_analysis_report.txt).
+*   **Chỉ số đánh giá (Evaluation Metrics):**
+    *   **Hệ số tương quan Pearson ($r$):** Đo độ mạnh liên kết tuyến tính (từ -1 đến 1).
+    *   **Khoảng cách DTW (DTW Distance):** Khoảng cách phi tuyến đo lường sai lệch chuỗi thời gian (khoảng cách càng nhỏ càng đồng pha).
+    *   **Hệ số hồi quy cố định (Entity Intercept) và $R^2$:** Đo mức độ giải thích biến động và đặc thù độc lập của từng ngân hàng.
+*   **Biểu đồ hiển thị trên Streamlit (Visualizations):**
+    *   *Tab 2 (Phân hệ LSTM):* Bản đồ nhiệt tương quan lăn (Rolling Correlation Heatmap) giữa 4 mã cổ phiếu.
+    *   Biểu đồ phân phối sai số Box Plot và Stacked Bar Chart dòng tiền thanh khoản 24 tháng theo tỷ đồng VND.
+    *   Bản đồ nhiệt khoảng cách DTW (DTW Distance Heatmap) biểu diễn mức độ đồng pha và phân hóa.
 
 ### 💡 Q3: Chỉ số tài chính nào đóng vai trò dẫn dắt và quyết định việc một ngân hàng rơi vào nhóm cảnh báo đỏ về rủi ro nợ xấu cao (NPL $\ge$ 3%)?
 *   **Mục tiêu:** Xây dựng hệ thống cảnh báo sớm rủi ro tín dụng của ngân hàng thương mại Việt Nam và xếp hạng tầm quan trọng của các chỉ số tài chính CAMELS.
-*   **Dữ liệu đầu vào (Input):** 10 chỉ số tài chính CAMELS được tính toán tự động từ 661 báo cáo tài chính năm của 45 ngân hàng Việt Nam giai đoạn 2002–2022.
-*   **Phương pháp & Công cụ:** Mô hình phân loại **Random Forest Classifier** so sánh với baseline phân loại **Logistic Regression**. 
-    *   *Phân chia dữ liệu:* Áp dụng phân chia theo thời gian (**Time-based split**): Tập huấn luyện (dữ liệu giai đoạn 2002–2017), Tập kiểm thử (dữ liệu giai đoạn 2018–2022) để loại bỏ hoàn toàn rò rỉ dữ liệu (data leakage) thời gian.
-    *   *Tối ưu hóa ngưỡng quyết định (Threshold Tuning):* Điều chỉnh ngưỡng phân lớp từ mặc định 0.5 xuống **0.2327** dựa trên điểm số F-beta ($\beta=2$) nhằm tối đa hóa **Recall** của nhóm Rủi ro cao, chấp nhận tăng nhẹ tỷ lệ cảnh báo sai (False Positive) để không bỏ sót bất kỳ ngân hàng nào thực sự nguy hiểm (giảm thiểu tối đa False Negative).
-*   **Chỉ số đánh giá (Metrics):** AUC-ROC, Recall lớp rủi ro cao ($\ge 85\%$), F1-Score, Feature Importance.
-*   **Đầu ra (Output):** Nhãn cảnh báo rủi ro (`risk_label`) và xác suất rủi ro (`risk_probability`) được nạp trực tiếp vào bảng `bank_risk_predictions` trên BigQuery.
+*   **Dữ liệu đầu vào (Input):** 10 chỉ số tài chính CAMELS tính toán tự động trong ETL: an toàn vốn (`eta`, `etd`), chất lượng tài sản (`npl_ratio`, `llp_ratio`), quản lý chi phí (`cir`), khả năng sinh lời (`roa`, `roe`, `nim`), và thanh khoản (`lta`, `ltd`, `gta`) truy vấn từ bảng: **`GCP_PROJECT_ID.financial_dwh.fact_bank_performance`**.
+*   **Kết quả đầu ra (Output):**
+    *   *BigQuery DWH:* Nhãn cảnh báo rủi ro nhị phân (`risk_label`) và xác suất rủi ro (`risk_probability`) nạp vào bảng: **`GCP_PROJECT_ID.financial_dwh.bank_risk_predictions`**.
+    *   *Tệp tin cục bộ:* Tệp [data/processed/causal_analysis_report.txt](./data/processed/causal_analysis_report.txt) lưu kết quả kiểm định dừng ADF, p-value của Granger Causality, và bảng hệ số hồi quy bảng trễ LSDV.
+    *   Hình ảnh biểu đồ kiểm định nhân quả được lưu tại [data/processed/llp_npl_causality.png](./data/processed/llp_npl_causality.png).
+*   **Chỉ số đánh giá (Evaluation Metrics):**
+    *   **AUC-ROC (Area Under the Curve):** Đo lường năng lực phân loại tổng thế (ngưỡng chấp nhận $>0.80$).
+    *   **Recall lớp High Risk (Độ nhạy):** Tỷ lệ phát hiện chính xác ngân hàng nợ xấu $\ge 3\%$ (ngưỡng chấp nhận $\ge 85\%$).
+    *   **Feature Importance (%):** Trọng số giảm Gini đo tầm quan trọng của chỉ số tài chính.
+    *   **F-p_value (Granger Test):** Giá trị p đo ý nghĩa thống kê của quan hệ nhân quả.
+*   **Biểu đồ hiển thị trên Streamlit (Visualizations):**
+    *   *Phân hệ Cảnh báo rủi ro (Random Forest):* Biểu đồ cột ngang (Horizontal Bar Chart) xếp hạng độ quan trọng đặc trưng (Feature Importance) của 10 chỉ số tài chính CAMELS.
+    *   Bảng theo dõi cảnh báo rủi ro (Risk Monitoring Table) tích hợp đèn tín dụng đỏ (🚨 High Risk) đối với các ngân hàng có xác suất nợ xấu cao.
 
 ### 💡 Q4: Các chiến lược hoạt động và hồ sơ tài chính của các ngân hàng thương mại Việt Nam có tạo thành các phân cụm rõ rệt dựa trên dữ liệu lịch sử không?
 *   **Mục tiêu:** Gom cụm phi giám sát các ngân hàng thương mại Việt Nam để nhận diện các mô hình kinh doanh đặc trưng (phòng thủ, tối ưu hóa lợi nhuận, hay đòn bẩy quy mô lớn).
-*   **Dữ liệu đầu vào (Input):** 10 chỉ số tài chính CAMELS đã chuẩn hóa bằng `StandardScaler`.
-*   **Phương pháp & Công cụ:** Thuật toán giảm chiều Phân tích thành phần chính (PCA) kết hợp gom cụm **K-Means**. Sử dụng phương pháp Khuỷu tay (Elbow Method) và Hệ số dáng điệu (Silhouette Analysis) để tìm số lượng cụm $k$ tối ưu.
-*   **Chỉ số đánh giá (Metrics):** Silhouette Score, Davies-Bouldin Index, Tỷ lệ phương sai giải thích tích lũy của PCA ($\ge 80\%$).
-*   **Đầu ra (Output):** Phân bổ mã cụm (`cluster_id`) nạp vào bảng `bank_cluster_assignments` trên BigQuery.
+*   **Dữ liệu đầu vào (Input):** 10 chỉ số tài chính CAMELS đã chuẩn hóa bằng `StandardScaler` truy vấn từ bảng Data Warehouse: **`GCP_PROJECT_ID.financial_dwh.fact_bank_performance`**.
+*   **Kết quả đầu ra (Output):**
+    *   *BigQuery DWH:* Phân bổ mã cụm (`cluster_id` từ 0 đến 2) nạp vào bảng: **`GCP_PROJECT_ID.financial_dwh.bank_cluster_assignments`**.
+*   **Chỉ số đánh giá (Metrics):**
+    *   **Silhouette Score (Hệ số dáng điệu):** Đánh giá độ đồng nhất nội cụm và tách biệt ngoại cụm (càng gần 1 càng tốt).
+    *   **Davies-Bouldin Index:** Đánh giá chất lượng phân cụm (càng thấp càng tốt).
+    *   **Tỷ lệ phương sai giải thích PCA (%):** Lượng thông tin gốc được bảo toàn sau khi giảm chiều ($\ge 80\%$).
+*   **Biểu đồ hiển thị trên Streamlit (Visualizations):**
+    *   *Phân hệ Phân Cụm Ngân Hàng:* Biểu đồ phân tán 2D (2D Scatter Plot) biểu diễn 39 ngân hàng trên hệ trục không gian giảm chiều của 2 thành phần chính đầu tiên (PC1 và PC2), tô màu theo 3 nhãn cụm.
+    *   Biểu đồ cột (Grouped Bar Chart) so sánh hồ sơ trung bình (CAMELS Average Profiles) của 3 cụm để phác họa đặc trưng kinh tế.
+    *   Danh sách bộ lọc ngân hàng tương tác theo cụm.
 
 ---
 
@@ -120,6 +153,15 @@ Mô hình hồi quy đánh giá ảnh hưởng cố định của từng ngân h
 
 ### 4.3. Dự báo sớm rủi ro nợ xấu ngân hàng thương mại Việt Nam (Q3)
 
+#### A. Làm rõ bài toán: Phân loại nhị phân (Classification) vs. Dự đoán giá trị liên tục (Regression)
+Trong đề tài này, nhóm nghiên cứu sử dụng mô hình **Random Forest Classifier** để thực hiện bài toán **Phân loại nhị phân (Binary Classification)**: Phân lớp xem tỷ lệ nợ xấu (`npl_ratio`) của một ngân hàng tại một năm tài khóa có **vượt ngưỡng cảnh báo đỏ 3%** hay không (nhãn `1` nếu $\ge 3\%$, `0` nếu $< 3\%$), thay vì dự đoán giá trị liên tục tuyệt đối của tỷ lệ nợ xấu.
+
+**Tại sao việc sử dụng mô hình Phân loại (Classifier) là hoàn toàn đúng đắn và tối ưu hơn mô hình Hồi quy (Regressor)?**
+1.  **Ý nghĩa pháp lý và thực tiễn (Regulatory Red-line):** Theo quy chế giám sát của Ngân hàng Nhà nước Việt Nam (SBV), mốc **3%** là ranh giới pháp lý sống còn. Việc một ngân hàng có tỷ lệ nợ xấu vượt mức 3% sẽ lập tức kích hoạt các chế tài quản lý (hạn chế room tín dụng, cấm chia cổ tức bằng tiền mặt, đưa vào diện kiểm soát đặc biệt). Do đó, đối với cơ quan quản lý và các đối tác liên ngân hàng, điều cốt lõi là **phát hiện sớm khả năng vi phạm ngưỡng đỏ để đưa ra quyết định can thiệp (nhãn 0 hoặc 1)**, chứ không phải là dự đoán số lẻ thập phân chính xác của nợ xấu (ví dụ: dự đoán 2.85% hay 2.91%).
+2.  **Độ tin cậy của mô hình trên cỡ mẫu nhỏ:** Tỷ lệ nợ xấu thực tế của các ngân hàng thương mại hoạt động bình thường biến động trong biên độ rất hẹp (thường từ 0.5% đến 2.5%). Việc sử dụng hồi quy liên tục trên tập dữ liệu tương đối nhỏ (661 dòng báo cáo tài chính) rất dễ bị kéo lệch và mất tính ổn định bởi các hành vi kỹ thuật kế toán (window dressing) làm sạch sổ sách cuối năm của các ngân hàng. Mô hình phân loại giúp giảm nhiễu này và tập trung vào các biến động mang tính rủi ro thực sự.
+3.  **Tối ưu hóa hành động bằng Decision Threshold Tuning:** Bài toán phân loại cho phép ta tinh chỉnh **ngưỡng quyết định (đạt 0.2327)** nhằm tối đa hóa **Recall** (đạt 91.67%). Điều này giúp hạn chế tối đa việc bỏ sót ngân hàng có rủi ro thực tế (False Negative), điều mà mô hình hồi quy thông thường không thể cấu hình trực tiếp được.
+
+#### B. Kết quả thực nghiệm và so sánh mô hình đối chứng
 Đề tài đối chiếu kết quả giữa mô hình Random Forest Classifier (vận hành chính thức) và Logistic Regression (baseline đối chứng):
 
 | Mô hình phân loại | AUC-ROC trên tập Test | F1-Score | **Recall lớp Rủi ro cao (High Risk Recall)** | Ngưỡng quyết định (Decision Threshold) | Số lỗi bỏ sót rủi ro (False Negatives) |
@@ -128,18 +170,18 @@ Mô hình hồi quy đánh giá ảnh hưởng cố định của từng ngân h
 | **Random Forest** (Mặc định) | `0.9752` | `0.8800` | **83.33%** | `0.5000` (Mặc định) | 3 ngân hàng |
 | **Random Forest** (Tối ưu hóa) | **`0.9752`** | **`0.8462`** | **91.67%** $\rightarrow$ **Đạt yêu cầu** | **`0.2327`** (Tự điều chỉnh) | **Chỉ bỏ sót 1 ngân hàng** |
 
-#### A. Tại sao mô hình tối ưu hóa sử dụng ngưỡng quyết định 0.2327?
+#### C. Tại sao mô hình tối ưu hóa sử dụng ngưỡng quyết định 0.2327?
 *   Trong quản trị rủi ro tín dụng, **hậu quả của việc bỏ sót một ngân hàng có nguy cơ nợ xấu cao (lỗi loại 2 - False Negative) nguy hại gấp nhiều lần so với việc cảnh báo nhầm một ngân hàng khỏe mạnh (lỗi loại 1 - False Positive)**. 
 *   Bằng cách hạ ngưỡng quyết định từ `0.5` xuống `0.2327`, mô hình tăng đáng kể độ nhạy (Recall lớp High Risk tăng từ `83.33%` lên `91.67%`). Cứ **12 trường hợp** ngân hàng thực sự nợ xấu vượt ngưỡng 3% trong lịch sử kiểm thử, hệ thống radar của nhóm phát hiện chính xác **11 trường hợp**.
 
-#### B. Xếp hạng tầm quan trọng của các chỉ số CAMELS (Feature Importance)
+#### D. Xếp hạng tầm quan trọng của các chỉ số CAMELS (Feature Importance)
 Mô hình Random Forest trích xuất mức độ đóng góp của các chỉ số tài chính trong việc nhận diện nợ xấu:
 1.  **`llp_ratio` (Độ quan trọng: 21.05%):** Dự phòng rủi ro tín dụng là chỉ báo sớm hàng đầu. Khi chi phí dự phòng tăng mạnh liên tục, nợ xấu chắc chắn sẽ bùng phát ở các kỳ kế tiếp.
 2.  **`roe` (Độ quan trọng: 11.49%):** Khả năng sinh lời suy giảm làm yếu đi năng lực tự hấp thụ nợ xấu của nguồn vốn chủ sở hữu.
 3.  **`cir` (Độ quan trọng: 11.03%):** Tỷ lệ chi phí vận hành phình to phản ánh sự quản lý yếu kém của ban điều hành ngân hàng.
 4.  **`roa` (Độ quan trọng: 9.85%):** Hiệu quả sử dụng tài sản suy yếu kéo theo sự sụt giảm dòng tiền lành mạnh.
 
-#### C. Kiểm định nhân quả Granger (Granger Causality Test)
+#### E. Kiểm định nhân quả Granger (Granger Causality Test)
 *   **Giả thuyết:** Dự phòng rủi ro tín dụng (`llp_ratio`) có khả năng cảnh báo sớm (Granger-cause) tỷ lệ nợ xấu (`npl_ratio`) ở các kỳ tương lai hay không?
 *   **Kết quả kiểm định:** Với độ trễ (lag) 1 năm, chỉ số kiểm định đạt hệ số $F = 2.875$ và giá trị **$p\text{-}value = 0.0914$**.
 *   **Kết luận kinh tế lượng:** Với mức ý nghĩa thống kê 10%, kiểm định bác bỏ giả thuyết $H_0$, xác nhận rằng xu hướng tăng của tỷ lệ trích lập dự phòng `llp_ratio` ở năm trước là thông tin đầu vào đáng tin cậy để dự báo sớm sự bùng phát nợ xấu `npl_ratio` ở năm sau. Điều này củng cố tính thực tế của việc mô hình Random Forest xếp `llp_ratio` làm đặc trưng quan trọng nhất.
@@ -153,7 +195,7 @@ Mô hình gom cụm phi giám sát K-Means kết hợp PCA (với $K=3$) đạt 
 *   **Silhouette Score:** **`0.3222`** (Cụm phân tách rõ nét trên không gian tọa độ mới).
 *   **Davies-Bouldin Index:** **`0.9746`** (Khoảng cách giữa các cụm đạt độ phân ly tốt).
 
-#### Đặc trưng tài chính và hồ sơ của 3 cụm ngân hàng được phác họa:
+#### A. Đặc trưng tài chính và hồ sơ của 3 cụm ngân hàng được phác họa:
 
 ```mermaid
 gantt
@@ -168,13 +210,30 @@ gantt
     An toàn vốn ETA cao vượt trội, Dư nợ LTA rất thấp, NPL ~ 0%   :done, 2002, 2022
 ```
 
-*   **Cụm 1 — Nhóm Trụ cột Hệ thống (24 Ngân hàng):**
-    *   *Đại diện:* VCB, BID, CTG, TCB, ACB, MBB, VPB...
-    *   *Hồ sơ tài chính:* Quy mô tài sản cực kỳ lớn, biên lãi ròng NIM duy trì bền vững ($3.5\% - 4.5\%$), và hiệu số sinh lời ROE/ROA lành mạnh. Đây là các định chế tài chính dẫn dắt thị trường tiền tệ.
-*   **Cụm 0 — Nhóm Ngân hàng TMCP Quy mô nhỏ (13 Ngân hàng):**
-    *   *Hồ sơ tài chính:* Quy mô tài sản nhỏ, đệm an toàn vốn mỏng, hệ số CIR khá cao ($> 45\%$) do chưa tối ưu hóa được chi phí vận hành theo quy mô. Nhóm này dễ bị tổn thương trước các cú sốc lãi suất.
-*   **Cụm 2 — Nhóm Ngân hàng Ngoại và Liên doanh đặc thù (2 Ngân hàng):**
-    *   *Hồ sơ tài chính:* Tỷ lệ an toàn vốn `eta`, `etd` cực kỳ cao, tỷ lệ dư nợ cho vay `lta` thấp, hầu như không tập trung vào tín dụng bán lẻ mà duy trì trạng thái thanh khoản cực kỳ an toàn, tỷ lệ nợ xấu NPL gần như bằng không.
+#### B. Cơ sở khoa học và các tiêu chí đặt tên cho các cụm (Lecturer Feedback Answer)
+Nhóm nghiên cứu dựa trên việc so sánh **Hồ sơ chỉ số tài chính trung bình (Average CAMELS Profiles)** và **Bản chất cấu trúc sở hữu** để đặt tên cho 3 cụm:
+
+1.  **Cụm 1 — Nhóm Trụ cột Hệ thống (24 Ngân hàng):**
+    *   *Đại diện tiêu biểu:* VCB, BID, CTG, TCB, ACB, MBB, VPB...
+    *   *Yếu tố tài chính làm cơ sở:*
+        *   **Quy mô tài sản và tiền gửi:** Lớn vượt trội, nắm giữ thị phần chi phối hệ thống.
+        *   **Hiệu quả vận hành (CIR):** Thấp nhất hệ thống (trung bình $< 35\%$), phản ánh hiệu quả kinh tế theo quy mô (economies of scale) rất tốt, giúp tối ưu hóa chi phí hoạt động.
+        *   **Khả năng sinh lời (ROE, ROA, NIM):** ROE trung bình đạt mức cao và ổn định ($15\% - 22\%$), NIM duy trì bền vững ($3.5\% - 4.5\%$).
+        *   *Kết luận tên gọi:* Đặt tên là **"Trụ cột Hệ thống"** vì đây là các định chế lớn dẫn dắt thị trường tín dụng và thanh khoản quốc gia.
+2.  **Cụm 0 — Nhóm Ngân hàng TMCP Quy mô nhỏ (13 Ngân hàng):**
+    *   *Thành phần:* Gồm các ngân hàng thương mại cổ phần tư nhân quy mô nhỏ hơn đang trong giai đoạn tích lũy tài sản.
+    *   *Yếu tố tài chính làm cơ sở:*
+        *   **Hiệu quả vận hành (CIR):** Cao vượt trội (trung bình $> 45\%$), chứng tỏ chi phí vận hành còn nặng nề do chưa tối ưu hóa được quy mô.
+        *   **Biên lãi ròng (NIM):** Bị thu hẹp do chi phí huy động đầu vào cao hơn (phải tăng lãi suất để cạnh tranh với các ông lớn quốc doanh) trong khi năng lực cho vay đầu ra bị giới hạn.
+        *   **Đệm vốn (`eta` - Vốn chủ sở hữu / Tổng tài sản):** Khá mỏng, dễ tổn thương trước các biến động lãi suất vĩ mô.
+        *   *Kết luận tên gọi:* Đặt tên là **"TMCP Quy mô nhỏ"** phản ánh đúng định vị cạnh tranh và điểm yếu chi phí của nhóm này.
+3.  **Cụm 2 — Nhóm Ngân hàng Ngoại và Liên doanh đặc thù (2 Ngân hàng):**
+    *   *Thành phần:* Các chi nhánh ngân hàng nước ngoài và ngân hàng liên doanh.
+    *   *Yếu tố tài chính làm cơ sở:*
+        *   **Đệm an toàn vốn (`eta`, `etd` - Vốn chủ sở hữu / Tiền gửi):** Cao kỷ lục, vượt trội hoàn toàn so với các ngân hàng nội địa.
+        *   **Tỷ lệ dư nợ cho vay (`lta` - Dư nợ / Tổng tài sản):** Rất thấp. Nhóm này không tập trung vào tín dụng bán lẻ đại trà.
+        *   **Chất lượng tài sản (NPL):** Tỷ lệ nợ xấu gần như bằng không.
+        *   *Kết luận tên gọi:* Đặt tên là **"Khối Ngoại & Đặc thù"** vì nhóm này hoạt động theo chiến lược cực kỳ phòng thủ, duy trì nguồn vốn tự có khổng lồ so với quy mô cho vay để đáp ứng các tiêu chuẩn quản trị rủi ro quốc tế từ ngân hàng mẹ.
 
 *(Lưu ý: 6 ngân hàng ngoại lệ cực đoan sáp nhập hoặc tái cơ cấu bắt buộc bao gồm DAB, CB, GPB, WEB, VBSP, MDB đã bị loại bỏ khỏi mô hình phân cụm để tránh làm lệch tâm cụm).*
 
