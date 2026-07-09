@@ -18,6 +18,6 @@ This directory stores all data files used by the Financial Data Analytics Platfo
 |------|-------------|-------------------|
 | `VN banks dataset (updated August 2023).xlsx` | CAMELS financial data for 45 commercial banks (2002–2022) | `fact_bank_performance` |
 
-*Note: Daily stock OHLCV data for BID, TCB, VCB, and CTG is programmatically crawled using [extract_data.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/extract_data.py) and loaded directly into the pipeline without requiring manual spreadsheet downloads.*
+*Note: Daily stock OHLCV data for BID, TCB, VCB, and CTG is programmatically crawled using [`extract_data.py`](../src/etl/extract_data.py) and loaded directly into the pipeline without requiring manual spreadsheet downloads.*
 
 For full column mappings and transformation rules, see [`docs/etl-spec.md`](../docs/etl-spec.md).
