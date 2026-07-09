@@ -480,7 +480,8 @@ print("[ML-DTW] DTW correlation heatmap", flush=True)
 with open("data/processed/dtw_correlation_report.json", "r") as f:
     dtw_data = json.load(f)
 
-pearson_matrix = pd.DataFrame(dtw_data['pearson_correlation'])
+pearson_matrix = pd.DataFrame(dtw_data['pearson_correlation_matrix'])
+dtw_df = pd.DataFrame(dtw_data['dtw_distance_matrix'])
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 fig.patch.set_facecolor('#0e1117')
@@ -494,26 +495,6 @@ sns.heatmap(pearson_matrix, annot=True, fmt='.4f', cmap=cmap_div,
             linewidths=2, linecolor='#0e1117', annot_kws={'size': 14, 'weight': 'bold'},
             vmin=0.3, vmax=1.0, ax=ax1, square=True, cbar_kws={'shrink': 0.8})
 ax1.set_title("Ma Trận Tương Quan Pearson\n(Toàn lịch sử 2014–2026)", color='#fff')
-
-# DTW distances
-dtw_distances = dtw_data.get('dtw_distances', {})
-dtw_matrix_data = {}
-for t1 in tickers:
-    row = {}
-    for t2 in tickers:
-        key = f"{t1}_{t2}"
-        key2 = f"{t2}_{t1}"
-        if t1 == t2:
-            row[t2] = 0
-        elif key in dtw_distances:
-            row[t2] = dtw_distances[key]
-        elif key2 in dtw_distances:
-            row[t2] = dtw_distances[key2]
-        else:
-            row[t2] = np.nan
-    dtw_matrix_data[t1] = row
-
-dtw_df = pd.DataFrame(dtw_matrix_data).T
 
 ax2 = axes[1]
 ax2.set_facecolor('#0e1117')
