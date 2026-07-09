@@ -1,0 +1,46 @@
+---
+title: Luồng Xử Lý Mô Hình LSTM — Dự Báo Giá Đóng Cửa Cổ Phiếu Ngân Hàng
+---
+flowchart TD
+    A[("📊 BigQuery DWH\nfact_stock_daily_metrics")] -->|"Query: close_price, open, high, low,\nvolume, price_change_pct, volume_change_pct"| B
+
+    subgraph PREP["🔧 FEATURE ENGINEERING (feature_engineering_stock.py)"]
+        B["Lọc ngày giao dịch thực tế HOSE\nLoại bỏ T7, CN, ngày lễ"]
+        B --> C["Chia tập Train/Test\nTrain: 80% | Test: 20%\nKhông xáo trộn ngẫu nhiên"]
+        C --> D["MinMaxScaler\nChuẩn hóa về 0..1\nCửa sổ trượt N ngày"]
+    end
+
+    subgraph ARIMA["📈 BƯỚC 1: ARIMA Baseline (baseline_arima.py)"]
+        D1["ARIMA(p,d,q)\nAuto-order selection\nChỉ dùng close_price"]
+        D1 --> R1["RMSE BID: 5.5419\nRMSE TCB: 9.4864\nRMSE VCB: 4.4900\nRMSE CTG: 11.3624"]
+    end
+
+    subgraph LSTM_UNI["🧠 BƯỚC 2: LSTM Đơn biến (train_lstm.py)"]
+        D2["LSTM Univariate\nInput: close_price\nLayers: LSTM → Dropout → Dense"]
+        D2 --> R2["RMSE BID: 2.7781\nRMSE TCB: 1.5390 ✅\nRMSE VCB: 2.8600\nRMSE CTG: 1.6568"]
+    end
+
+    subgraph LSTM_MULTI["🧠 BƯỚC 3: LSTM Đa biến (train_lstm.py)"]
+        D3["LSTM Multivariate\nInput: 7 đặc trưng OHLCV\nLayers: LSTM → Dropout → Dense"]
+        D3 --> R3["RMSE BID: 2.7402 ✅\nRMSE TCB: 1.7081\nRMSE VCB: 2.8278 ✅\nRMSE CTG: 1.3733 ✅"]
+    end
+
+    D --> ARIMA
+    D --> LSTM_UNI
+    D --> LSTM_MULTI
+
+    subgraph OUTPUT["📤 OUTPUT"]
+        O1["fact_model_predictions\nbase_date_key · stock_key\nhorizon (T+1..T+5)\npredicted_close_price"]
+        O2["lstm_model_comparison.json\nRMSE · MAE · Model Type"]
+        O3["Streamlit Dashboard\nTab So sánh thực nghiệm\nLine Chart thực tế vs dự báo"]
+    end
+
+    R1 --> OUTPUT
+    R2 --> OUTPUT
+    R3 --> OUTPUT
+
+    style PREP fill:#1a2a3a,color:#ddf,stroke:#4a90d9
+    style ARIMA fill:#2a1a1a,color:#fdd,stroke:#e74c3c
+    style LSTM_UNI fill:#1a2a1a,color:#dfd,stroke:#5cb85c
+    style LSTM_MULTI fill:#1a2a1a,color:#dfd,stroke:#27ae60
+    style OUTPUT fill:#1a3a2a,color:#dfd,stroke:#1abc9c

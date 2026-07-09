@@ -1,0 +1,41 @@
+---
+title: Luồng Xử Lý Mô Hình Random Forest — Cảnh Báo Sớm Rủi Ro Nợ Xấu
+---
+flowchart TD
+    A[("📊 BigQuery DWH\nfact_bank_performance")] -->|"Query: eta, etd, llp_ratio,\nroa, roe, nim, cir, lta, ltd, gta\nnpl_ratio (nhãn mục tiêu)"| B
+
+    subgraph PREP["🔧 CHUẨN BỊ DỮ LIỆU (feature_engineering_bank.py)"]
+        B["Tạo nhãn nhị phân\nrisk_label = 1 nếu npl_ratio ≥ 3%\nrisk_label = 0 nếu npl_ratio < 3%"]
+        B --> C["Phân tách theo thời gian\nTrain: 2002–2018 (80%)\nTest: 2019–2022 (20%)\nTránh data leakage"]
+        C --> D["Phân phối lớp:\nLớp 0 (An toàn): 94.64%\nLớp 1 (Rủi ro): 5.36% (mất cân bằng)"]
+    end
+
+    subgraph BASELINE["📊 BASELINE: Logistic Regression (baseline_logistic.py)"]
+        D --> LR["Logistic Regression\nclass_weight=balanced\nThreshold=0.5"]
+        LR --> LR_R["AUC-ROC: 0.9102\nRecall High Risk: 72.22%\nF1-Score: 0.7420\n❌ Chưa đạt Recall ≥ 85%"]
+    end
+
+    subgraph RF["🌲 RANDOM FOREST (train_random_forest.py)"]
+        D --> RF1["Random Forest Classifier\nn_estimators=100\nmax_depth=5\nclass_weight=balanced"]
+        RF1 --> RF2["Threshold mặc định = 0.5\nRecall High Risk: 83.33%\n❌ Gần đạt nhưng chưa đủ"]
+        RF2 --> RF3["Tối ưu hóa ngưỡng\nPrecision-Recall Curve\nF-beta với β=2 ưu tiên Recall"]
+        RF3 --> RF4["Threshold tối ưu = 0.2327\nAUC-ROC: 0.9752\nRecall High Risk: 91.67% ✅\nAccuracy: 94.44%\nFalse Negatives: chỉ 1 ca"]
+    end
+
+    subgraph INTERPRET["🔍 DIỄN GIẢI (train_random_forest.py)"]
+        RF4 --> FI["Feature Importance\nGini Impurity Decrease"]
+        FI --> FI_R["Top features:\n1. llp_ratio: 21.05%\n2. roe: 11.49%\n3. cir: 11.03%\n4. roa: 9.85%"]
+        RF4 --> GC["Kiểm định Granger Causality\nlag=1 năm\nllp_ratio → npl_ratio"]
+        GC --> GC_R["F-statistic: 2.875\np-value: 0.0914\n✅ Ý nghĩa ở mức 10%\nXác nhận quan hệ nhân quả"]
+    end
+
+    subgraph OUTPUT["📤 OUTPUT"]
+        RF4 --> O1["bank_risk_predictions\nbank_key · date_key\nrisk_label · risk_probability\nactual_npl_ratio · model_name\n661 bản ghi"]
+        RF4 --> O2["Streamlit Dashboard\nFeature Importance Bar Chart\nPrecision-Recall Curve\nRisk Monitoring Table"]
+    end
+
+    style PREP fill:#1a2a3a,color:#ddf,stroke:#4a90d9
+    style BASELINE fill:#2a1a1a,color:#fdd,stroke:#e74c3c
+    style RF fill:#1a3a1a,color:#dfd,stroke:#27ae60
+    style INTERPRET fill:#2a2a1a,color:#ffd,stroke:#f39c12
+    style OUTPUT fill:#1a3a2a,color:#dfd,stroke:#1abc9c

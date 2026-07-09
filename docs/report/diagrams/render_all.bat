@@ -1,0 +1,19 @@
+@echo off
+setlocal
+set DIAG_DIR=docs\report\diagrams
+
+echo [1/6] Rendering D1: System Architecture...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d1_system_arch.mmd -o %DIAG_DIR%\d1_system_arch.png -w 1600 -H 900 -b white
+echo [2/6] Rendering D2: ETL Pipeline...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d2_etl_pipeline.mmd -o %DIAG_DIR%\d2_etl_pipeline.png -w 1400 -H 900 -b white
+echo [3/6] Rendering D3: Star Schema...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d3_star_schema.mmd -o %DIAG_DIR%\d3_star_schema.png -w 1800 -H 1400 -b white
+echo [4/6] Rendering D4: LSTM Flow...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d4_lstm_flow.mmd -o %DIAG_DIR%\d4_lstm_flow.png -w 1400 -H 1000 -b white
+echo [5/6] Rendering D5: K-Means Flow...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d5_kmeans_flow.mmd -o %DIAG_DIR%\d5_kmeans_flow.png -w 1400 -H 1000 -b white
+echo [6/6] Rendering D6: Random Forest Flow...
+npx @mermaid-js/mermaid-cli -i %DIAG_DIR%\d6_rf_flow.mmd -o %DIAG_DIR%\d6_rf_flow.png -w 1400 -H 1000 -b white
+
+echo.
+echo All diagrams rendered. Check docs\report\diagrams\

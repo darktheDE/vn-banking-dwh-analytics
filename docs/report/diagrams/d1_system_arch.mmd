@@ -1,0 +1,59 @@
+---
+title: Kiến Trúc Hệ Thống End-to-End Nền Tảng Phân Tích Tài Chính Ngân Hàng Việt Nam
+---
+flowchart TD
+    subgraph SRC["📁 TẦNG 1: NGUỒN DỮ LIỆU (Data Source Layer)"]
+        direction LR
+        S1["📊 Excel OHLCV\nBID, TCB, VCB, CTG\n(dữ liệu hàng ngày 2014–2026)"]
+        S2["🏦 Excel CAMELS\n45 Ngân hàng TM VN\n(báo cáo năm 2002–2022)"]
+    end
+
+    subgraph ETL["⚙️ TẦNG 2: INGESTION & XỬ LÝ (ETL Layer)"]
+        direction LR
+        E1["Extract\nPython + openpyxl\nPandas DataFrame"]
+        E2["Transform\nLàm sạch · Chuẩn hóa\nTính chỉ số phái sinh\nĐiền khuyết Median"]
+        E3["Load\ngoogle-cloud-bigquery\nWRITE_APPEND · MERGE"]
+        E4["Validate\nvalidate_integrity.py\nDQ Rules 6 tầng"]
+        E1 --> E2 --> E3 --> E4
+    end
+
+    subgraph DWH["🗄️ TẦNG 3: KHO DỮ LIỆU (Google BigQuery — Star Schema)"]
+        direction TB
+        D1["dim_date\ndim_stock\ndim_bank (SCD-2)\ndim_trading_session\ndim_audit"]
+        D2["fact_stock_daily_metrics\n11,835 bản ghi\nPartition: date_key"]
+        D3["fact_bank_performance\n667 bản ghi\nPartition: date_key"]
+    end
+
+    subgraph ML["🤖 TẦNG 4: HỌC MÁY & PHÂN TÍCH (ML & Analytics Layer)"]
+        direction LR
+        M1["LSTM\nDự báo giá\nT+1 → T+5"]
+        M2["K-Means + PCA\nPhân cụm chiến lược\n39 ngân hàng · k=3"]
+        M3["Random Forest\nPhân loại rủi ro\nNPL ≥ 3%"]
+    end
+
+    subgraph OUT["📤 ML OUTPUT TABLES (BigQuery)"]
+        direction LR
+        O1["fact_model_predictions\n20 bản ghi"]
+        O2["bank_cluster_assignments\n39 bản ghi"]
+        O3["bank_risk_predictions\n661 bản ghi"]
+    end
+
+    subgraph PRES["📊 TẦNG 5: TRÌNH BÀY & PHỤC VỤ (Presentation Layer)"]
+        direction LR
+        P1["Streamlit Dashboard\ngoogle-cloud-bigquery SDK\nlocalhost:8501"]
+        P2["Looker Studio\nNative BQ Connector\n(Kế hoạch triển khai)"]
+    end
+
+    SRC --> ETL
+    ETL --> DWH
+    DWH --> ML
+    ML --> OUT
+    OUT --> DWH
+    DWH --> PRES
+
+    style SRC fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style ETL fill:#1a4731,color:#fff,stroke:#5cb85c
+    style DWH fill:#4a2c6e,color:#fff,stroke:#9b59b6
+    style ML fill:#7a3b1e,color:#fff,stroke:#e67e22
+    style OUT fill:#5a3e1b,color:#fff,stroke:#f39c12
+    style PRES fill:#1a3a4a,color:#fff,stroke:#1abc9c

@@ -1,0 +1,46 @@
+---
+title: Luồng Xử Lý Mô Hình K-Means + PCA — Phân Cụm Chiến Lược Hoạt Động Ngân Hàng
+---
+flowchart TD
+    A[("📊 BigQuery DWH\nfact_bank_performance")] -->|"Query: 10 chỉ số CAMELS\nnpl_ratio, llp_ratio, roa, roe, nim\ncir, eta, etd, lta, ltd\n45 ngân hàng × 20 năm"| B
+
+    subgraph PREP["🔧 TIỀN XỬ LÝ (feature_engineering_bank.py)"]
+        B["Loại 6 ngân hàng ngoại lệ\nDAB, CB, GPB, WEB, VBSP, MDB\n→ 39 ngân hàng còn lại"]
+        B --> C["Tính trung bình 20 năm\nMỗi ngân hàng 1 vector\nkhông gian 10 chiều"]
+        C --> D["StandardScaler\nChuẩn hóa μ=0, σ=1\nĐảm bảo bình đẳng đơn vị"]
+    end
+
+    subgraph PCA_STEP["📐 GIẢM CHIỀU PCA (train_kmeans.py)"]
+        D --> E["PCA — Phân tích thành phần chính\nXác định số chiều tối ưu\ngiữ lại ≥ 80% phương sai"]
+        E --> F["Kết quả PCA:\nPC1: 44.20% phương sai\nPC2: 23.82% phương sai\nPC3: 17.90% phương sai\nTổng: 85.92% ≥ 80% ✅"]
+    end
+
+    subgraph TUNE["🔍 CHỌN K TỐI ƯU"]
+        F --> G1["Phương pháp Elbow\nVẽ Inertia vs k\nXác định điểm gãy"]
+        F --> G2["Silhouette Analysis\nĐánh giá k=2, 3, 4, 5\nChọn k cao nhất"]
+        G1 --> H["K tối ưu = 3"]
+        G2 --> H
+    end
+
+    subgraph KMEANS["🎯 K-MEANS CLUSTERING (k=3)"]
+        H --> I["K-Means\nn_init=10 · max_iter=300\nrandom_state=42"]
+        I --> J["Silhouette Score: 0.3222\nDavies-Bouldin Index: 0.9746"]
+    end
+
+    subgraph RESULT["📋 KẾT QUẢ PHÂN CỤM"]
+        J --> K1["Cụm 1: 24 ngân hàng\nTrụ cột Hệ thống\nVCB·BID·CTG·TCB·ACB..."]
+        J --> K2["Cụm 0: 13 ngân hàng\nTMCP Quy mô nhỏ\nNIM hẹp · CIR cao"]
+        J --> K3["Cụm 2: 2 ngân hàng\nKhối Ngoại & Đặc thù\nETA cao · NPL ≈ 0%"]
+    end
+
+    subgraph OUTPUT["📤 OUTPUT"]
+        K1 & K2 & K3 --> O1["bank_cluster_assignments\nbank_key · cluster_id\ncluster_name · model_name"]
+        K1 & K2 & K3 --> O2["Streamlit Dashboard\nPCA 2D Scatter Plot\nGrouped Bar CAMELS Profile"]
+    end
+
+    style PREP fill:#1a2a3a,color:#ddf,stroke:#4a90d9
+    style PCA_STEP fill:#2a1a3a,color:#ddf,stroke:#9b59b6
+    style TUNE fill:#1a3a1a,color:#dfd,stroke:#5cb85c
+    style KMEANS fill:#3a2a1a,color:#fed,stroke:#e67e22
+    style RESULT fill:#1a3a2a,color:#dfd,stroke:#1abc9c
+    style OUTPUT fill:#1a3a2a,color:#dfd,stroke:#27ae60

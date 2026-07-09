@@ -1,0 +1,162 @@
+---
+title: Star Schema Kho Dữ Liệu BigQuery — financial_dwh (Phiên bản 2026)
+---
+erDiagram
+    dim_date {
+        INT64 date_key PK
+        DATE full_date
+        INT64 day
+        INT64 month
+        INT64 year
+        INT64 quarter
+        BOOL is_trading_day
+        INT64 audit_key FK
+        DATETIME _created_at
+        DATETIME _updated_at
+        STRING _source_file
+    }
+
+    dim_stock {
+        INT64 stock_key PK
+        STRING ticker
+        STRING company_name
+        STRING exchange
+        STRING industry
+        INT64 audit_key FK
+        DATETIME _created_at
+        DATETIME _updated_at
+        STRING _source_file
+    }
+
+    dim_bank {
+        INT64 bank_key PK
+        STRING bank_code
+        STRING bank_name
+        STRING bank_type
+        FLOAT64 charter_capital
+        DATE valid_from
+        DATE valid_to
+        BOOL is_current
+        INT64 audit_key FK
+        DATETIME _created_at
+        DATETIME _updated_at
+        STRING _source_file
+    }
+
+    dim_trading_session {
+        INT64 session_key PK
+        STRING session_name
+        TIME start_time
+        TIME end_time
+        INT64 audit_key FK
+        DATETIME _created_at
+        DATETIME _updated_at
+        STRING _source_file
+    }
+
+    dim_audit {
+        INT64 audit_key PK
+        STRING run_id
+        TIMESTAMP run_timestamp
+        STRING script_name
+        STRING source_file
+        INT64 rows_processed
+        STRING status
+    }
+
+    fact_stock_daily_metrics {
+        INT64 date_key FK
+        INT64 stock_key FK
+        FLOAT64 open_price
+        FLOAT64 high_price
+        FLOAT64 low_price
+        FLOAT64 close_price
+        INT64 trading_volume
+        FLOAT64 price_change
+        FLOAT64 price_change_pct
+        FLOAT64 price_amplitude
+        FLOAT64 volume_change_pct
+        FLOAT64 trading_value
+        INT64 audit_key FK
+        TIMESTAMP _created_at
+        TIMESTAMP _updated_at
+        STRING _source_file
+    }
+
+    fact_bank_performance {
+        INT64 date_key FK
+        INT64 bank_key FK
+        FLOAT64 total_assets
+        FLOAT64 total_deposits
+        FLOAT64 total_loans
+        FLOAT64 total_equity
+        INT64 num_employees
+        INT64 num_branches
+        FLOAT64 npl_amount
+        FLOAT64 loan_loss_provision
+        FLOAT64 npl_ratio
+        FLOAT64 llp_ratio
+        FLOAT64 roa
+        FLOAT64 roe
+        FLOAT64 nim
+        FLOAT64 cir
+        FLOAT64 eta
+        FLOAT64 etd
+        FLOAT64 lta
+        FLOAT64 ltd
+        FLOAT64 gta
+        BOOL is_imputed
+        INT64 audit_key FK
+        DATETIME _created_at
+        DATETIME _updated_at
+        STRING _source_file
+    }
+
+    fact_model_predictions {
+        INT64 base_date_key FK
+        INT64 stock_key FK
+        STRING horizon
+        FLOAT64 predicted_close_price
+        STRING model_name
+    }
+
+    bank_risk_predictions {
+        INT64 bank_key FK
+        STRING bank_code
+        INT64 date_key FK
+        INT64 risk_label
+        FLOAT64 risk_probability
+        FLOAT64 actual_npl_ratio
+        STRING model_name
+    }
+
+    bank_cluster_assignments {
+        INT64 bank_key FK
+        STRING bank_code
+        STRING bank_name
+        STRING bank_type
+        INT64 cluster_id
+        STRING cluster_name
+        STRING model_name
+    }
+
+    dim_date ||--o{ fact_stock_daily_metrics : "date_key"
+    dim_stock ||--o{ fact_stock_daily_metrics : "stock_key"
+    dim_audit ||--o{ fact_stock_daily_metrics : "audit_key"
+
+    dim_date ||--o{ fact_bank_performance : "date_key"
+    dim_bank ||--o{ fact_bank_performance : "bank_key"
+    dim_audit ||--o{ fact_bank_performance : "audit_key"
+
+    dim_date ||--o{ fact_model_predictions : "base_date_key"
+    dim_stock ||--o{ fact_model_predictions : "stock_key"
+
+    dim_bank ||--o{ bank_risk_predictions : "bank_key"
+    dim_date ||--o{ bank_risk_predictions : "date_key"
+
+    dim_bank ||--o{ bank_cluster_assignments : "bank_key"
+
+    dim_audit ||--o{ dim_date : "audit_key"
+    dim_audit ||--o{ dim_stock : "audit_key"
+    dim_audit ||--o{ dim_bank : "audit_key"
+    dim_audit ||--o{ dim_trading_session : "audit_key"

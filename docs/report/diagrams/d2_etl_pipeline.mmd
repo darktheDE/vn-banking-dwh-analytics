@@ -1,0 +1,59 @@
+---
+title: Sơ Đồ Luồng Dữ Liệu ETL Pipeline — Hệ Thống Ngân Hàng Việt Nam
+---
+flowchart LR
+    subgraph SOURCE["Nguồn Dữ Liệu"]
+        A1["📄 Excel OHLCV\n7 tệp cổ phiếu\nBID·TCB·VCB·CTG"]
+        A2["📄 Excel CAMELS\n45 Ngân hàng\n20 năm 2002–2022"]
+    end
+
+    subgraph EXTRACT["EXTRACT"]
+        B1["extract_data.py\nopenpyxl → DataFrame\nChuyển vị sheet BCTC"]
+    end
+
+    subgraph TRANSFORM["TRANSFORM"]
+        C1["Chuẩn hóa cột\nsnake_case · kiểu dữ liệu"]
+        C2["Làm sạch dữ liệu\nLoại trùng lặp\nFFill ≤ 1 ngày (Stock)\nMedian Impute (Bank)"]
+        C3["Tính chỉ số phái sinh\nprice_change · price_change_pct\nprice_amplitude · trading_value\nnpl_ratio · llp_ratio · eta..."]
+        C4["Gán Surrogate Keys\ndate_key · stock_key · bank_key\naudit_key"]
+        C1 --> C2 --> C3 --> C4
+    end
+
+    subgraph DIMENSION["NẠP BẢNG CHIỀU"]
+        D1["populate_dim_date.py\n9,131 bản ghi"]
+        D2["populate_dim_stock.py\n4 bản ghi"]
+        D3["populate_dim_bank.py\n45 bản ghi\nSCD Type 2"]
+        D4["populate_dim_trading_session.py\n4 phiên HOSE"]
+    end
+
+    subgraph FACT["NẠP BẢNG THỰC TẾ"]
+        E1["consolidate_stock_metrics.py\nfact_stock_daily_metrics\n11,835 bản ghi"]
+        E2["load_bank_performance.py\nfact_bank_performance\n667 bản ghi"]
+    end
+
+    subgraph LOAD["LOAD → BigQuery"]
+        F1["load_to_bigquery.py\nWRITE_APPEND\nMERGE Upsert\nPartition + Cluster"]
+    end
+
+    subgraph VALIDATE["VALIDATE INTEGRITY"]
+        G1["validate_integrity.py\nDQ-01: Null check\nDQ-02: Range check\nDQ-03: Row count\nDQ-04: FK integrity\nDQ-05: Duplicate check\nDQ-06: Timeline check"]
+    end
+
+    SOURCE --> EXTRACT --> TRANSFORM
+    TRANSFORM --> DIMENSION
+    TRANSFORM --> FACT
+    DIMENSION --> LOAD
+    FACT --> LOAD
+    LOAD --> VALIDATE
+
+    VALIDATE -->|"PASS ✅"| DWH[("Google BigQuery\nfinancial_dwh")]
+    VALIDATE -->|"FAIL ❌"| ERR["🔴 Log Error\nAlert · Rollback"]
+
+    style SOURCE fill:#1e2a3a,color:#cdd,stroke:#4a90d9
+    style EXTRACT fill:#1a3320,color:#dfd,stroke:#5cb85c
+    style TRANSFORM fill:#2a1f3a,color:#ddf,stroke:#9b59b6
+    style DIMENSION fill:#3a2010,color:#fed,stroke:#e67e22
+    style FACT fill:#3a2010,color:#fed,stroke:#e67e22
+    style LOAD fill:#1a3330,color:#dfd,stroke:#1abc9c
+    style VALIDATE fill:#3a1a1a,color:#fdd,stroke:#e74c3c
+    style DWH fill:#1e3050,color:#fff,stroke:#4a90d9

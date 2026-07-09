@@ -1,0 +1,37 @@
+---
+# Pandoc Word Export Configuration
+# Chuyển đổi Bao_Cao_Phan_Tich_Du_Lieu_Nhom2.md sang .docx
+
+title: "Báo Cáo Phân Tích Dữ Liệu"
+subtitle: "Kho Dữ Liệu và Nền Tảng Phân Tích Học Máy Hệ Thống Ngân Hàng Thương Mại Việt Nam"
+author:
+  - "Nhóm 2 — HCMUTE HK6 2026"
+date: "Tháng 7, 2026"
+lang: vi
+
+# Reference doc định dạng Word chuẩn Việt Nam
+# (tạo bằng pandoc --print-default-data-file reference.docx)
+
+# Page margins (in inches, chuẩn VN: left 3cm, right 2cm, top/bottom 2.5cm)
+geometry: "left=3cm,right=2cm,top=2.5cm,bottom=2.5cm"
+
+# Font settings
+fontsize: 13pt
+mainfont: "Times New Roman"
+monofont: "Courier New"
+
+# Line spacing: 1.5
+linestretch: 1.5
+
+# Table of contents
+toc: true
+toc-depth: 3
+toc-title: "MỤC LỤC"
+
+# Figure and table captions
+fig-cap-location: bottom
+tbl-cap-location: top
+
+# Number sections
+number-sections: true
+---
