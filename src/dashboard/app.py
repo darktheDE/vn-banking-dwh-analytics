@@ -527,7 +527,7 @@ def show_eda_section():
                         y=a * x_vals[idx] + b,
                         mode="lines",
                         name="Xu hướng chung hệ thống",
-                        line=dict(color="black", width=2, dash="dash")
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
                     )
                 )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
@@ -569,7 +569,7 @@ def show_eda_section():
                         y=a * x_vals[idx] + b,
                         mode="lines",
                         name="Xu hướng chung hệ thống",
-                        line=dict(color="black", width=2, dash="dash")
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
                     )
                 )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
@@ -611,7 +611,7 @@ def show_eda_section():
                         y=a * x_vals[idx] + b,
                         mode="lines",
                         name="Xu hướng chung hệ thống",
-                        line=dict(color="black", width=2, dash="dash")
+                        line=dict(color="#8b5cf6", width=2.5, dash="dash")
                     )
                 )
             st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
