@@ -1119,7 +1119,7 @@ def show_credit_risk_section():
         meta_col1, meta_col2 = st.columns([1, 1])
         
         with meta_col1:
-            st.markdown("""
+            st.markdown(r"""
             **Random Forest Hyperparameters (Tham số huấn luyện):**
             *   **Thuật toán**: Random Forest Classifier (Scikit-Learn)
             *   **Số cây quyết định (Estimators)**: `100` | **Chiều sâu tối đa (Max Depth)**: `5`
@@ -1129,7 +1129,7 @@ def show_credit_risk_section():
             """)
             
         with meta_col2:
-            st.markdown("""
+            st.markdown(r"""
             **Performance Metrics (Chỉ số kiểm thử trên Test Set):**
             *   **Độ chính xác toàn cục (Accuracy)**: **`94.44%`**
             *   **AUC-ROC Score**: **`0.9752`** (Baseline Logistic Regression đối chứng: `0.7811`).
@@ -1333,7 +1333,7 @@ def show_conclusion_section():
         """)
         
     with col2:
-        st.markdown("""
+        st.markdown(r"""
         #### 🛡️ Phát hiện 3: Hệ thống cảnh báo rủi ro tín dụng đạt độ nhạy cao
         Mô hình phân loại Random Forest đã vượt qua toàn bộ các ngưỡng chấp nhận bắt buộc của đề tài:
         *   **AUC-ROC đạt `0.9752`** (vượt xa ngưỡng yêu cầu $> 0.80$).
@@ -1437,14 +1437,14 @@ def show_conclusion_section():
         """)
 
     with st.expander("Câu hỏi 2: Sự đồng pha và phân hóa giá giữa nhóm ngân hàng quốc doanh và ngân hàng thương mại tư nhân"): 
-        st.markdown("""
+        st.markdown(r"""
         **Trả lời**:
         *   **Nhóm quốc doanh (BID, VCB, CTG) đồng pha rất cao**: Hệ số tương quan Pearson giữa 3 mã này đều vượt `0.85` và khoảng cách Dynamic Time Warping (DTW) rất ngắn (ví dụ: BID - VCB = `201.25`). Do họ cùng chịu sự điều tiết tín dụng trực tiếp của Ngân hàng Nhà nước, có cấu trúc tài sản và đối tượng khách hàng tương đồng.
         *   **TCB (Tư nhân) thể hiện sự phân hóa rõ nét**: Hệ số tương quan của TCB với VCB thấp hơn hẳn (chỉ quanh `0.54`) và khoảng cách DTW rất lớn (TCB - VCB = `457.03`). Mô hình hồi quy LSDV Fixed Effects ($R^2 = 53.03\%$) cũng xác nhận TCB có hệ số ảnh hưởng cố định độc lập, biến động nhạy bén theo thị trường trái phiếu và bất động sản thay vì xu hướng quốc doanh.
         """)
 
     with st.expander("Câu hỏi 3: Các chỉ số tài chính CAMELS quyết định việc ngân hàng bị phân vào nhóm nguy cơ nợ xấu cao"): 
-        st.markdown("""
+        st.markdown(r"""
         **Trả lời**:
         *   Mô hình Random Forest Classifier đạt hiệu năng phân loại vượt trội (**AUC-ROC = 0.9752**, **Recall lớp High Risk = 91.67%** tại ngưỡng quyết định tối ưu là **0.2327**).
         *   Top 3 chỉ số CAMELS quyết định nhất:
