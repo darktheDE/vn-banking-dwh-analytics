@@ -499,7 +499,7 @@ def show_eda_section():
         for col in feature_cols:
             plot_df[col] = plot_df[col] * 100
             
-        if "CIR vs ROA" in pair_option:
+        if "CIR" in pair_option:
             # Filter outliers: CIR <= 150%, ROA between -5% and 5% for clean visualization
             sub_df = plot_df[(plot_df["cir"] <= 150) & (plot_df["roa"] >= -5) & (plot_df["roa"] <= 5)].copy()
             sub_df = sub_df.dropna(subset=["cir", "roa"])
@@ -541,7 +541,7 @@ def show_eda_section():
                 *   *Nhóm cổ phần tư nhân (JSCB - màu đỏ)*: Phân tán rộng thể hiện sự phân cực lớn về năng lực quản lý hiệu quả giữa các ngân hàng.
             """)
             
-        elif "LTA vs NIM" in pair_option:
+        elif "LTA" in pair_option:
             # Filter outliers: LTA <= 100%, NIM between 0% and 10%
             sub_df = plot_df[(plot_df["lta"] <= 100) & (plot_df["nim"] >= 0) & (plot_df["nim"] <= 10)].copy()
             sub_df = sub_df.dropna(subset=["lta", "nim"])
