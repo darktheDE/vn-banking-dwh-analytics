@@ -480,6 +480,70 @@ def show_eda_section():
         st.plotly_chart(fig, use_container_width=True, theme="streamlit")
         st.caption("Tình hình: Mối tương quan cực kỳ mạnh mẽ (hệ số > 0.8) giữa ROA và ROE phản ánh cấu trúc lợi nhuận đồng thuận. Ngược lại, CIR tương quan âm rõ rệt với ROA/ROE, chứng minh tối ưu hóa chi phí hoạt động trực tiếp quyết định khả năng sinh lời của các ngân hàng.")
 
+        st.markdown("---")
+        st.subheader("🔍 Phân Tích Cặp Chỉ Số Tương Quan Đặc Biệt")
+        st.write("Lựa chọn các cặp biến tài chính có mối quan hệ nghiệp vụ đặc thù để xem biểu đồ phân tán (Scatter Plot) kèm đường xu hướng (OLS Trendline):")
+        
+        pair_option = st.selectbox(
+            "Chọn cặp biến tài chính để phân tích tương quan",
+            [
+                "Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA) - Quan hệ Hiệu quả & Sinh lời",
+                "Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM) - Quan hệ Phân bổ tài sản & Biên lợi nhuận",
+                "Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD) - Quan hệ Thanh khoản & Đệm vốn an toàn"
+            ],
+            key="corr_pair_selectbox"
+        )
+        
+        # Multiply features by 100 to show in %
+        plot_df = df.copy()
+        for col in feature_cols:
+            plot_df[col] = plot_df[col] * 100
+            
+        if "CIR vs ROA" in pair_option:
+            fig_scatter = px.scatter(
+                plot_df,
+                x="cir",
+                y="roa",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                trendline="ols",
+                title="Tỷ lệ Chi phí/Thu nhập (CIR) vs Tỷ suất sinh lời/Tài sản (ROA)",
+                labels={"cir": "CIR (%)", "roa": "ROA (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+            )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan âm rõ nét chứng minh CIR càng tăng (kém tối ưu chi phí vận hành), ROA càng giảm. Nhóm ngân hàng JSCB (màu đỏ) phân tán rộng phản ánh sự phân hóa về khả năng quản lý chi phí, trong khi SOCB (màu xanh dương) tập trung chặt chẽ hơn.")
+            
+        elif "LTA vs NIM" in pair_option:
+            fig_scatter = px.scatter(
+                plot_df,
+                x="lta",
+                y="nim",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                trendline="ols",
+                title="Tỷ lệ Cho vay/Tổng tài sản (LTA) vs Biên lãi ròng (NIM)",
+                labels={"lta": "LTA (%)", "nim": "NIM (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+            )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            st.info("💡 **Phân tích nghiệp vụ**: Mối tương quan dương rõ rệt. Khi ngân hàng phân bổ nhiều tài sản hơn vào hoạt động cho vay (LTA cao), biên lãi ròng (NIM) có xu hướng tăng lên do cho vay là tài sản sinh lời có lợi suất cao nhất. Nhóm FOCB (màu xanh lá) duy trì LTA thấp và NIM khiêm tốn phản ánh tính phòng thủ.")
+            
+        else:
+            fig_scatter = px.scatter(
+                plot_df,
+                x="ltd",
+                y="etd",
+                color="bank_type",
+                hover_data=["bank_code", "year"],
+                trendline="ols",
+                title="Tỷ lệ Cho vay/Tiền gửi (LTD) vs Vốn chủ sở hữu/Tiền gửi (ETD)",
+                labels={"ltd": "LTD (%)", "etd": "ETD (%)", "bank_type": "Phân loại Ngân hàng"},
+                color_discrete_map={"SOCB": "#3b82f6", "JSCB": "#ef4444", "FOCB": "#10b981"}
+            )
+            st.plotly_chart(fig_scatter, use_container_width=True, theme="streamlit")
+            st.info("💡 **Phân tích nghiệp vụ**: Tương quan dương rất mạnh (0.87). Các ngân hàng cho vay nhiều so với nguồn tiền gửi huy động (LTD cao) bắt buộc phải tích lũy đệm vốn chủ sở hữu lớn so với tiền gửi (ETD cao) nhằm phòng ngừa rủi ro thanh khoản và đảm bảo tỷ lệ an toàn vốn theo quy định.")
+
     elif eda_mode == "Xu Hướng Theo Thời Gian":
         st.subheader("Xu Hướng Tài Chính Qua Các Năm")
         trend_col = st.selectbox(
