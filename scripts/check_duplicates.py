@@ -42,8 +42,8 @@ TABLE_PRIMARY_KEYS: Dict[str, List[str]] = {
     "fact_stock_daily_metrics": ["date_key", "stock_key"],
     "fact_bank_performance": ["date_key", "bank_key"],
     "bank_cluster_assignments": ["bank_key"],
-    "bank_risk_predictions": ["bank_key", "year"],
-    "fact_model_predictions": ["target_date_key", "stock_key", "model_variant", "horizon"],
+    "bank_risk_predictions": ["bank_key", "date_key"],
+    "fact_model_predictions": ["base_date_key", "stock_key", "model_name", "horizon"],
 }
 
 
