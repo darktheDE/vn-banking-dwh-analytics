@@ -38,5 +38,5 @@
 
 ## Phase R5: Release v1.1.0 & Tagging
 - `[x]` **R5-01**: Commit các thay đổi hoàn tất vào nhánh `refactor/v1-cleanup`.
-- `[ ]` **R5-02**: Merge nhánh `refactor/v1-cleanup` vào `main`.
-- `[ ]` **R5-03**: Tạo git tag `v1.1.0` với changelog chi tiết.
+- `[x]` **R5-02**: Merge nhánh `refactor/v1-cleanup` vào `main`.
+- `[x]` **R5-03**: Tạo git tag `v1.1.0` với changelog chi tiết.
