@@ -67,10 +67,31 @@ REM 7. Train Models
 echo [*] Step 7: Training Machine Learning models (LSTM, K-Means, Random Forest)...
 python -m src.models.feature_engineering_stock
 python -m src.models.feature_engineering_bank
-python -m src.models.baseline_arima
-python -m src.models.train_lstm
+
+python -c "import statsmodels" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    python -m src.models.baseline_arima
+) else (
+    echo [WARNING] statsmodels not found. Skipping ARIMA baseline.
+)
+
+python -c "import tensorflow" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo [*] TensorFlow detected. Training LSTM models...
+    python -m src.models.train_lstm
+) else (
+    echo [WARNING] TensorFlow is not available in current environment. Skipping LSTM training.
+)
+
 python -m src.models.train_kmeans
-python -m src.models.baseline_logistic
+
+python -c "import statsmodels" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    python -m src.models.baseline_logistic
+) else (
+    echo [WARNING] statsmodels not found. Skipping Logistic baseline.
+)
+
 python -m src.models.train_random_forest
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Model training failed.

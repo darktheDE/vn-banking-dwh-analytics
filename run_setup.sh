@@ -45,10 +45,28 @@ python -m src.etl.validate_integrity
 echo "[*] Step 7: Training Machine Learning models (LSTM, K-Means, Random Forest)..."
 python -m src.models.feature_engineering_stock
 python -m src.models.feature_engineering_bank
-python -m src.models.baseline_arima
-python -m src.models.train_lstm
+
+if python -c "import statsmodels" 2>/dev/null; then
+    python -m src.models.baseline_arima
+else
+    echo "[WARNING] statsmodels not found. Skipping ARIMA baseline."
+fi
+
+if python -c "import tensorflow" 2>/dev/null; then
+    echo "[*] TensorFlow detected. Training LSTM models..."
+    python -m src.models.train_lstm
+else
+    echo "[WARNING] TensorFlow is not available in current environment. Skipping LSTM training."
+fi
+
 python -m src.models.train_kmeans
-python -m src.models.baseline_logistic
+
+if python -c "import statsmodels" 2>/dev/null; then
+    python -m src.models.baseline_logistic
+else
+    echo "[WARNING] statsmodels not found. Skipping Logistic baseline."
+fi
+
 python -m src.models.train_random_forest
 
 echo ""

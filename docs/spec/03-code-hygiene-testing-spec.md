@@ -25,3 +25,10 @@ Do các thư viện Deep Learning (`tensorflow`) và Trực quan hóa (`streamli
    - Yêu cầu môi trường có `scikit-learn`, `statsmodels`, `tensorflow`.
 3. **Tầng 3 - Presentation Test (`--tier dashboard`):**
    - Kiểm tra `src.dashboard.app` và các script audit BI.
+
+## 4. Tự Động Hóa CI/CD (GitHub Actions)
+Đường ống CI (`.github/workflows/ci.yml`) tự động kích hoạt trên các sự kiện `push` và `pull_request` vào nhánh `main` với các kiểm tra bắt buộc:
+1. Biên dịch và kiểm tra cú pháp toàn bộ file Python: `python -m compileall -q src tests scripts`
+2. Smoke test tầng Core ETL: `python tests/test_pipeline_imports.py --tier etl`
+3. Kiểm tra tính toàn vẹn tham chiếu và chất lượng dữ liệu: `python -m src.etl.validate_integrity`
+Mọi thay đổi mã nguồn làm hỏng import hoặc vi phạm quy tắc toàn vẹn dữ liệu Star Schema sẽ bị CI chặn lại ngay lập tức.
