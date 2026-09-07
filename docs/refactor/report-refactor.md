@@ -1,16 +1,16 @@
 # Báo Cáo Nghiên Cứu và Kế Hoạch Tối Ưu Hóa Hệ Thống (report_refactor.md)
 
-Tài liệu này tổng hợp kết quả nghiên cứu học thuật, khảo sát công nghệ và đề xuất giải pháp để giải quyết triệt để các yêu cầu và phản hồi từ giảng viên được ghi nhận trong [refactor.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/refactor.md).
+Tài liệu này tổng hợp kết quả nghiên cứu học thuật, khảo sát công nghệ và đề xuất giải pháp để giải quyết triệt để các yêu cầu và phản hồi từ giảng viên được ghi nhận trong [refactor.md](refactor.md).
 
 ---
 
 ## 1. Các tài liệu và mã nguồn đã đọc, phân tích
 Để nắm rõ hiện trạng hệ thống trước khi đề xuất giải pháp, chúng tôi đã tiến hành đọc và phân tích sâu các tài liệu cốt lõi sau:
-*   [refactor.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/refactor.md): Ghi nhận feedback của giảng viên về việc phản biện mô hình, kiểm tra nhân quả, so sánh nguyên chuỗi, tối ưu Star Schema và làm rõ luồng kiến trúc OLTP (Supabase) - OLAP (BigQuery).
-*   [AGENTS.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/AGENTS.md): Bản hiến pháp hướng dẫn Agent, quy định chuẩn ngôn ngữ tiếng Việt trang trọng, các ràng buộc kỹ thuật của mô hình và quy tắc ETL.
-*   [docs/star-schema.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/star-schema.md) & [sql/bigquery_schema.sql](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/sql/bigquery_schema.sql): Kiến trúc DWH hiện tại với 5 bảng Dimension và 5 bảng Fact độc lập cho dữ liệu giao dịch chứng khoán hàng ngày.
-*   [docs/etl-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/etl-spec.md) & [src/etl/](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/): Quy trình làm sạch dữ liệu hiện tại đang đọc trực tiếp từ các file Excel tĩnh trong thư mục `data/raw/`.
-*   [docs/ml-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/ml-spec.md) & [src/models/](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/): Các mô hình ML hiện tại (LSTM, ARIMA, Random Forest, K-Means) và các tiêu chí chấp nhận kỹ thuật (RMSE, AUC-ROC, Recall).
+*   [refactor.md](refactor.md): Ghi nhận feedback của giảng viên về việc phản biện mô hình, kiểm tra nhân quả, so sánh nguyên chuỗi, tối ưu Star Schema và làm rõ luồng kiến trúc OLTP (Supabase) - OLAP (BigQuery).
+*   [AGENTS.md](AGENTS.md): Bản hiến pháp hướng dẫn Agent, quy định chuẩn ngôn ngữ tiếng Việt trang trọng, các ràng buộc kỹ thuật của mô hình và quy tắc ETL.
+*   [docs/star-schema.md](docs/star-schema.md) & [sql/bigquery_schema.sql](sql/bigquery_schema.sql): Kiến trúc DWH hiện tại với 5 bảng Dimension và 5 bảng Fact độc lập cho dữ liệu giao dịch chứng khoán hàng ngày.
+*   [docs/etl-spec.md](docs/etl-spec.md) & [src/etl/](src/etl/): Quy trình làm sạch dữ liệu hiện tại đang đọc trực tiếp từ các file Excel tĩnh trong thư mục `data/raw/`.
+*   [docs/ml-spec.md](docs/ml-spec.md) & [src/models/](src/models/): Các mô hình ML hiện tại (LSTM, ARIMA, Random Forest, K-Means) và các tiêu chí chấp nhận kỹ thuật (RMSE, AUC-ROC, Recall).
 
 ---
 

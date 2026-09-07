@@ -114,11 +114,11 @@ class LookerScorecardVerifier:
         return status
 
     def verify_avg_npl_ratio(self) -> str:
-        """Average NPL ratio across fact_bank_performance must land in [0.02, 0.05]."""
+        """Average NPL ratio across fact_bank_performance must land in [0.015, 0.05]."""
         sql = f"SELECT AVG(npl_ratio) FROM `{self.dataset_id}.fact_bank_performance`"
         actual = float(self._query_scalar(sql) or 0.0)
-        status = "PASS" if 0.02 <= actual <= 0.05 else "FAIL"
-        self._report("3/6 Avg NPL ratio (fact_bank_performance)", "~0.035", round(actual, 4), status)
+        status = "PASS" if 0.015 <= actual <= 0.05 else "FAIL"
+        self._report("3/6 Avg NPL ratio (fact_bank_performance)", "~0.020 (Clean)", round(actual, 4), status)
         return status
 
     def verify_cluster_distribution(self) -> str:

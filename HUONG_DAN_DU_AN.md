@@ -9,7 +9,7 @@ Tài liệu này cung cấp hướng dẫn cặn kẽ và chi tiết về toàn 
 ### 1.1 Bối Cảnh Thực Tế
 Hệ thống ngân hàng và thị trường tài chính Việt Nam có vai trò cốt lõi trong nền kinh tế. Sự biến động của dòng tiền và chất lượng tài sản đòi hỏi các tổ chức tài chính và nhà đầu tư phải đưa ra quyết định dựa trên dữ liệu định lượng. Tuy nhiên, dữ liệu tài chính hiện nay thường bị phân mảnh giữa dữ liệu vi mô hàng ngày trên sàn giao dịch chứng khoán (như giá cổ phiếu, khối lượng mua bán của khối ngoại và tự doanh) và dữ liệu vĩ mô dài hạn từ báo cáo tài chính của các ngân hàng.
 
-Để biết thêm thông tin chi tiết về bối cảnh nghiên cứu và các yêu cầu nghiệp vụ ban đầu, quý độc giả có thể tham khảo thêm tại [prd.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/prd.md) hoặc [product-brief.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/product-brief.md).
+Để biết thêm thông tin chi tiết về bối cảnh nghiên cứu và các yêu cầu nghiệp vụ ban đầu, quý độc giả có thể tham khảo thêm tại [prd.md](docs/prd.md) hoặc [product-brief.md](docs/product-brief.md).
 
 ### 1.2 Mục Tiêu Dự Án
 Dự án được thiết lập nhằm xây dựng một hệ thống tích hợp tự động hóa từ đầu đến cuối bao gồm:
@@ -30,13 +30,13 @@ Dự án tập trung giải quyết 4 câu hỏi nghiên cứu cốt lõi:
 4. **Câu hỏi 4 (Q4):** Có thể phân loại rõ rệt chiến lược hoạt động của các nhóm ngân hàng tại Việt Nam dựa trên dữ liệu tài chính hay không?
    - **Giả thuyết:** Phân tích dữ liệu sẽ phân tách hệ thống ngân hàng thành 3 cụm chính phản ánh đặc trưng sở hữu và hoạt động: nhóm quốc doanh tối ưu quy mô, nhóm cổ phần tối ưu lợi nhuận và nhóm ngân hàng liên doanh hoặc nước ngoài tối ưu an toàn vốn.
 
-Chi tiết về kết quả kiểm chứng các câu hỏi nghiên cứu này được trình bày tại [RESULT.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/RESULT.md).
+Chi tiết về kết quả kiểm chứng các câu hỏi nghiên cứu này được trình bày tại [RESULT.md](RESULT.md).
 
 ---
 
 ## 2. Kiến Trúc Kho Dữ Liệu (Star Schema Data Warehouse)
 
-Để tối ưu hóa hiệu năng truy vấn cho các công cụ Business Intelligence và chuẩn bị dữ liệu đầu vào cho các thuật toán học máy, dự án thiết kế Kho dữ liệu theo mô hình hình sao (Star Schema) lưu trữ trên Google BigQuery. Đặc tả chi tiết về các bảng và trường dữ liệu được tài liệu hóa tại [star-schema.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/star-schema.md) và [data-dictionary.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-dictionary.md). Luồng di chuyển dữ liệu chi tiết giữa các tầng (Data Lineage) được mô tả cụ thể tại [data-lineage.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/data-lineage.md).
+Để tối ưu hóa hiệu năng truy vấn cho các công cụ Business Intelligence và chuẩn bị dữ liệu đầu vào cho các thuật toán học máy, dự án thiết kế Kho dữ liệu theo mô hình hình sao (Star Schema) lưu trữ trên Google BigQuery. Đặc tả chi tiết về các bảng và trường dữ liệu được tài liệu hóa tại [star-schema.md](docs/star-schema.md) và [data-dictionary.md](docs/data-dictionary.md). Luồng di chuyển dữ liệu chi tiết giữa các tầng (Data Lineage) được mô tả cụ thể tại [data-lineage.md](docs/data-lineage.md).
 
 ### 2.1 Tại Sao Chọn Mô Hình Star Schema?
 - **Hiệu năng truy vấn vượt trội:** Giảm thiểu số lượng liên kết bảng (JOIN) phức tạp khi thực hiện truy vấn phân tích.
@@ -82,22 +82,22 @@ Kết quả dự báo và phân cụm từ các mô hình học máy được gh
 
 ## 3. Quy Trình Trích Xuất, Biến Đổi và Nạp Dữ Liệu (ETL Pipeline)
 
-Quy trình ETL được triển khai hoàn toàn bằng mã nguồn Python, tuân thủ các quy định nghiệp vụ nghiêm ngặt về làm sạch và kiểm tra chất lượng dữ liệu được định nghĩa trong tài liệu đặc tả kỹ thuật dữ liệu [etl-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/etl-spec.md).
+Quy trình ETL được triển khai hoàn toàn bằng mã nguồn Python, tuân thủ các quy định nghiệp vụ nghiêm ngặt về làm sạch và kiểm tra chất lượng dữ liệu được định nghĩa trong tài liệu đặc tả kỹ thuật dữ liệu [etl-spec.md](docs/etl-spec.md).
 
 ### 3.1 Cấu Trúc Các Tệp Tin ETL
-Toàn bộ mã nguồn ETL nằm trong thư mục [src/etl](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl):
-- [provision_schema.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/provision_schema.py): Đọc tệp cấu trúc SQL `sql/bigquery_schema.sql` và khởi tạo toàn bộ cấu trúc bảng trống trên BigQuery.
-- [populate_dim_date.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/populate_dim_date.py): Tạo dữ liệu lịch ngày tự động từ năm 2002 đến năm 2026.
-- [populate_dim_stock.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/populate_dim_stock.py): Thiết lập các bản ghi tĩnh cho 4 mã cổ phiếu ngân hàng.
-- [populate_dim_bank.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/populate_dim_bank.py): Đọc danh sách ngân hàng từ tệp nguồn báo cáo tài chính, tạo khóa thay thế `bank_key`, xử lý trùng lặp và áp dụng cơ chế SCD Type 2 để lưu vết vốn điều lệ.
-- [populate_dim_trading_session.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/populate_dim_trading_session.py): Thiết lập thông tin về 4 phiên giao dịch chính trên sàn HOSE.
-- [load_price_history.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_price_history.py): Trích xuất và chuẩn hóa lịch sử giá giao dịch hàng ngày của 4 cổ phiếu.
-- [load_foreign_trading.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_foreign_trading.py): Xử lý dữ liệu giao dịch khối ngoại của cổ phiếu BID.
-- [load_proprietary_trading.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_proprietary_trading.py): Xử lý dữ liệu tự doanh của cổ phiếu BID.
-- [load_order_stats.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_order_stats.py): Xử lý thông tin đặt lệnh của cổ phiếu BID.
-- [load_bank_performance.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_bank_performance.py): Trích xuất dữ liệu tài chính 20 năm của các ngân hàng và thực hiện nội suy các giá trị khuyết thiếu.
-- [load_to_bigquery.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_to_bigquery.py): Tệp trung tâm điều phối việc tải các tệp dữ liệu đã làm sạch lên BigQuery.
-- [validate_integrity.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/validate_integrity.py): Chạy các truy vấn SQL kiểm định tính toàn vẹn khóa ngoại và các quy tắc chất lượng dữ liệu.
+Toàn bộ mã nguồn ETL nằm trong thư mục [src/etl](src/etl):
+- [provision_schema.py](src/etl/provision_schema.py): Đọc tệp cấu trúc SQL `sql/bigquery_schema.sql` và khởi tạo toàn bộ cấu trúc bảng trống trên BigQuery.
+- [populate_dim_date.py](src/etl/populate_dim_date.py): Tạo dữ liệu lịch ngày tự động từ năm 2002 đến năm 2026.
+- [populate_dim_stock.py](src/etl/populate_dim_stock.py): Thiết lập các bản ghi tĩnh cho 4 mã cổ phiếu ngân hàng.
+- [populate_dim_bank.py](src/etl/populate_dim_bank.py): Đọc danh sách ngân hàng từ tệp nguồn báo cáo tài chính, tạo khóa thay thế `bank_key`, xử lý trùng lặp và áp dụng cơ chế SCD Type 2 để lưu vết vốn điều lệ.
+- [populate_dim_trading_session.py](src/etl/populate_dim_trading_session.py): Thiết lập thông tin về 4 phiên giao dịch chính trên sàn HOSE.
+- [load_price_history.py](src/etl/load_price_history.py): Trích xuất và chuẩn hóa lịch sử giá giao dịch hàng ngày của 4 cổ phiếu.
+- [load_foreign_trading.py](src/etl/load_foreign_trading.py): Xử lý dữ liệu giao dịch khối ngoại của cổ phiếu BID.
+- [load_proprietary_trading.py](src/etl/load_proprietary_trading.py): Xử lý dữ liệu tự doanh của cổ phiếu BID.
+- [load_order_stats.py](src/etl/load_order_stats.py): Xử lý thông tin đặt lệnh của cổ phiếu BID.
+- [load_bank_performance.py](src/etl/load_bank_performance.py): Trích xuất dữ liệu tài chính 20 năm của các ngân hàng và thực hiện nội suy các giá trị khuyết thiếu.
+- [load_to_bigquery.py](src/etl/load_to_bigquery.py): Tệp trung tâm điều phối việc tải các tệp dữ liệu đã làm sạch lên BigQuery.
+- [validate_integrity.py](src/etl/validate_integrity.py): Chạy các truy vấn SQL kiểm định tính toàn vẹn khóa ngoại và các quy tắc chất lượng dữ liệu.
 
 ### 3.2 Quy Tắc Làm Sạch Dữ Liệu
 Các bước biến đổi dữ liệu (Transform) áp dụng trong mã nguồn bao gồm:
@@ -108,7 +108,7 @@ Các bước biến đổi dữ liệu (Transform) áp dụng trong mã nguồn 
 - **Ràng buộc đặc biệt:** Tuyệt đối không áp dụng forward-fill cho biến tỷ lệ nợ xấu (`npl_ratio`) vì đây là biến mục tiêu dùng để phân loại rủi ro trong các mô hình học máy. Bất kỳ sự nội suy sai lệch nào trên biến này sẽ gây ra hiện tượng rò rỉ hoặc nhiễu dữ liệu nghiêm trọng. Biến này bắt buộc phải sử dụng nội suy trung vị theo năm để đảm bảo tính nhất quán.
 
 ### 3.3 Cơ Chế Tải Dữ Liệu Tăng Dần (Incremental Load) và Tính Bất Biến
-Để đảm bảo tính bất biến (idempotency) và tránh trùng lặp dữ liệu khi chạy lại các tiến trình tải, [load_to_bigquery.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/etl/load_to_bigquery.py) triển khai cơ chế tải tăng dần bằng câu lệnh `MERGE` SQL.
+Để đảm bảo tính bất biến (idempotency) và tránh trùng lặp dữ liệu khi chạy lại các tiến trình tải, [load_to_bigquery.py](src/etl/load_to_bigquery.py) triển khai cơ chế tải tăng dần bằng câu lệnh `MERGE` SQL.
 
 Dữ liệu mới trước tiên được đẩy vào một bảng tạm (staging table). Sau đó, câu lệnh `MERGE` so khớp các bản ghi giữa bảng thực tế chính thức và bảng tạm dựa trên tập hợp khóa chính (ví dụ như kết hợp `date_key` và `stock_key`). Nếu bản ghi đã tồn tại, hệ thống tiến hành cập nhật (UPDATE) các trường thông tin thay đổi và cập nhật trường kiểm toán hệ thống `_updated_at`. Nếu bản ghi chưa tồn tại, hệ thống tiến hành chèn mới (INSERT) toàn bộ dòng dữ liệu cùng với các trường kiểm toán hệ thống.
 
@@ -125,26 +125,26 @@ Mọi dòng dữ liệu khi đi qua quy trình biến đổi đều được t�
 
 ## 4. Chi Tiết Các Mô Hình Học Máy (Machine Learning Platform)
 
-Nền tảng học máy tích hợp sử dụng dữ liệu trực tiếp truy vấn từ Kho dữ liệu BigQuery, thực hiện huấn luyện các mô hình và ghi nhận kết quả. Đặc tả chi tiết của các mô hình học máy được mô tả tại [ml-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/ml-spec.md).
+Nền tảng học máy tích hợp sử dụng dữ liệu trực tiếp truy vấn từ Kho dữ liệu BigQuery, thực hiện huấn luyện các mô hình và ghi nhận kết quả. Đặc tả chi tiết của các mô hình học máy được mô tả tại [ml-spec.md](docs/ml-spec.md).
 
 ### 4.1 Mô Hình Dự Báo Chuỗi Thời Gian Giá Cổ Phiếu (LSTM)
-Mô hình LSTM (Long Short-Term Memory) được triển khai trong tệp [train_lstm.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/train_lstm.py) nhằm dự báo giá đóng cửa của cổ phiếu trong 5 ngày giao dịch tiếp theo ($T+1$ đến $T+5$).
+Mô hình LSTM (Long Short-Term Memory) được triển khai trong tệp [train_lstm.py](src/models/train_lstm.py) nhằm dự báo giá đóng cửa của cổ phiếu trong 5 ngày giao dịch tiếp theo ($T+1$ đến $T+5$).
 
 - **Kỹ thuật Đặc trưng (Feature Engineering):**
-  - Đối với cổ phiếu BID (có đầy đủ dữ liệu phụ trợ): Đầu vào bao gồm giá đóng cửa (`close_price`), giá mở cửa, giá cao nhất, giá thấp nhất, khối lượng giao dịch, khối lượng mua ròng khối ngoại (`foreign_net_volume`), giá trị mua ròng khối ngoại, khối lượng mua ròng tự doanh (`prop_net_volume`), giá trị mua ròng tự doanh, tỷ lệ thay đổi giá hàng ngày (`price_change_pct`), và các đặc trưng trễ 1 ngày của dòng tiền ngoại và tự doanh (`foreign_net_lag_1`, `prop_net_lag_1`). Các đặc trưng này được xây dựng trong [feature_engineering_stock.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/feature_engineering_stock.py).
+  - Đối với cổ phiếu BID (có đầy đủ dữ liệu phụ trợ): Đầu vào bao gồm giá đóng cửa (`close_price`), giá mở cửa, giá cao nhất, giá thấp nhất, khối lượng giao dịch, khối lượng mua ròng khối ngoại (`foreign_net_volume`), giá trị mua ròng khối ngoại, khối lượng mua ròng tự doanh (`prop_net_volume`), giá trị mua ròng tự doanh, tỷ lệ thay đổi giá hàng ngày (`price_change_pct`), và các đặc trưng trễ 1 ngày của dòng tiền ngoại và tự doanh (`foreign_net_lag_1`, `prop_net_lag_1`). Các đặc trưng này được xây dựng trong [feature_engineering_stock.py](src/models/feature_engineering_stock.py).
   - Đối với các cổ phiếu khác (TCB, VCB, CTG): Sử dụng các chỉ số giá cơ bản kết hợp tỷ lệ thay đổi giá và tỷ lệ thay đổi khối lượng giao dịch (`volume_change_pct`).
 - **Chuẩn hóa dữ liệu:** Sử dụng `MinMaxScaler` để đưa các đặc trưng về khoảng $[0, 1]$. Việc chuẩn hóa được thực hiện trên từng cửa sổ trượt (sliding window sequences) để tránh hiện tượng rò rỉ thông tin từ tương lai.
 - **Ràng buộc huấn luyện:** Mô hình chỉ huấn luyện trên các ngày giao dịch thực tế của sàn HOSE, không tạo thêm dữ liệu giả cho ngày nghỉ hay cuối tuần. Để tránh hiện tượng trượt giá lịch sử quá xa đối với các ngân hàng có dữ liệu dài hạn, mô hình giới hạn huấn luyện trong 750 phiên giao dịch gần nhất (khoảng 3 năm hoạt động gần đây).
 - **Cấu trúc mạng LSTM:**
   - Đối với các bộ dữ liệu nhỏ (dưới 200 mẫu): Sử dụng cấu trúc mạng đơn giản gồm 1 lớp LSTM (64 units), 1 lớp ẩn Dense (32 units) và lớp đầu ra để tránh quá khớp (overfitting).
   - Đối với các bộ dữ liệu lớn (VCB, CTG, TCB): Sử dụng cấu trúc xếp chồng (stacked LSTM) gồm 2 lớp LSTM (128 units và 64 units), xen kẽ các lớp Dropout (tỷ lệ 0.2) để điều hòa trọng số, nối tiếp bởi lớp Dense ẩn và lớp Dense đầu ra có kích thước bằng 5 (tương ứng dự báo từ T+1 đến T+5).
-- **So sánh Baseline:** Mô hình được đối chiếu trực tiếp với mô hình baseline truyền thống là **ARIMA** trong [baseline_arima.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/baseline_arima.py). Ràng buộc nghiệm thu bắt buộc là sai số bình phương trung bình chân phương (RMSE) của mô hình LSTM trên tập kiểm thử phải thấp hơn mô hình ARIMA.
+- **So sánh Baseline:** Mô hình được đối chiếu trực tiếp với mô hình baseline truyền thống là **ARIMA** trong [baseline_arima.py](src/models/baseline_arima.py). Ràng buộc nghiệm thu bắt buộc là sai số bình phương trung bình chân phương (RMSE) của mô hình LSTM trên tập kiểm thử phải thấp hơn mô hình ARIMA.
 - **Kết quả thực tế:** Mô hình LSTM đạt hiệu năng vượt trội so với ARIMA trên tất cả các mã cổ phiếu. Ví dụ, đối với BID, LSTM đạt RMSE là **0.9167** so với ARIMA là **1.1696**; đối với TCB, LSTM đạt RMSE là **1.3725** so với ARIMA là **9.4864**.
 
 ### 4.2 Mô Hình Gom Cụm Chiến Lược Hoạt Động Ngân Hàng (K-Means & PCA)
-Thuật toán học máy không giám sát được triển khai trong tệp [train_kmeans.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/train_kmeans.py) nhằm nhóm các ngân hàng thương mại tại Việt Nam dựa trên tương đồng về các chỉ số tài chính CAMELS.
+Thuật toán học máy không giám sát được triển khai trong tệp [train_kmeans.py](src/models/train_kmeans.py) nhằm nhóm các ngân hàng thương mại tại Việt Nam dựa trên tương đồng về các chỉ số tài chính CAMELS.
 
-- **Tiền xử lý dữ liệu:** Chuẩn hóa toàn bộ 47 chỉ số tài chính bằng `StandardScaler` để đưa phân phối về trung bình bằng 0 và độ lệch chuẩn bằng 1 bằng cách sử dụng các hàm trong [feature_engineering_bank.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/feature_engineering_bank.py).
+- **Tiền xử lý dữ liệu:** Chuẩn hóa toàn bộ 47 chỉ số tài chính bằng `StandardScaler` để đưa phân phối về trung bình bằng 0 và độ lệch chuẩn bằng 1 bằng cách sử dụng các hàm trong [feature_engineering_bank.py](src/models/feature_engineering_bank.py).
 - **Giảm chiều dữ liệu bằng PCA (Principal Component Analysis):** Do dữ liệu tài chính có số lượng biến rất lớn (47 cột) và có hiện tượng đa cộng tuyến cao giữa các chỉ số hiệu suất, thuật toán PCA được áp dụng để giảm chiều không gian đặc trưng. Dự án lựa chọn số lượng thành phần chính sao cho tổng phương sai giải thích tích lũy (cumulative explained variance) đạt tối thiểu **80%**. Kết quả thực tế giữ lại **3 thành phần chính** (giải thích **85.92%** lượng thông tin gốc).
 - **Lựa chọn số cụm K tối ưu:**
   - *Phương pháp cùi chỏ (Elbow Method):* Vẽ biểu đồ tổng bình phương khoảng cách trong cụm (WCSS) theo số cụm K và tìm điểm uốn.
@@ -157,14 +157,14 @@ Thuật toán học máy không giám sát được triển khai trong tệp [tr
   - *Lưu ý:* Quá trình phân cụm loại bỏ 6 ngân hàng ngoại lai đặc thù do có cấu trúc tài sản dị biệt bao gồm CB, VBSP, DAB, GPB, WEB, MDB.
 
 ### 4.3 Mô Hình Phân Loại Cảnh Báo Sớm Rủi Ro Nợ Xấu (Random Forest)
-Mô hình phân loại có giám sát được triển khai trong tệp [train_random_forest.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/train_random_forest.py) để phân loại khả năng một ngân hàng rơi vào nhóm rủi ro tài chính cao.
+Mô hình phân loại có giám sát được triển khai trong tệp [train_random_forest.py](src/models/train_random_forest.py) để phân loại khả năng một ngân hàng rơi vào nhóm rủi ro tài chính cao.
 
 - **Nhãn mục tiêu (Target Variable):** Tạo biến nhị phân `risk_label` nhận giá trị **1** nếu tỷ lệ nợ xấu (`npl_ratio`) của ngân hàng tại năm đó lớn hơn hoặc bằng **3%** (ngưỡng cảnh báo đỏ theo quy định của Ngân hàng Nhà nước), và nhận giá trị **0** nếu nhỏ hơn 3%.
 - **Phân tách tập dữ liệu (Train/Test Split):** Không sử dụng phương pháp chia ngẫu nhiên thông thường để tránh rò rỉ dữ liệu chuỗi thời gian (data leakage). Dự án sử dụng phương pháp phân tách theo mốc thời gian: Huấn luyện trên toàn bộ dữ liệu từ năm 2021 trở về trước, và kiểm thử trên toàn bộ dữ liệu của năm 2022.
 - **Ràng buộc chấp nhận nghiêm ngặt:** Do mục tiêu là phát hiện sớm rủi ro tín dụng để ngăn chặn tổn thất tài chính, mô hình bắt buộc phải đạt:
   - Chỉ số AUC-ROC lớn hơn **0.80**.
   - Độ nhạy (Recall) đối với lớp Rủi ro cao (`risk_label = 1`) lớn hơn hoặc bằng **85%**. Điều này đảm bảo hệ thống không bỏ sót các trường hợp ngân hàng thực tế có nợ xấu cao nhưng lại dự báo là an toàn.
-- **So sánh Baseline:** Mô hình Random Forest được đối chiếu với baseline là mô hình Hồi quy Logistic (Logistic Regression) trong [baseline_logistic.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/baseline_logistic.py).
+- **So sánh Baseline:** Mô hình Random Forest được đối chiếu với baseline là mô hình Hồi quy Logistic (Logistic Regression) trong [baseline_logistic.py](src/models/baseline_logistic.py).
 - **Kết quả huấn luyện thực tế:**
   - Mô hình Random Forest đạt điểm **AUC-ROC là 0.9370** (vượt xa yêu cầu 0.80).
   - Bằng cách điều chỉnh ngưỡng quyết định (decision threshold) tối ưu về mức **0.2822**, mô hình đạt chỉ số **Recall cho lớp Rủi ro cao là 85.71%**, hoàn thành chỉ tiêu nghiệp vụ đề ra.
@@ -177,10 +177,10 @@ Mô hình phân loại có giám sát được triển khai trong tệp [train_r
 
 ## 5. Trực Quan Hóa Dữ Liệu và Hệ Thống Báo Cáo (Business Intelligence)
 
-Hệ thống báo cáo được phát triển qua hai giai đoạn để đảm bảo tính chính xác về mặt nghiệp vụ trước khi triển khai trực tuyến. Đặc tả chi tiết về hệ thống báo cáo được ghi nhận tại [dashboard-spec.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/dashboard-spec.md).
+Hệ thống báo cáo được phát triển qua hai giai đoạn để đảm bảo tính chính xác về mặt nghiệp vụ trước khi triển khai trực tuyến. Đặc tả chi tiết về hệ thống báo cáo được ghi nhận tại [dashboard-spec.md](docs/dashboard-spec.md).
 
 ### 5.1 Kiểm Định Cục Bộ (Local Prototyping)
-Trước khi kết nối trực tuyến với đám mây, các đồ thị phân tích được thiết kế và kiểm tra cục bộ bằng thư viện Python Seaborn và Matplotlib thông qua tệp [local/generate_dashboard_plots.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/models/local/generate_dashboard_plots.py). Các đồ thị này bao gồm phân phối biến thế, ma trận tương quan CAMELS, biểu đồ gom cụm PCA và biểu đồ tầm quan trọng đặc trưng. Kết quả được lưu tại thư mục hình ảnh để phục vụ báo cáo khoa học.
+Trước khi kết nối trực tuyến với đám mây, các đồ thị phân tích được thiết kế và kiểm tra cục bộ bằng thư viện Python Seaborn và Matplotlib thông qua tệp [local/generate_dashboard_plots.py](src/models/local/generate_dashboard_plots.py). Các đồ thị này bao gồm phân phối biến thế, ma trận tương quan CAMELS, biểu đồ gom cụm PCA và biểu đồ tầm quan trọng đặc trưng. Kết quả được lưu tại thư mục hình ảnh để phục vụ báo cáo khoa học.
 
 ### 5.2 Bảng Điều Khiển Trực Tuyến Looker Studio
 Sau khi kiểm định dữ liệu trên BigQuery, hệ thống được kết nối trực tiếp với Looker Studio thông qua cổng kết nối gốc (Native BigQuery Connector), phân chia thành 3 trang báo cáo tương ứng với các mục tiêu nghiên cứu:
@@ -198,18 +198,18 @@ Sau khi kiểm định dữ liệu trên BigQuery, hệ thống được kết n
    - *Biểu đồ chính:* Bảng danh sách ngân hàng được sắp xếp theo mức độ rủi ro, tô màu đỏ cảnh báo đối với các đơn vị được mô hình Random Forest phân loại thuộc nhóm Rủi ro cao hoặc có xác suất dự báo nợ xấu vượt ngưỡng quyết định. Biểu đồ đường xu hướng tỷ lệ nợ xấu (`npl_ratio`) qua các năm của từng ngân hàng để nhận diện tốc độ suy thoái tài sản.
    - *Bộ lọc tương tác:* Lọc theo phân loại rủi ro (An toàn / Rủi ro cao), tên ngân hàng, và năm báo cáo.
 
-Ngoài ra, dự án còn đi kèm một giao diện ứng dụng web Streamlit cục bộ được xây dựng trong [app.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/dashboard/app.py) để người dùng có thể chạy trực quan hóa và kiểm tra kết quả ngay trên máy tính cá nhân.
+Ngoài ra, dự án còn đi kèm một giao diện ứng dụng web Streamlit cục bộ được xây dựng trong [app.py](src/dashboard/app.py) để người dùng có thể chạy trực quan hóa và kiểm tra kết quả ngay trên máy tính cá nhân.
 
 ---
 
 ## 6. Hướng Dẫn Thiết Lập và Chạy Hệ Thống
 
-Để vận hành toàn bộ hệ thống từ bước khởi tạo cơ sở dữ liệu đến chạy huấn luyện các mô hình học máy, người dùng thực hiện theo các bước chi tiết dưới đây. Các cấu hình liên quan đến môi trường được hướng dẫn chi tiết tại [env-config.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/docs/env-config.md).
+Để vận hành toàn bộ hệ thống từ bước khởi tạo cơ sở dữ liệu đến chạy huấn luyện các mô hình học máy, người dùng thực hiện theo các bước chi tiết dưới đây. Các cấu hình liên quan đến môi trường được hướng dẫn chi tiết tại [env-config.md](docs/env-config.md).
 
 ### 6.1 Môi Trường và Các Thư Viện Phụ Thuộc
 Dự án yêu cầu cài đặt phiên bản Python từ 3.9 trở lên (khuyến nghị sử dụng Python 3.9 hoặc 3.10 để đảm bảo tính tương thích tốt nhất với thư viện TensorFlow).
 
-Các thư viện cốt lõi được định nghĩa trong [requirements.txt](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/requirements.txt) bao gồm:
+Các thư viện cốt lõi được định nghĩa trong [requirements.txt](requirements.txt) bao gồm:
 - `pandas` và `openpyxl`: Phục vụ trích xuất và biến đổi dữ liệu bảng tính.
 - `google-cloud-bigquery` và `pandas-gbq`: Kết nối và nạp dữ liệu lên Google Cloud BigQuery.
 - `scikit-learn`: Triển khai các mô hình học máy cổ điển (K-Means, PCA, Random Forest, Logistic Regression).
@@ -221,7 +221,7 @@ Người dùng cần tạo một tệp `.env` tại thư mục gốc của dự 
 
 ```bash
 # Đường dẫn tuyệt đối đến tệp JSON chứa khóa bảo mật của tài khoản dịch vụ GCP
-GOOGLE_APPLICATION_CREDENTIALS="D:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/vn-banking-dwh-analytics-67f213ad7317.json"
+GOOGLE_APPLICATION_CREDENTIALS="./vn-banking-dwh-analytics-67f213ad7317.json"
 
 # Mã dự án Google Cloud Platform
 GCP_PROJECT_ID="vn-banking-dwh-analytics"
@@ -311,8 +311,8 @@ Sau khi dữ liệu đã được nạp và kiểm định thành công trên Kh
 
 ## 7. Quy Chuẩn Lập Trình và Bảo Mật Hệ Thống
 
-Để dự án hoạt động ổn định và dễ bảo trì trong môi trường sản xuất thực tế, toàn bộ mã nguồn phải tuân thủ nghiêm ngặt các quy chuẩn kỹ thuật được định nghĩa tại [DEVELOPMENT.md](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/DEVELOPMENT.md):
+Để dự án hoạt động ổn định và dễ bảo trì trong môi trường sản xuất thực tế, toàn bộ mã nguồn phải tuân thủ nghiêm ngặt các quy chuẩn kỹ thuật được định nghĩa tại [DEVELOPMENT.md](DEVELOPMENT.md):
 
-- **Ghi nhật ký hệ thống (Logging):** Tuyệt đối không sử dụng hàm `print()` thông thường trong các tệp tin sản xuất thuộc thư mục `src/etl/` và `src/models/`. Hệ thống bắt buộc phải sử dụng thư viện logging chuẩn hóa được cấu hình trong [logger.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/utils/logger.py). Điều này giúp phân loại thông tin log theo các cấp độ `INFO`, `WARNING`, `ERROR`, hỗ trợ giám sát và gỡ lỗi từ xa một cách khoa học.
-- **Bảo mật thông tin cấu hình:** Không được nhúng cứng (hardcode) các thông tin nhạy cảm như ID dự án GCP, tên Dataset, hoặc nội dung của tệp khóa bảo mật JSON vào trong mã nguồn. Mọi cấu hình phải được nạp động từ biến môi trường thông qua tệp cấu hình trung tâm [config.py](file:///d:/HCMUTE/HCMUTE_HK6/DataAnalysis/final/project2/vn-banking-dwh-analytics/src/utils/config.py).
+- **Ghi nhật ký hệ thống (Logging):** Tuyệt đối không sử dụng hàm `print()` thông thường trong các tệp tin sản xuất thuộc thư mục `src/etl/` và `src/models/`. Hệ thống bắt buộc phải sử dụng thư viện logging chuẩn hóa được cấu hình trong [logger.py](src/utils/logger.py). Điều này giúp phân loại thông tin log theo các cấp độ `INFO`, `WARNING`, `ERROR`, hỗ trợ giám sát và gỡ lỗi từ xa một cách khoa học.
+- **Bảo mật thông tin cấu hình:** Không được nhúng cứng (hardcode) các thông tin nhạy cảm như ID dự án GCP, tên Dataset, hoặc nội dung của tệp khóa bảo mật JSON vào trong mã nguồn. Mọi cấu hình phải được nạp động từ biến môi trường thông qua tệp cấu hình trung tâm [config.py](src/utils/config.py).
 - **Tính bất biến của dữ liệu chuỗi thời gian:** Trong quá trình chuẩn bị dữ liệu đầu vào cho mô hình LSTM, tuyệt đối không sử dụng phương pháp nội suy tiếp diễn (forward-fill) để tạo ra các dòng dữ liệu nhân tạo cho các ngày nghỉ hoặc ngày lễ giao dịch. Dữ liệu huấn luyện mô hình bắt buộc phải phản ánh chính xác các phiên giao dịch thực tế của sàn HOSE để tránh làm sai lệch mô hình dự báo chuỗi thời gian.
