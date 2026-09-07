@@ -5,21 +5,16 @@ Tài liệu này lưu lại trạng thái tức thời (Hot Context) của phiê
 ---
 
 ## 1. Trạng Thái Hiện Tại
-* **Nhánh làm việc Git:** `refactor/v1-cleanup`
-* **Commit gần nhất:** `1b114bf feat: add Looker Studio scorecard verification script and pipeline import smoke tests`
-* **Mục tiêu phiên:** Hoàn tất Phase R1 (Hygiene & Harness) -> Thực thi Phase R2 (BigQuery Zero-Duplicate) -> Phase R3 (CAMELS Data Quality).
-* **Tiến độ bộ khung Harness:**
-  - `docs/spec/`: Hoàn thành 3 spec (`01-dwh-idempotency`, `02-camels-data-quality`, `03-code-hygiene-testing`).
-  - `docs/adr/`: Hoàn thành 3 ADR (`0001-idempotent-bigquery-loading`, `0002-camels-bounds-and-outliers`, `0003-modular-test-suite`).
-  - `docs/plan/`: Hoàn thành lộ trình tổng thể và checklist tác vụ chi tiết.
-  - `docs/memory/`: Hoàn thành nhật ký lỗi và quy chuẩn nghiệp vụ.
+* **Nhánh làm việc Git:** `main` (clean working tree).
+* **Release Version:** Tag `v1.1.0` đã phát hành và đẩy lên GitHub.
+* **CI/CD Pipeline:** Đã thiết lập GitHub Actions ([.github/workflows/ci.yml](../../.github/workflows/ci.yml)). Run 34100220340: **SUCCESS** trên cả Python 3.10 và 3.11.
+* **GCP BigQuery Environment:** Dataset `financial_dwh` trong project `vn-banking-dwh-analytics` (`asia-southeast1`). Toàn bộ 10 bảng (5 Dim, 2 Fact, 3 ML Output) sạch, không trùng lặp (0 duplicate keys), chất lượng dữ liệu CAMELS đạt chuẩn Thông tư SBV.
+* **Harness Architecture:** Hoàn tất 11 tài liệu kỹ thuật chuẩn trong `docs/spec/`, `docs/adr/`, `docs/plan/`, `docs/memory/`.
 
-## 2. Việc Đang Triển Khai Tiếp Theo
-1. Hoàn tất Phase R1:
-   - Sửa side-effect ở `src/etl/extract_data.py`.
-   - Cập nhật `tests/test_pipeline_imports.py` hỗ trợ `--tier {etl, ml, dashboard, all}`.
-2. Triển khai Phase R2:
-   - Sửa `src/etl/load_to_bigquery.py` fallback sang `WRITE_TRUNCATE`.
-   - Viết `scripts/check_duplicates.py`.
-3. Triển khai Phase R3:
-   - Sửa `src/etl/load_bank_performance.py` cho `npl_ratio` và bounds CAMELS.
+---
+
+## 2. Kết Quả Kiểm Thử & CI Tự Động
+1. **Compilation Check**: `python -m compileall -q src tests scripts` -> **PASS**.
+2. **Core DWH Smoke Test**: `python tests/test_pipeline_imports.py --tier etl` -> **13/13 PASS**.
+3. **Data Integrity & Star Schema**: `python -m src.etl.validate_integrity` -> **TOTAL ERRORS FOUND: 0**.
+4. **Primary Key Uniqueness**: `python scripts/check_duplicates.py` -> **0 duplicate keys trên toàn bộ 9 bảng**.
