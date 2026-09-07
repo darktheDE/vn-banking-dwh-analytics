@@ -1,5 +1,9 @@
 """Task B-09: Load fact_foreign_trading.
 
+.. deprecated:: 1.1
+    Merged into fact_stock_daily_metrics.
+    Retained for historical reference only.
+
 Reads the raw BID foreign trading data, cleans it, handles missing values
 using forward-fill (max 1 day), and saves it locally as a CSV.
 """

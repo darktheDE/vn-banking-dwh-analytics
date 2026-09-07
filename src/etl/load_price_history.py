@@ -1,5 +1,9 @@
 """Task B-08: Load fact_price_history.
 
+.. deprecated:: 1.1
+    Use src.etl.consolidate_stock_metrics instead.
+    Retained for historical reference and individual file audit only.
+
 Reads raw/processed price history data for focus banks (BID, TCB, VCB, CTG),
 cleans and standardizes the prices, and saves a consolidated fact DataFrame
 locally as a CSV file.

@@ -134,3 +134,36 @@ CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_bank_performance` (
 )
 PARTITION BY RANGE_BUCKET(date_key, GENERATE_ARRAY(20020101, 20301231, 10000))
 CLUSTER BY bank_key;
+
+-- ------------------------------------------------------------
+-- 3. Machine Learning Output Tables
+-- ------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `{dataset_id}.bank_cluster_assignments` (
+  bank_key INT64 NOT NULL,
+  bank_code STRING NOT NULL,
+  bank_name STRING,
+  bank_type STRING,
+  cluster_id INT64 NOT NULL,
+  cluster_name STRING,
+  model_name STRING
+);
+
+CREATE TABLE IF NOT EXISTS `{dataset_id}.bank_risk_predictions` (
+  bank_key INT64 NOT NULL,
+  bank_code STRING NOT NULL,
+  date_key INT64 NOT NULL,
+  risk_label INT64 NOT NULL,
+  risk_probability FLOAT64,
+  actual_npl_ratio FLOAT64,
+  model_name STRING
+);
+
+CREATE TABLE IF NOT EXISTS `{dataset_id}.fact_model_predictions` (
+  base_date_key INT64 NOT NULL,
+  stock_key INT64 NOT NULL,
+  horizon STRING NOT NULL,
+  predicted_close_price FLOAT64,
+  model_name STRING
+);
+

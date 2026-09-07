@@ -21,14 +21,10 @@ if hasattr(sys.stdout, 'reconfigure'):
 load_dotenv()
 config = load_config()
 DATA_DIR = os.path.join(config.processed_data_path, "raw_extractions")
-os.makedirs(DATA_DIR, exist_ok=True)
 
 # Danh sách các mã cổ phiếu cần tải dữ liệu
 SYMBOLS = ['BID', 'TCB', 'VCB', 'CTG']
 
-logger.info("==================================================================")
-logger.info("   BẮT ĐẦU QUÁ TRÌNH TRÍCH XUẤT DỮ LIỆU NGÂN HÀNG (BID - TCB)")
-logger.info("==================================================================")
 
 # ==============================================================================
 # HỢP PHẦN 1: TẢI VÀ GỘP LỊCH SỬ GIÁ CỔ PHIẾU
@@ -106,6 +102,11 @@ def transpose_and_clean(df, report_type):
 # QUÁ TRÌNH CHẠY CHÍNH
 # ==============================================================================
 def main():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    logger.info("==================================================================")
+    logger.info("   BẮT ĐẦU QUÁ TRÌNH TRÍCH XUẤT DỮ LIỆU NGÂN HÀNG (BID - TCB - VCB - CTG)")
+    logger.info("==================================================================")
+
     all_mappings = []
 
     for symbol in SYMBOLS:

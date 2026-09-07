@@ -249,8 +249,12 @@ def load_incremental_via_merge(
     except Exception as e:
         # Check if DML/billing is disabled (free-tier constraint)
         if "billingNotEnabled" in str(e) or "Billing has not been enabled" in str(e):
-            logger.warning("Billing is disabled on this Google Cloud project. DML/MERGE is blocked in the free tier.")
-            logger.warning("Falling back to loading directly via standard append load (WRITE_APPEND)...")
+            logger.warning(
+                "Billing is disabled on this Google Cloud project (BigQuery Free Sandbox). DML/MERGE is blocked."
+            )
+            logger.warning(
+                "Falling back to idempotent table replacement (WRITE_TRUNCATE) per ADR-0001 to prevent duplicate rows..."
+            )
             
             # Clean up staging table if it was created
             try:
@@ -259,11 +263,15 @@ def load_incremental_via_merge(
                 pass
                 
             job_config = bigquery.LoadJobConfig(
-                write_disposition="WRITE_APPEND"
+                write_disposition="WRITE_TRUNCATE"
             )
             job = client.load_table_from_dataframe(df, target_table_id, job_config=job_config)
             job.result()
-            logger.info("Successfully loaded %d rows directly to %s using WRITE_APPEND fallback.", len(df), table_name)
+            logger.info(
+                "Successfully loaded %d rows directly to %s using WRITE_TRUNCATE fallback (idempotent).",
+                len(df),
+                table_name,
+            )
         else:
             raise e
 
