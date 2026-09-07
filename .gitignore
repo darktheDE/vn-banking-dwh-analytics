@@ -30,3 +30,9 @@ reports/models/
 # Data files exceptions
 data/*.zip
 
+# Audit scratch directory (created by Claude Code session for ad-hoc queries)
+_audit/
+
+# Local venv (added in v1.0.0; sometimes created outside the standard venv/ path)
+.python-version-installed
+

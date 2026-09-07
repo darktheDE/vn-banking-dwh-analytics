@@ -157,6 +157,7 @@ def _resolve_workbook_path() -> Path:
 		Path(raw_data_path) / WORKBOOK_NAME,
 		Path("./data") / WORKBOOK_NAME,
 		Path("./data/raw") / WORKBOOK_NAME,
+		Path("./docs/ref") / WORKBOOK_NAME,
 	]
 
 	for workbook_path in candidate_paths:
@@ -276,11 +277,32 @@ def _standardize_raw_frame(raw_df: pd.DataFrame) -> pd.DataFrame:
 		df["cir"].notna(),
 		df["non_interest_expense"] / (df["net_interest_income"].abs() + df["non_interest_income"].abs()),
 	)
-	df["npl_ratio"] = df["npl_ratio"].where(df["npl_ratio"].notna(), df["npl_amount"] / df["total_loans"])
-	df["llp_ratio"] = df["llp_ratio"].where(df["llp_ratio"].notna(), df["loan_loss_provision"] / df["total_loans"])
+	df["npl_ratio"] = df["npl_ratio"].where(df["npl_ratio"].notna(), df["npl_amount"].abs() / df["total_loans"].abs())
+	df["llp_ratio"] = df["llp_ratio"].where(df["llp_ratio"].notna(), df["loan_loss_provision"].abs() / df["total_loans"].abs())
 	df["lta"] = df["total_loans"] / df["total_assets"]
 	df["ltd"] = df["total_loans"] / df["total_deposits"]
 	df["gta"] = df["total_loans"] / df["total_assets"]
+
+	# Enforce mathematical domain constraints per SPEC-02 & ADR-0002
+	# Contra-assets in raw Excel may have negative signs: enforce non-negativity
+	df["npl_ratio"] = df["npl_ratio"].abs()
+	df["llp_ratio"] = df["llp_ratio"].abs()
+
+	# If ratio was provided as percentage > 1.0 (e.g. 3.5 instead of 0.035), normalize to [0, 1]
+	df.loc[df["npl_ratio"] > 1.0, "npl_ratio"] = df.loc[df["npl_ratio"] > 1.0, "npl_ratio"] / 100.0
+	df.loc[df["llp_ratio"] > 1.0, "llp_ratio"] = df.loc[df["llp_ratio"] > 1.0, "llp_ratio"] / 100.0
+
+	# Clamp NPL strictly within [0.0, 1.0]
+	df["npl_ratio"] = df["npl_ratio"].clip(lower=0.0, upper=1.0)
+
+	# Warn on unusual ratios for non-FOCB banks (domestic commercial banks)
+	domestic_mask = ~df["bank_type"].isin(["FOCB", "FOREIGN"])
+	extreme_nim = df[domestic_mask & (df["nim"] > 0.20)]
+	if not extreme_nim.empty:
+		logger.warning("Detected %d rows with extreme NIM (>20%%) in domestic commercial banks.", len(extreme_nim))
+	extreme_ltd = df[domestic_mask & (df["ltd"] > 2.0)]
+	if not extreme_ltd.empty:
+		logger.warning("Detected %d rows with extreme LTD (>200%%) in domestic commercial banks.", len(extreme_ltd))
 
 	return df
 

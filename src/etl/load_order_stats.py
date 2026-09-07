@@ -1,5 +1,9 @@
 """Task B-11: Load fact_order_stats.
 
+.. deprecated:: 1.1
+    Merged into fact_stock_daily_metrics.
+    Retained for historical reference only.
+
 Reads the raw BID order statistics data, cleans it, rejects null rows
 (no forward-fill), and saves it locally as a CSV.
 """
